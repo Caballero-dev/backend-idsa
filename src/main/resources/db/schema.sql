@@ -14,12 +14,12 @@ CREATE TABLE modalities
     PRIMARY KEY (modality_id)
 );
 
-CREATE TABLE especialities
+CREATE TABLE specialties
 (
-    especiality_id   SERIAL,
-    especiality_name VARCHAR(100) UNIQUE NOT NULL,
-    short_name       VARCHAR(10) UNIQUE  NOT NULL,
-    PRIMARY KEY (especiality_id)
+    speciality_id   SERIAL,
+    speciality_name VARCHAR(100) UNIQUE NOT NULL,
+    short_name      VARCHAR(10) UNIQUE  NOT NULL,
+    PRIMARY KEY (speciality_id)
 );
 
 CREATE TABLE grades
@@ -89,18 +89,18 @@ CREATE TABLE group_configuration
 (
     group_configuration_id SERIAL,
     campus_id              INT NOT NULL,
-    especiality_id         INT NOT NULL,
+    speciality_id          INT NOT NULL,
     modality_id            INT NOT NULL,
     grade_id               INT NOT NULL,
     group_id               INT NOT NULL,
     generation_id          INT NOT NULL,
     tutor_id               INT NOT NULL,
     PRIMARY KEY (group_configuration_id),
-    CONSTRAINT unique_group_configuration UNIQUE (campus_id, especiality_id, modality_id, grade_id, group_id,
+    CONSTRAINT unique_group_configuration UNIQUE (campus_id, speciality_id, modality_id, grade_id, group_id,
                                                   generation_id),
     FOREIGN KEY (campus_id) REFERENCES campuses (campus_id),
     FOREIGN KEY (modality_id) REFERENCES modalities (modality_id),
-    FOREIGN KEY (especiality_id) REFERENCES especialities (especiality_id),
+    FOREIGN KEY (speciality_id) REFERENCES specialties (speciality_id),
     FOREIGN KEY (grade_id) REFERENCES grades (grade_id),
     FOREIGN KEY (group_id) REFERENCES groups (group_id),
     FOREIGN KEY (generation_id) REFERENCES generations (generation_id),
