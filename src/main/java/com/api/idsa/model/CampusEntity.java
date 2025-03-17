@@ -17,7 +17,7 @@ public class CampusEntity {
     @Column(name = "campus_id")
     private Long campusId;
 
-    @Column(name = "campus_name")
+    @Column(name = "campus_name", length = 100, nullable = false, unique = true)
     private String campusName;
 
 }
