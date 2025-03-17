@@ -6,18 +6,18 @@ import lombok.Data;
 import lombok.NoArgsConstructor;
 
 @Entity
-@Table(name = "campuses")
+@Table(name = "modalities")
 @Data
 @AllArgsConstructor
 @NoArgsConstructor
-public class CampusEntity {
+public class ModalityEntity {
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
-    @Column(name = "campus_id")
-    private Long campusId;
+    @Column(name = "modality_id")
+    private Long modalityId;
 
-    @Column(name = "campus_name", length = 100, nullable = false, unique = true)
-    private String campusName;
+    @Column(name = "modality_name", length = 50, nullable = false, unique = true)
+    private String modalityName;
 
 }

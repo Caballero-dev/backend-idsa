@@ -3,12 +3,16 @@ package com.api.idsa.exception;
 import com.api.idsa.dto.response.ErrorMessageResponse;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.validation.FieldError;
+import org.springframework.web.bind.MethodArgumentNotValidException;
 import org.springframework.web.bind.annotation.ExceptionHandler;
 import org.springframework.web.bind.annotation.RestControllerAdvice;
 import org.springframework.web.context.request.WebRequest;
 
 import java.time.LocalDateTime;
 import java.time.format.DateTimeFormatter;
+import java.util.ArrayList;
+import java.util.List;
 
 @RestControllerAdvice
 public class GlobalExceptionHandler {
@@ -20,7 +24,7 @@ public class GlobalExceptionHandler {
                 .status(HttpStatus.NOT_FOUND.getReasonPhrase())
                 .timestamp(LocalDateTime.now().format(DateTimeFormatter.ISO_DATE_TIME))
                 .message(ex.getMessage())
-                .description(request.getDescription(false))
+                .path(request.getDescription(false).replace("uri=", ""))
                 .error("Resource Not Found")
                 .build();
         return ResponseEntity.status(HttpStatus.NOT_FOUND).body(errorMessageResponse);
@@ -33,10 +37,49 @@ public class GlobalExceptionHandler {
                 .status(HttpStatus.CONFLICT.getReasonPhrase())
                 .timestamp(LocalDateTime.now().format(DateTimeFormatter.ISO_DATE_TIME))
                 .message(ex.getMessage())
-                .description(request.getDescription(false))
+                .path(request.getDescription(false).replace("uri=", ""))
                 .error("Duplicate Resource")
                 .build();
         return ResponseEntity.status(HttpStatus.CONFLICT).body(errorMessageResponse);
+    }
+
+    @ExceptionHandler(MethodArgumentNotValidException.class)
+    public ResponseEntity<ErrorMessageResponse> handleValidationExceptions(
+            MethodArgumentNotValidException ex, WebRequest request) {
+
+        List<ErrorMessageResponse.ValidationError> validationErrors = new ArrayList<>();
+
+        ex.getBindingResult().getAllErrors().forEach((error) -> {
+            String fieldName = "";
+            String rejectedValue = "";
+
+            if (error instanceof FieldError) {
+                fieldName = ((FieldError) error).getField();
+                rejectedValue = ((FieldError) error).getRejectedValue() != null ?
+                        ((FieldError) error).getRejectedValue().toString() : "";
+            }
+
+            validationErrors.add(
+                    ErrorMessageResponse.ValidationError.builder()
+                            .code(error.getCode())
+                            .field(fieldName)
+                            .message(error.getDefaultMessage())
+                            .rejectedValue(rejectedValue)
+                            .build()
+            );
+        });
+
+        ErrorMessageResponse errorResponse = ErrorMessageResponse.builder()
+                .timestamp(LocalDateTime.now().format(DateTimeFormatter.ISO_DATE_TIME))
+                .statusCode(HttpStatus.BAD_REQUEST.value())
+                .status(HttpStatus.BAD_REQUEST.getReasonPhrase())
+                .error(HttpStatus.BAD_REQUEST.getReasonPhrase())
+                .message("Validation failed")
+                .path(request.getDescription(false).replace("uri=", ""))
+                .validationErrors(validationErrors)
+                .build();
+
+        return new ResponseEntity<>(errorResponse, HttpStatus.BAD_REQUEST);
     }
 
 }

@@ -5,6 +5,7 @@ import com.api.idsa.dto.response.CampusResponse;
 import com.api.idsa.exception.DuplicateResourceException;
 import com.api.idsa.exception.ResourceNotFoundException;
 import com.api.idsa.service.ICampusService;
+import jakarta.validation.Valid;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
@@ -24,12 +25,12 @@ public class CampusController {
     }
 
     @PostMapping
-    public ResponseEntity<CampusResponse> createCampus(@RequestBody CampusRequest campusRequest) throws DuplicateResourceException {
+    public ResponseEntity<CampusResponse> createCampus(@Valid @RequestBody CampusRequest campusRequest) throws DuplicateResourceException {
         return ResponseEntity.ok(campusService.createCampus(campusRequest));
     }
 
     @PutMapping("/{campusId}")
-    public ResponseEntity<CampusResponse> updateCampus(@PathVariable Long campusId, @RequestBody CampusRequest campusRequest) throws ResourceNotFoundException, DuplicateResourceException {
+    public ResponseEntity<CampusResponse> updateCampus(@PathVariable Long campusId, @Valid @RequestBody CampusRequest campusRequest) throws ResourceNotFoundException, DuplicateResourceException {
         return ResponseEntity.ok(campusService.updateCampus(campusId, campusRequest));
     }
 
