@@ -1,6 +1,7 @@
-package com.api.idsa.validation;
+package com.api.idsa.validation.validator;
 
 import com.api.idsa.dto.request.GenerationRequest;
+import com.api.idsa.validation.annotation.YearRange;
 import jakarta.validation.ConstraintValidator;
 import jakarta.validation.ConstraintValidatorContext;
 

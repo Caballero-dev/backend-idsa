@@ -1,6 +1,6 @@
 package com.api.idsa.dto.request;
 
-import com.api.idsa.validation.YearRange;
+import com.api.idsa.validation.annotation.YearRange;
 import jakarta.validation.constraints.NotNull;
 import lombok.AllArgsConstructor;
 import lombok.Data;
