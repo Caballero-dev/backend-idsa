@@ -24,4 +24,8 @@ public class GenerationEntity {
 
     @Column(name = "end_year", nullable = false)
     private LocalDate endYear;
+
+//    @OneToMany(mappedBy = "generation")
+//    private List<GroupConfigurationEntity> groupConfigurations;
+
 }

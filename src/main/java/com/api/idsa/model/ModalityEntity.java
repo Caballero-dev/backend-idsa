@@ -20,4 +20,7 @@ public class ModalityEntity {
     @Column(name = "modality_name", length = 50, nullable = false, unique = true)
     private String modalityName;
 
+//    @OneToMany(mappedBy = "modality")
+//    private List<GroupConfigurationEntity> groupConfigurations;
+
 }

@@ -20,4 +20,7 @@ public class GroupEntity {
     @Column(name = "group_name", length = 2, nullable = false, unique = true)
     private String groupName;
 
+//    @OneToMany(mappedBy = "group")
+//    private List<GroupConfigurationEntity> groupConfigurations;
+
 }

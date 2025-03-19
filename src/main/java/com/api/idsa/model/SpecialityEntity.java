@@ -23,4 +23,7 @@ public class SpecialityEntity {
     @Column(name = "short_name", length = 10, nullable = false, unique = true)
     private String shortName;
 
+//    @OneToMany(mappedBy = "specialty")
+//    private List<GroupConfigurationEntity> groupConfigurations;
+
 }
