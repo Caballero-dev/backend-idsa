@@ -55,11 +55,11 @@ CREATE TABLE roles
 CREATE TABLE users
 (
     user_id    SERIAL,
-    role_id    INT                 NOT NULL,
-    email      VARCHAR(100) UNIQUE NOT NULL,
-    password   VARCHAR(255)        NOT NULL,
-    created_at TIMESTAMP           NOT NULL DEFAULT CURRENT_TIMESTAMP,
-    is_active  BOOLEAN             NOT NULL DEFAULT TRUE,
+    role_id    INT                      NOT NULL,
+    email      VARCHAR(100) UNIQUE      NOT NULL,
+    password   VARCHAR(255)             NOT NULL,
+    created_at TIMESTAMP WITH TIME ZONE NOT NULL DEFAULT CURRENT_TIMESTAMP,
+    is_active  BOOLEAN                  NOT NULL DEFAULT TRUE,
     PRIMARY KEY (user_id),
     FOREIGN KEY (role_id) REFERENCES roles (role_id)
 );
@@ -121,15 +121,23 @@ CREATE TABLE students
 CREATE TABLE reports
 (
     report_id            SERIAL,
-    student_id           INT           NOT NULL,
-    images_paths         VARCHAR[],
-    temperature          NUMERIC(4, 2) NOT NULL,
-    pupil_dilation_right NUMERIC(4, 2) NOT NULL,
-    pupil_dilation_left  NUMERIC(4, 2) NOT NULL,
-    heart_rate           NUMERIC(4, 2) NOT NULL,
-    oxygen_levels        NUMERIC(4, 2) NOT NULL,
-    prediction_result    NUMERIC(5, 2) NOT NULL,
-    created_at           TIMESTAMP     NOT NULL DEFAULT CURRENT_TIMESTAMP,
+    student_id           INT                      NOT NULL,
+    temperature          NUMERIC(4, 2)            NOT NULL,
+    pupil_dilation_right NUMERIC(4, 2)            NOT NULL,
+    pupil_dilation_left  NUMERIC(4, 2)            NOT NULL,
+    heart_rate           NUMERIC(4, 2)            NOT NULL,
+    oxygen_levels        NUMERIC(4, 2)            NOT NULL,
+    prediction_result    NUMERIC(5, 2)            NOT NULL,
+    created_at           TIMESTAMP WITH TIME ZONE NOT NULL DEFAULT CURRENT_TIMESTAMP,
     PRIMARY KEY (report_id),
     FOREIGN KEY (student_id) REFERENCES students (student_id)
+);
+
+CREATE TABLE report_images
+(
+    image_id   SERIAL,
+    report_id  INT     NOT NULL,
+    image_path VARCHAR NOT NULL,
+    PRIMARY KEY (image_id),
+    FOREIGN KEY (report_id) REFERENCES reports (report_id)
 );
