@@ -20,7 +20,4 @@ public class RoleEntity {
     @Column(name = "role_name", length = 50, nullable = false, unique = true)
     private String roleName;
 
-//    @OneToMany(mappedBy = "role")
-//    private List<UserEntity> users;
-
 }
