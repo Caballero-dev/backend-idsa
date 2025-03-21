@@ -55,25 +55,25 @@ CREATE TABLE roles
 CREATE TABLE users
 (
     user_id    SERIAL,
+    person_id  INT                      NOT NULL,
     role_id    INT                      NOT NULL,
     email      VARCHAR(100) UNIQUE      NOT NULL,
     password   VARCHAR(255)             NOT NULL,
     created_at TIMESTAMP WITH TIME ZONE NOT NULL DEFAULT CURRENT_TIMESTAMP,
     is_active  BOOLEAN                  NOT NULL DEFAULT TRUE,
     PRIMARY KEY (user_id),
+    FOREIGN KEY (person_id) REFERENCES people (person_id),
     FOREIGN KEY (role_id) REFERENCES roles (role_id)
 );
 
 CREATE TABLE people
 (
     person_id      SERIAL,
-    user_id        INT                NOT NULL,
     name           VARCHAR(50)        NOT NULL,
     first_surname  VARCHAR(50)        NOT NULL,
     second_surname VARCHAR(50)        NOT NULL,
     phone_number   VARCHAR(10) UNIQUE NOT NULL,
     PRIMARY KEY (person_id),
-    FOREIGN KEY (user_id) REFERENCES users (user_id)
 );
 
 CREATE TABLE tutors
