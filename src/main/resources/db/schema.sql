@@ -45,6 +45,16 @@ CREATE TABLE generations
     CONSTRAINT unique_generation UNIQUE (start_year, end_year)
 );
 
+CREATE TABLE people
+(
+    person_id      SERIAL,
+    name           VARCHAR(50)        NOT NULL,
+    first_surname  VARCHAR(50)        NOT NULL,
+    second_surname VARCHAR(50)        NOT NULL,
+    phone_number   VARCHAR(10) UNIQUE NOT NULL,
+    PRIMARY KEY (person_id)
+);
+
 CREATE TABLE roles
 (
     role_id   SERIAL,
@@ -64,16 +74,6 @@ CREATE TABLE users
     PRIMARY KEY (user_id),
     FOREIGN KEY (person_id) REFERENCES people (person_id),
     FOREIGN KEY (role_id) REFERENCES roles (role_id)
-);
-
-CREATE TABLE people
-(
-    person_id      SERIAL,
-    name           VARCHAR(50)        NOT NULL,
-    first_surname  VARCHAR(50)        NOT NULL,
-    second_surname VARCHAR(50)        NOT NULL,
-    phone_number   VARCHAR(10) UNIQUE NOT NULL,
-    PRIMARY KEY (person_id),
 );
 
 CREATE TABLE tutors
