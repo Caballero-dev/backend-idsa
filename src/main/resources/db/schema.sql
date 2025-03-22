@@ -69,8 +69,8 @@ CREATE TABLE users
     role_id    INT                      NOT NULL,
     email      VARCHAR(100) UNIQUE      NOT NULL,
     password   VARCHAR(255)             NOT NULL,
-    created_at TIMESTAMP WITH TIME ZONE NOT NULL DEFAULT CURRENT_TIMESTAMP,
-    is_active  BOOLEAN                  NOT NULL DEFAULT TRUE,
+    created_at TIMESTAMP WITH TIME ZONE NOT NULL,
+    is_active  BOOLEAN                  NOT NULL,
     PRIMARY KEY (user_id),
     FOREIGN KEY (person_id) REFERENCES people (person_id),
     FOREIGN KEY (role_id) REFERENCES roles (role_id)
@@ -128,7 +128,7 @@ CREATE TABLE reports
     heart_rate           NUMERIC(4, 2)            NOT NULL,
     oxygen_levels        NUMERIC(4, 2)            NOT NULL,
     prediction_result    NUMERIC(5, 2)            NOT NULL,
-    created_at           TIMESTAMP WITH TIME ZONE NOT NULL DEFAULT CURRENT_TIMESTAMP,
+    created_at           TIMESTAMP WITH TIME ZONE NOT NULL,
     PRIMARY KEY (report_id),
     FOREIGN KEY (student_id) REFERENCES students (student_id)
 );
