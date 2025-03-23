@@ -1,6 +1,7 @@
 package com.api.idsa.exception;
 
 import com.api.idsa.dto.response.ErrorMessageResponse;
+import org.springframework.dao.DataIntegrityViolationException;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.validation.FieldError;
@@ -54,6 +55,19 @@ public class GlobalExceptionHandler {
                 .error("User Creation Denied")
                 .build();
         return ResponseEntity.status(HttpStatus.FORBIDDEN).body(errorMessageResponse);
+    }
+
+    @ExceptionHandler(DataIntegrityViolationException.class)
+    public ResponseEntity<ErrorMessageResponse> handleDataIntegrityViolationException(DataIntegrityViolationException ex, WebRequest request) {
+        ErrorMessageResponse errorMessageResponse = ErrorMessageResponse.builder()
+                .statusCode(HttpStatus.INTERNAL_SERVER_ERROR.value())
+                .status(HttpStatus.INTERNAL_SERVER_ERROR.getReasonPhrase())
+                .timestamp(LocalDateTime.now().format(DateTimeFormatter.ISO_DATE_TIME))
+                .message(ex.getMessage())
+                .path(request.getDescription(false).replace("uri=", ""))
+                .error("Data Integrity Violation")
+                .build();
+        return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(errorMessageResponse);
     }
 
     @ExceptionHandler(MethodArgumentNotValidException.class)
