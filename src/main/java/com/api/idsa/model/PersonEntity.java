@@ -1,6 +1,5 @@
 package com.api.idsa.model;
 
-import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import jakarta.persistence.*;
 import lombok.AllArgsConstructor;
 import lombok.Data;
@@ -18,9 +17,7 @@ public class PersonEntity {
     @Column(name = "person_id")
     private Long personId;
 
-    @OneToOne(fetch = FetchType.EAGER)
-    @JoinColumn(name = "user_id", nullable = false)
-    @JsonIgnoreProperties("person")
+    @OneToOne(mappedBy = "person")
     private UserEntity user;
 
     @Column(name = "name", nullable = false, length = 50)
@@ -35,12 +32,10 @@ public class PersonEntity {
     @Column(name = "phone_number", unique = true, nullable = false, length = 10)
     private String phoneNumber;
 
-    @OneToOne(mappedBy = "person", cascade = CascadeType.ALL)
-    @JsonIgnoreProperties("person")
+    @OneToOne(mappedBy = "person")
     private TutorEntity tutor;
 
-    @OneToOne(mappedBy = "person", cascade = CascadeType.ALL)
-    @JsonIgnoreProperties("person")
+    @OneToOne(mappedBy = "person")
     private StudentEntity student;
 
 }

@@ -20,9 +20,8 @@ public class TutorEntity {
     @Column(name = "tutor_id")
     private Long tutorId;
 
-    @OneToOne(fetch = FetchType.EAGER)
+    @OneToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "person_id", nullable = false)
-    @JsonIgnoreProperties({"tutor", "student"})
     private PersonEntity person;
 
     @Column(name = "employee_code", unique = true, nullable = false, length = 20)

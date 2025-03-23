@@ -1,11 +1,17 @@
 package com.api.idsa.model;
 
 import jakarta.persistence.*;
+import lombok.AllArgsConstructor;
+import lombok.Data;
+import lombok.NoArgsConstructor;
 
 import java.time.ZonedDateTime;
 
 @Entity
 @Table(name = "users")
+@Data
+@AllArgsConstructor
+@NoArgsConstructor
 public class UserEntity {
 
     @Id
@@ -13,7 +19,11 @@ public class UserEntity {
     @Column(name = "user_id")
     private Long userId;
 
-    @ManyToOne(fetch = FetchType.EAGER)
+    @OneToOne(fetch = FetchType.LAZY)
+    @JoinColumn(name = "person_id", nullable = false)
+    private PersonEntity person;
+
+    @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "role_id", nullable = false)
     private RoleEntity role;
 
@@ -27,10 +37,6 @@ public class UserEntity {
     private ZonedDateTime createdAt;
 
     @Column(name = "is_active", nullable = false)
-    private Boolean isActive = true;
-
-//    @OneToOne(mappedBy = "user", cascade = CascadeType.ALL, fetch = FetchType.EAGER)
-    @OneToOne(mappedBy = "user", fetch = FetchType.EAGER)
-    private PersonEntity person;
+    private Boolean isActive;
 
 }

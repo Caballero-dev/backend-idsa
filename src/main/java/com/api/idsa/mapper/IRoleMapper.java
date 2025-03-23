@@ -4,6 +4,7 @@ import com.api.idsa.dto.response.RoleResponse;
 import com.api.idsa.model.RoleEntity;
 import org.mapstruct.Mapper;
 import org.mapstruct.Mapping;
+import org.mapstruct.Named;
 
 import java.util.List;
 
@@ -18,10 +19,12 @@ public interface IRoleMapper {
     @Mapping(target = "roleName", expression = "java(mapRoleName(roleEntity.getRoleName()))")
     RoleResponse toResponse(RoleEntity roleEntity);
 
+    @Named("mapRoleId")
     default String mapRoleId(String roleName) {
         return roleName;
     }
 
+    @Named("mapRoleName")
     default String mapRoleName(String roleName) {
         return switch (roleName) {
             case "ROLE_ADMIN" -> "Administrador";

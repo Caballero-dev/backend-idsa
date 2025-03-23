@@ -43,6 +43,19 @@ public class GlobalExceptionHandler {
         return ResponseEntity.status(HttpStatus.CONFLICT).body(errorMessageResponse);
     }
 
+    @ExceptionHandler(UserRoleCreationDeniedException.class)
+    public ResponseEntity<ErrorMessageResponse> handleUserRoleCreationDeniedException(UserRoleCreationDeniedException ex, WebRequest request) {
+        ErrorMessageResponse errorMessageResponse = ErrorMessageResponse.builder()
+                .statusCode(HttpStatus.FORBIDDEN.value())
+                .status(HttpStatus.FORBIDDEN.getReasonPhrase())
+                .timestamp(LocalDateTime.now().format(DateTimeFormatter.ISO_DATE_TIME))
+                .message(ex.getMessage())
+                .path(request.getDescription(false).replace("uri=", ""))
+                .error("User Creation Denied")
+                .build();
+        return ResponseEntity.status(HttpStatus.FORBIDDEN).body(errorMessageResponse);
+    }
+
     @ExceptionHandler(MethodArgumentNotValidException.class)
     public ResponseEntity<ErrorMessageResponse> handleValidationExceptions(
             MethodArgumentNotValidException ex, WebRequest request) {

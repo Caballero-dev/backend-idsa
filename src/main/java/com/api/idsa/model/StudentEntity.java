@@ -3,12 +3,12 @@ package com.api.idsa.model;
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import jakarta.persistence.*;
 import lombok.AllArgsConstructor;
-import lombok.Builder;
+import lombok.Data;
 import lombok.NoArgsConstructor;
 
 @Entity
 @Table(name = "students")
-@Builder
+@Data
 @AllArgsConstructor
 @NoArgsConstructor
 public class StudentEntity {
@@ -18,19 +18,17 @@ public class StudentEntity {
     @Column(name = "student_id")
     private Long studentId;
 
-    @OneToOne(fetch = FetchType.EAGER)
+    @OneToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "person_id", nullable = false)
-    @JsonIgnoreProperties({"student", "tutor"})
     private PersonEntity person;
 
-    @ManyToOne(fetch = FetchType.EAGER)
+    @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "group_configuration_id", nullable = false)
     @JsonIgnoreProperties("students")
     private GroupConfigurationEntity groupConfiguration;
 
     @Column(name = "student_code", length = 20, nullable = false, unique = true)
     private String studentCode;
-
 
 //    @OneToMany(mappedBy = "student")
 //    @JsonIgnoreProperties("student")
