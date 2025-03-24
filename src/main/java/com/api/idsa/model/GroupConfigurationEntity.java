@@ -1,7 +1,5 @@
 package com.api.idsa.model;
 
-import com.fasterxml.jackson.annotation.JsonIgnore;
-import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import jakarta.persistence.*;
 import lombok.AllArgsConstructor;
 import lombok.Data;
@@ -21,44 +19,35 @@ public class GroupConfigurationEntity {
     @Column(name = "group_configuration_id")
     private Long groupConfigurationId;
 
-    @ManyToOne(fetch = FetchType.EAGER)
+    @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "campus_id", nullable = false)
-    @JsonIgnoreProperties("groupConfigurations")
     private CampusEntity campus;
 
-    @ManyToOne(fetch = FetchType.EAGER)
+    @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "speciality_id", nullable = false)
-    @JsonIgnoreProperties("groupConfigurations")
     private SpecialityEntity speciality;
 
-    @ManyToOne(fetch = FetchType.EAGER)
+    @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "modality_id", nullable = false)
-    @JsonIgnoreProperties("groupConfigurations")
     private ModalityEntity modality;
 
-    @ManyToOne(fetch = FetchType.EAGER)
+    @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "grade_id", nullable = false)
-    @JsonIgnoreProperties("groupConfigurations")
     private GradeEntity grade;
 
-    @ManyToOne(fetch = FetchType.EAGER)
+    @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "group_id", nullable = false)
-    @JsonIgnoreProperties("groupConfigurations")
     private GroupEntity group;
 
-    @ManyToOne(fetch = FetchType.EAGER)
+    @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "generation_id", nullable = false)
-    @JsonIgnoreProperties("groupConfigurations")
     private GenerationEntity generation;
 
-    @ManyToOne(fetch = FetchType.EAGER)
+    @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "tutor_id", nullable = false)
-    @JsonIgnoreProperties("groupConfigurations")
     private TutorEntity tutor;
 
-    @JsonIgnore
     @OneToMany(mappedBy = "groupConfiguration")
-    @JsonIgnoreProperties("groupConfigurations")
     private List<StudentEntity> students;
 
 }
