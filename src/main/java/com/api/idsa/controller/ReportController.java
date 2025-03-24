@@ -1,0 +1,31 @@
+package com.api.idsa.controller;
+
+import com.api.idsa.dto.response.ReportResponse;
+import com.api.idsa.service.IReportService;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.http.ResponseEntity;
+import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.PathVariable;
+import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RestController;
+
+import java.util.List;
+
+@RestController
+@RequestMapping("/reports")
+public class ReportController {
+
+    @Autowired
+    IReportService reportService;
+
+    @GetMapping
+    public ResponseEntity<List<ReportResponse>> getAllReports() {
+        return ResponseEntity.ok(reportService.findAll());
+    }
+
+    @GetMapping("/student/{studentId}")
+    public ResponseEntity<List<ReportResponse>> getReportsByStudentId(@PathVariable Long studentId) {
+        return ResponseEntity.ok(reportService.getReportsByStudentId(studentId));
+    }
+
+}
