@@ -2,12 +2,12 @@ package com.api.idsa.model;
 
 import jakarta.persistence.*;
 import lombok.AllArgsConstructor;
-import lombok.Builder;
+import lombok.Data;
 import lombok.NoArgsConstructor;
 
 @Entity
 @Table(name = "report_images")
-@Builder
+@Data
 @AllArgsConstructor
 @NoArgsConstructor
 public class ReportImageEntity {
@@ -17,7 +17,7 @@ public class ReportImageEntity {
     @Column(name = "image_id")
     private Long imageId;
 
-    @ManyToOne
+    @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "report_id")
     private ReportEntity report;
 

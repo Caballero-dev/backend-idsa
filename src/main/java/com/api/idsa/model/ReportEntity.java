@@ -1,9 +1,8 @@
 package com.api.idsa.model;
 
-import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import jakarta.persistence.*;
 import lombok.AllArgsConstructor;
-import lombok.Builder;
+import lombok.Data;
 import lombok.NoArgsConstructor;
 
 import java.math.BigDecimal;
@@ -12,7 +11,7 @@ import java.util.List;
 
 @Entity
 @Table(name = "reports")
-@Builder
+@Data
 @AllArgsConstructor
 @NoArgsConstructor
 public class ReportEntity {
@@ -22,9 +21,8 @@ public class ReportEntity {
     @Column(name = "report_id")
     private Long reportId;
 
-    @ManyToOne(fetch = FetchType.EAGER)
+    @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "student_id", nullable = false)
-    @JsonIgnoreProperties("reports")
     private StudentEntity student;
 
     @OneToMany(mappedBy = "report")
@@ -50,5 +48,4 @@ public class ReportEntity {
 
     @Column(name = "created_at", nullable = false)
     private ZonedDateTime createdAt;
-
 }
