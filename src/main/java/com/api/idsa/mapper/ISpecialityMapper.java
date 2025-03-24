@@ -25,4 +25,9 @@ public interface ISpecialityMapper {
     @Mapping(source = "shortName", target = "shortName")
     SpecialityEntity toEntity(SpecialityRequest specialityRequest);
 
+    @Mapping(source = "specialityId", target = "specialityId")
+    @Mapping(source = "name", target = "specialityName")
+    @Mapping(source = "shortName", target = "shortName")
+    SpecialityEntity responseToEntity(SpecialityResponse specialityResponse);
+
 }

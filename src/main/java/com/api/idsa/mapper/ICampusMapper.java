@@ -22,4 +22,8 @@ public interface ICampusMapper {
     @Mapping(source = "name", target = "campusName")
     CampusEntity toEntity(CampusRequest campusRequest);
 
+    @Mapping(source = "campusId", target = "campusId")
+    @Mapping(source = "name", target = "campusName")
+    CampusEntity responseToEntity(CampusResponse campusResponse);
+
 }

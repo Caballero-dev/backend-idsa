@@ -22,4 +22,8 @@ public interface IGradeMapper {
     @Mapping(source = "name", target = "gradeName")
     GradeEntity toEntity(GradeRequest gradeRequest);
 
+    @Mapping(source = "gradeId", target = "gradeId")
+    @Mapping(source = "name", target = "gradeName")
+    GradeEntity responseToEntity(GradeResponse gradeResponse);
+
 }

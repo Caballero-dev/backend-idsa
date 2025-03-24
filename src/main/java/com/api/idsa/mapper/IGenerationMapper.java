@@ -24,4 +24,10 @@ public interface IGenerationMapper {
     @Mapping(source = "yearStart", target = "startYear")
     @Mapping(source = "yearEnd", target = "endYear")
     GenerationEntity toEntity(GenerationRequest generationRequest);
+
+    @Mapping(source = "generationId", target = "generationId")
+    @Mapping(source = "yearStart", target = "startYear")
+    @Mapping(source = "yearEnd", target = "endYear")
+    GenerationEntity responseToEntity(GenerationResponse generationResponse);
+
 }

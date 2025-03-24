@@ -36,4 +36,13 @@ public interface ITutorMapper {
     @Mapping(source = "phoneNumber", target = "phoneNumber")
     PersonEntity toPersonEntity(TutorRequest tutorRequest);
 
+    @Mapping(source = "tutorId", target = "tutorId")
+    @Mapping(source = "name", target = "person.name")
+    @Mapping(source = "firstSurname", target = "person.firstSurname")
+    @Mapping(source = "secondSurname", target = "person.secondSurname")
+    @Mapping(source = "phoneNumber", target = "person.phoneNumber")
+    @Mapping(source = "email", target = "person.user.email")
+    @Mapping(source = "employeeCode", target = "employeeCode")
+    TutorEntity responseToEntity(TutorResponse tutorResponse);
+
 }

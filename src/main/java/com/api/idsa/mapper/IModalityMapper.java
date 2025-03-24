@@ -22,4 +22,8 @@ public interface IModalityMapper {
     @Mapping(source = "name", target = "modalityName")
     ModalityEntity toEntity(ModalityRequest modalityRequest);
 
+    @Mapping(source = "modalityId", target = "modalityId")
+    @Mapping(source = "name", target = "modalityName")
+    ModalityEntity responseToEntity(ModalityResponse modalityResponse);
+
 }

@@ -22,4 +22,8 @@ public interface IGroupMapper {
     @Mapping(source = "name", target = "groupName")
     GroupEntity toEntity(GroupRequest groupRequest);
 
+    @Mapping(source = "groupId", target = "groupId")
+    @Mapping(source = "name", target = "groupName")
+    GroupEntity responseToEntity(GroupResponse groupResponse);
+
 }
