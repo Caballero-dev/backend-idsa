@@ -57,6 +57,19 @@ public class GlobalExceptionHandler {
         return ResponseEntity.status(HttpStatus.FORBIDDEN).body(errorMessageResponse);
     }
 
+    @ExceptionHandler(IncorrectPasswordException.class)
+    public ResponseEntity<ErrorMessageResponse> handleIncorrectPasswordException(IncorrectPasswordException ex, WebRequest request) {
+        ErrorMessageResponse errorMessageResponse = ErrorMessageResponse.builder()
+                .statusCode(HttpStatus.BAD_REQUEST.value())
+                .status(HttpStatus.BAD_REQUEST.getReasonPhrase())
+                .timestamp(LocalDateTime.now().format(DateTimeFormatter.ISO_DATE_TIME))
+                .message(ex.getMessage())
+                .path(request.getDescription(false).replace("uri=", ""))
+                .error("Incorrect Password")
+                .build();
+        return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body(errorMessageResponse);
+    }
+
     @ExceptionHandler(DataIntegrityViolationException.class)
     public ResponseEntity<ErrorMessageResponse> handleDataIntegrityViolationException(DataIntegrityViolationException ex, WebRequest request) {
         ErrorMessageResponse errorMessageResponse = ErrorMessageResponse.builder()
