@@ -85,7 +85,7 @@ CREATE TABLE tutors
     FOREIGN KEY (person_id) REFERENCES people (person_id)
 );
 
-CREATE TABLE group_configuration
+CREATE TABLE group_configurations
 (
     group_configuration_id SERIAL,
     campus_id              INT NOT NULL,
@@ -114,8 +114,22 @@ CREATE TABLE students
     group_configuration_id INT                NOT NULL,
     student_code           VARCHAR(20) UNIQUE NOT NULL,
     PRIMARY KEY (student_id),
-    FOREIGN KEY (group_configuration_id) REFERENCES group_configuration (group_configuration_id),
+    FOREIGN KEY (group_configuration_id) REFERENCES group_configurations (group_configuration_id),
     FOREIGN KEY (person_id) REFERENCES people (person_id)
+);
+
+CREATE TABLE biometric_data
+(
+    biometric_data_id SERIAL,
+    student_id        INT                      NOT NULL,
+    temperature       NUMERIC(4, 2)            NOT NULL,
+    heart_rate        NUMERIC(4, 2)            NOT NULL,
+    systolic_blood_pressure NUMERIC(5, 2)      NOT NULL,
+    diastolic_blood_pressure NUMERIC(5, 2)     NOT NULL,
+    image_path        VARCHAR(255)             NOT NULL,
+    created_at        TIMESTAMP WITH TIME ZONE NOT NULL,
+    PRIMARY KEY (biometric_data_id),
+    FOREIGN KEY (student_id) REFERENCES students (student_id)
 );
 
 CREATE TABLE reports
@@ -123,21 +137,23 @@ CREATE TABLE reports
     report_id            SERIAL,
     student_id           INT                      NOT NULL,
     temperature          NUMERIC(4, 2)            NOT NULL,
+    heart_rate           NUMERIC(4, 2)            NOT NULL,
+    systolic_blood_pressure NUMERIC(5, 2)      NOT NULL,
+    diastolic_blood_pressure NUMERIC(5, 2)     NOT NULL,
     pupil_dilation_right NUMERIC(4, 2)            NOT NULL,
     pupil_dilation_left  NUMERIC(4, 2)            NOT NULL,
-    heart_rate           NUMERIC(4, 2)            NOT NULL,
-    oxygen_levels        NUMERIC(4, 2)            NOT NULL,
     prediction_result    NUMERIC(5, 2)            NOT NULL,
     created_at           TIMESTAMP WITH TIME ZONE NOT NULL,
     PRIMARY KEY (report_id),
     FOREIGN KEY (student_id) REFERENCES students (student_id)
 );
 
-CREATE TABLE report_images
+CREATE TABLE data_reports
 (
-    image_id   SERIAL,
-    report_id  INT     NOT NULL,
-    image_path VARCHAR NOT NULL,
-    PRIMARY KEY (image_id),
-    FOREIGN KEY (report_id) REFERENCES reports (report_id)
+    data_report_id SERIAL,
+    report_id      INT NOT NULL,
+    biometric_data_id INT NOT NULL,
+    PRIMARY KEY (data_report_id),
+    FOREIGN KEY (report_id) REFERENCES reports (report_id),
+    FOREIGN KEY (biometric_data_id) REFERENCES biometric_data (biometric_data_id)
 );
