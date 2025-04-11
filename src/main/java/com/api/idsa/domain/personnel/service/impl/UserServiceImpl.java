@@ -51,7 +51,7 @@ public class UserServiceImpl implements IUserService {
         // List<UserEntity> userRepositories = userRepository.findAllByIsActiveTrue();
         // userRepositories.removeIf(user -> "ROLE_ADMIN".equals(user.getRole().getRoleName()));
         return userMapper.toResponseList(
-            userRepository.findAllByIsActiveFalseAndRole_RoleNameIsNot("ROLE_ADMIN")
+            userRepository.findAllByIsActiveTrueAndRole_RoleNameIsNot("ROLE_ADMIN")
         );
     }
 
@@ -60,7 +60,7 @@ public class UserServiceImpl implements IUserService {
         // List<UserEntity> userRepositories = userRepository.findAllByIsActiveFalse();
         // userRepositories.removeIf(user -> "ROLE_ADMIN".equals(user.getRole().getRoleName()));
         return userMapper.toResponseList(
-            userRepository.findAllByIsActiveTrueAndRole_RoleNameIsNot("ROLE_ADMIN")
+            userRepository.findAllByIsActiveFalseAndRole_RoleNameIsNot("ROLE_ADMIN")
         );
     }
 
