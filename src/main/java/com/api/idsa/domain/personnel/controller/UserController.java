@@ -3,7 +3,6 @@ package com.api.idsa.domain.personnel.controller;
 import com.api.idsa.common.exception.DuplicateResourceException;
 import com.api.idsa.common.exception.ResourceNotFoundException;
 import com.api.idsa.common.exception.UserRoleCreationDeniedException;
-import com.api.idsa.domain.personnel.dto.request.UpdateUserRequest;
 import com.api.idsa.domain.personnel.dto.request.UserRequest;
 import com.api.idsa.domain.personnel.dto.response.UserResponse;
 import com.api.idsa.domain.personnel.service.IUserService;
@@ -24,12 +23,12 @@ public class UserController {
 
     @GetMapping("/active")
     public ResponseEntity<List<UserResponse>> getActiveUsers() {
-        return ResponseEntity.ok(userService.findAllActiveExceptAdmin());
+        return ResponseEntity.ok(userService.getAllActiveExceptAdmin());
     }
 
     @GetMapping("/inactive")
     public ResponseEntity<List<UserResponse>> getInactiveUsers() {
-        return ResponseEntity.ok(userService.findAllInactiveExceptAdmin());
+        return ResponseEntity.ok(userService.getAllInactiveExceptAdmin());
     }
 
     @PostMapping
@@ -38,8 +37,13 @@ public class UserController {
     }
 
     @PutMapping("/{userId}")
-    public ResponseEntity<UserResponse> updateUser(@PathVariable Long userId, @RequestParam boolean isUpdatePassword, @Valid @RequestBody UpdateUserRequest updateUserRequest) throws ResourceNotFoundException, DuplicateResourceException, UserRoleCreationDeniedException {
+    public ResponseEntity<UserResponse> updateUser(@PathVariable Long userId, @RequestParam boolean isUpdatePassword, @Valid @RequestBody UserRequest updateUserRequest) throws ResourceNotFoundException, DuplicateResourceException, UserRoleCreationDeniedException {
         return ResponseEntity.ok(userService.updateUser(userId, isUpdatePassword, updateUserRequest));
+    }
+
+    @PutMapping("/{userId}/status")
+    public void updateUserStatus(@PathVariable Long userId, @RequestParam boolean isActive) throws ResourceNotFoundException {
+        userService.updateUserStatus(userId, isActive);
     }
 
     @DeleteMapping("/{userId}")

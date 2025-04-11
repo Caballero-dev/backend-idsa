@@ -10,15 +10,15 @@ import lombok.NoArgsConstructor;
 @Data
 @AllArgsConstructor
 @NoArgsConstructor
-public class SpecialityEntity {
+public class SpecialtyEntity {
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
-    @Column(name = "speciality_id")
-    private Long specialityId;
+    @Column(name = "specialty_id")
+    private Long specialtyId;
 
-    @Column(name = "speciality_name", length = 100, nullable = false, unique = true)
-    private String specialityName;
+    @Column(name = "specialty_name", length = 100, nullable = false, unique = true)
+    private String specialtyName;
 
     @Column(name = "short_name", length = 10, nullable = false, unique = true)
     private String shortName;

@@ -6,7 +6,7 @@ import com.api.idsa.domain.academic.dto.request.ModalityRequest;
 import com.api.idsa.domain.academic.dto.response.ModalityResponse;
 import com.api.idsa.domain.academic.mapper.IModalityMapper;
 import com.api.idsa.domain.academic.model.ModalityEntity;
-import com.api.idsa.domain.academic.repository.IModalityRepositoty;
+import com.api.idsa.domain.academic.repository.IModalityRepository;
 import com.api.idsa.domain.academic.service.IModalityService;
 
 import org.springframework.beans.factory.annotation.Autowired;
@@ -18,46 +18,48 @@ import java.util.List;
 public class ModalityServiceImpl implements IModalityService {
 
     @Autowired
-    IModalityRepositoty modalityRepositoty;
+    IModalityRepository modalityRepository;
 
-     @Autowired
+    @Autowired
     IModalityMapper modalityMapper;
 
-
     @Override
-    public List<ModalityResponse> findAll() {
-        return modalityMapper.toResponseList(modalityRepositoty.findAll());
+    public List<ModalityResponse> getAllModality() {
+        return modalityMapper.toResponseList(modalityRepository.findAll());
     }
 
     @Override
-    public ModalityResponse createModality(ModalityRequest modalityRequest) throws DuplicateResourceException {
-        if (modalityRepositoty.existsByModalityName(modalityRequest.getName())) {
-            throw new DuplicateResourceException("create", "Campus", modalityRequest.getName());
+    public ModalityResponse createModality(ModalityRequest modalityRequest) {
+
+        if (modalityRepository.existsByModalityName(modalityRequest.getName())) {
+            throw new DuplicateResourceException("create", "Modality", modalityRequest.getName());
         }
 
         ModalityEntity modalityEntity = modalityMapper.toEntity(modalityRequest);
-        return modalityMapper.toResponse(modalityRepositoty.save(modalityEntity));
+        return modalityMapper.toResponse(modalityRepository.save(modalityEntity));
     }
-
+    
     @Override
-    public ModalityResponse updateModality(Long modalityId, ModalityRequest modalityRequest) throws ResourceNotFoundException, DuplicateResourceException {
-        ModalityEntity modalityEntity = modalityRepositoty.findById(modalityId)
-                .orElseThrow(() -> new ResourceNotFoundException("update", "Campus", modalityId));
-
-        if (!modalityEntity.getModalityName().equals(modalityRequest.getName()) && modalityRepositoty.existsByModalityName(modalityRequest.getName())) {
-            throw new DuplicateResourceException("update", "Campus", modalityRequest.getName());
+    public ModalityResponse updateModality(Long modalityId, ModalityRequest modalityRequest) {
+        
+        ModalityEntity modalityEntity = modalityRepository.findById(modalityId)
+                .orElseThrow(() -> new ResourceNotFoundException("update", "Modality", modalityId));
+        
+        if (!modalityEntity.getModalityName().equals(modalityRequest.getName()) && modalityRepository.existsByModalityName(modalityRequest.getName())) {
+            throw new DuplicateResourceException("update", "Modality", modalityRequest.getName());
         }
 
         modalityEntity.setModalityName(modalityRequest.getName());
-        return modalityMapper.toResponse(modalityRepositoty.save(modalityEntity));
+        return modalityMapper.toResponse(modalityRepository.save(modalityEntity));
     }
-
+    
     @Override
-    public void deleteModality(Long modalityId) throws ResourceNotFoundException {
-        ModalityEntity modalityEntity = modalityRepositoty.findById(modalityId)
-                .orElseThrow(() -> new ResourceNotFoundException("delete", "Campus", modalityId));
+    public void deleteModality(Long modalityId) {
 
-        modalityRepositoty.delete(modalityEntity);
+        ModalityEntity modalityEntity = modalityRepository.findById(modalityId)
+                .orElseThrow(() -> new ResourceNotFoundException("delete", "Modality", modalityId));
+        
+        modalityRepository.delete(modalityEntity);
     }
-
+    
 }

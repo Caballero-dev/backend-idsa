@@ -39,4 +39,7 @@ public class UserEntity {
     @Column(name = "is_active", nullable = false)
     private Boolean isActive;
 
+    @Column(name = "is_verified_email", nullable = false)
+    private Boolean isVerifiedEmail;
+
 }

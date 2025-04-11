@@ -19,7 +19,7 @@ public class GroupConfigurationResponse {
 
     private CampusResponse campus;
 
-    private SpecialityResponse speciality;
+    private SpecialtyResponse specialty;
 
     private ModalityResponse modality;
 

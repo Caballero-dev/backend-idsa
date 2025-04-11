@@ -14,7 +14,7 @@ public interface IStudentService {
      *
      * @return Lista de  {@link StudentResponse} con la información de los estudiantes.
      */
-    List<StudentResponse> findAll();
+    List<StudentResponse> getAllStudent();
 
     /**
      * Obtiene una lista de estudiantes por groupConfigurationId.
@@ -22,7 +22,7 @@ public interface IStudentService {
      * @param groupConfigurationId ID de la configuración del grupo.
      * @return Lista de {@link StudentResponse} con la información de los estudiantes.
      */
-    List<StudentResponse> findByGroupConfigurationId(Long groupConfigurationId);
+    List<StudentResponse> getStudentsByGroupConfigurationId(Long groupConfigurationId);
 
     /**
      * Crea un nuevo estudiante.
@@ -30,8 +30,9 @@ public interface IStudentService {
      * @param studentRequest Objeto que contiene la información del estudiante a crear.
      * @return {@link StudentResponse} con la información del estudiante creado.
      * @throws DuplicateResourceException si ya existe un estudiante con el mismo código, email o número de teléfono.
+     * @throws ResourceNotFoundException si la configuración del grupo no existe.
      */
-    StudentResponse createStudent(StudentRequest studentRequest, Long groupConfigurationId) throws DuplicateResourceException, ResourceNotFoundException;
+    StudentResponse createStudent(StudentRequest studentRequest, Long groupConfigurationId);
 
     /**
      * Actualiza la información de un estudiante existente.
@@ -42,7 +43,7 @@ public interface IStudentService {
      * @throws DuplicateResourceException si ya existe un estudiante con el mismo código, email o número de teléfono.
      * @throws ResourceNotFoundException si el estudiante no existe.
      */
-    StudentResponse updateStudent(Long studentId, StudentRequest studentRequest) throws DuplicateResourceException, ResourceNotFoundException;
+    StudentResponse updateStudent(Long studentId, StudentRequest studentRequest);
 
     /**
      * Elimina un estudiante existente.
@@ -50,6 +51,6 @@ public interface IStudentService {
      * @param studentId ID del estudiante a eliminar.
      * @throws ResourceNotFoundException si el estudiante no existe.
      */
-    void deleteStudent(Long studentId) throws ResourceNotFoundException;
+    void deleteStudent(Long studentId);
 
 }

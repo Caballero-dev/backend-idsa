@@ -3,7 +3,6 @@ package com.api.idsa.domain.personnel.service;
 import com.api.idsa.common.exception.DuplicateResourceException;
 import com.api.idsa.common.exception.ResourceNotFoundException;
 import com.api.idsa.common.exception.UserRoleCreationDeniedException;
-import com.api.idsa.domain.personnel.dto.request.UpdateUserRequest;
 import com.api.idsa.domain.personnel.dto.request.UserRequest;
 import com.api.idsa.domain.personnel.dto.response.UserResponse;
 
@@ -16,21 +15,21 @@ public interface IUserService {
      *
      * @return Lista de {@link UserResponse} con la información de los usuarios.
      */
-    List<UserResponse> findAll();
+    List<UserResponse> getAllUser();
 
     /**
      * Obtiene los usuarios activos diferentes de "ROLE_ADMIN".
      *
      * @return Lista de {@link UserResponse} con la información de los usuarios activos.
      */
-    List<UserResponse> findAllActiveExceptAdmin();
+    List<UserResponse> getAllActiveExceptAdmin();
 
     /**
      * Obtiene ls usuarios inactivos diferentes de "ROLE_ADMIN".
      *
      * @return Lista de {@link UserResponse} con la información de los usuarios inactivos.
      */
-    List<UserResponse> findAllInactiveExceptAdmin();
+    List<UserResponse> getAllInactiveExceptAdmin();
 
     /**
      * Crea un nuevo usuario.
@@ -41,7 +40,7 @@ public interface IUserService {
      * @throws UserRoleCreationDeniedException si se intenta crear un usuario con rol no permitido.
      * @throws ResourceNotFoundException si el rol no existe.
      */
-    UserResponse createUser(UserRequest userRequest) throws DuplicateResourceException, UserRoleCreationDeniedException, ResourceNotFoundException;
+    UserResponse createUser(UserRequest userRequest);
 
     /**
      * Actualiza los datos de un usuario existente.
@@ -51,9 +50,19 @@ public interface IUserService {
      * @return {@link UserResponse} con la información del usuario actualizado.
      * @throws ResourceNotFoundException  si el usuario no existe.
      * @throws DuplicateResourceException si ya existe un usuario con el mismo correo electrónico, número de teléfono y número de empleado.
+     * @throws UserRoleCreationDeniedException si se intenta actualizar un usuario con rol no permitido.
      */
     // Nota: es opcinal actualizar la contraseña
-    UserResponse updateUser(Long userId, boolean isUpdatePassword, UpdateUserRequest updateUserRequest) throws ResourceNotFoundException, DuplicateResourceException, UserRoleCreationDeniedException;
+    UserResponse updateUser(Long userId, boolean isUpdatePassword, UserRequest updateUserRequest);
+
+    /**
+     * Actualiza el estado de un usuario existente a activo o inactivo.
+     * 
+     * @param userId ID del usuario a actualizar.
+     * @param isActive Estado a establecer (true para activo, false para inactivo).
+     * @throws ResourceNotFoundException si el usuario no existe.
+     */
+    void updateUserStatus(Long userId, boolean isActive);
 
     /**
      * Elimina un usuario existente.
@@ -61,6 +70,6 @@ public interface IUserService {
      * @param userId ID del usuario a eliminar.
      * @throws ResourceNotFoundException si el usuario no existe.
      */
-    void deleteUser(Long userId) throws ResourceNotFoundException;
+    void deleteUser(Long userId);
 
 }

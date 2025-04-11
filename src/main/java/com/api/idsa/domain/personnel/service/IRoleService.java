@@ -11,13 +11,13 @@ public interface IRoleService {
      *
      * @return Lista de {@link RoleResponse} que representan los roles disponibles.
      */
-    List<RoleResponse> findAll();
+    List<RoleResponse> getAllRole();
 
     /**
      * Obtiene los roles diferentes de "ROLE_ADMIN".
      *
      * @return Lista de {@link RoleResponse} que representan los roles diferentes de "ROLE_ADMIN".
      */
-    List<RoleResponse> findAllExceptAdmin();
+    List<RoleResponse> getAllRoleExceptAdmin();
 
 }

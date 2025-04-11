@@ -7,13 +7,13 @@ import com.api.idsa.domain.personnel.dto.response.UserProfileResponse;
 import com.api.idsa.domain.personnel.mapper.IUserProfileMapper;
 import com.api.idsa.domain.personnel.model.UserEntity;
 import com.api.idsa.domain.personnel.repository.IUserRepository;
-import com.api.idsa.domain.personnel.service.UserProfileService;
+import com.api.idsa.domain.personnel.service.IUserProfileService;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
 @Service
-public class UserProfileServiceImpl implements UserProfileService {
+public class UserProfileServiceImpl implements IUserProfileService {
 
     @Autowired
     IUserRepository userRepository;
@@ -22,17 +22,19 @@ public class UserProfileServiceImpl implements UserProfileService {
     IUserProfileMapper userProfileMapper;
 
     @Override
-    public UserProfileResponse getUserProfileByEmail(String email) throws ResourceNotFoundException {
+    public UserProfileResponse getUserProfileByEmail(String email) {
         UserEntity user = userRepository.findByEmail(email)
-                .orElseThrow(() -> new ResourceNotFoundException("User not found with email: " + email));
+                .orElseThrow(() -> new ResourceNotFoundException("Get", "User", "email", email));
 
         return userProfileMapper.toUserProfileResponse(user);
     }
 
+    // FIXME: implementar bien la actualización de la contraseña
     @Override
-    public void updatePassword(UpdatePasswordRequest request) throws ResourceNotFoundException {
+    public void updatePassword(UpdatePasswordRequest request) {
+
         UserEntity user = userRepository.findByEmail(request.getEmail())
-                .orElseThrow(() -> new ResourceNotFoundException("User not found with email: " + request.getEmail()));
+                .orElseThrow(() -> new ResourceNotFoundException("Update", "User", "email", request.getEmail()));
 
         if (!user.getPassword().equals(request.getCurrentPassword())) {
             throw new IncorrectPasswordException("Current password is incorrect");

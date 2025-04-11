@@ -14,7 +14,7 @@ public interface IGradeService {
      *
      * @return Lista de {@link GradeResponse} con la información de los grados.
      */
-    List<GradeResponse> findAll();
+    List<GradeResponse> getAllGrade();
 
     /**
      * Crea un grado.
@@ -23,7 +23,7 @@ public interface IGradeService {
      * @return {@link GradeResponse} con la información del grado creado.
      * @throws DuplicateResourceException si ya existe un grado con el mismo nombre.
      */
-    GradeResponse create(GradeRequest gradeRequest) throws DuplicateResourceException;
+    GradeResponse createGrade(GradeRequest gradeRequest);
 
     /**
      * Actualiza los datos de un grado existente.
@@ -34,7 +34,7 @@ public interface IGradeService {
      * @throws ResourceNotFoundException  si el grado no existe.
      * @throws DuplicateResourceException si ya existe un grado con el mismo nombre.
      */
-    GradeResponse update(Long gradeId, GradeRequest gradeRequest) throws ResourceNotFoundException, DuplicateResourceException;
+    GradeResponse updateGrade(Long gradeId, GradeRequest gradeRequest);
 
     /**
      * Elimina un grado existente.
@@ -42,6 +42,6 @@ public interface IGradeService {
      * @param gradeId ID del grado a eliminar.
      * @throws ResourceNotFoundException si el grado no existe.
      */
-    void delete(Long gradeId) throws ResourceNotFoundException;
+    void deleteGrade(Long gradeId);
 
 }

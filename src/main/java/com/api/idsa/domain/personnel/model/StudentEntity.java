@@ -8,6 +8,7 @@ import lombok.NoArgsConstructor;
 import java.util.List;
 
 import com.api.idsa.domain.academic.model.GroupConfigurationEntity;
+import com.api.idsa.domain.biometric.model.BiometricDataEntity;
 import com.api.idsa.domain.biometric.model.ReportEntity;
 
 @Entity
@@ -22,7 +23,7 @@ public class StudentEntity {
     @Column(name = "student_id")
     private Long studentId;
 
-    @OneToOne(fetch = FetchType.LAZY)
+    @OneToOne(fetch = FetchType.LAZY, cascade = CascadeType.ALL)
     @JoinColumn(name = "person_id", nullable = false)
     private PersonEntity person;
 
@@ -32,6 +33,9 @@ public class StudentEntity {
 
     @Column(name = "student_code", length = 20, nullable = false, unique = true)
     private String studentCode;
+
+    @OneToMany(mappedBy = "student")
+    private List<BiometricDataEntity> biometricData;
 
     @OneToMany(mappedBy = "student")
     private List<ReportEntity> reports;

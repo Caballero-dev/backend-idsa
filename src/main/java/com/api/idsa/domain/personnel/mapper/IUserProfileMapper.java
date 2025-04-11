@@ -17,7 +17,7 @@ public interface IUserProfileMapper {
     @Mapping(source = "email", target = "email")
     @Mapping(source = "person.phoneNumber", target = "phone")
     @Mapping(source = "role.roleName", target = "roleName")
-    @Mapping(source = ".", target = "key", qualifiedByName = "getKey")
+    @Mapping(target = "key", expression = "java(getKey(user))")
     @Mapping(source = "createdAt", target = "createdAt")
     UserProfileResponse toUserProfileResponse(UserEntity user);
 

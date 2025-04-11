@@ -14,7 +14,7 @@ public interface ITutorService {
      *
      * @return Lista de {@link TutorResponse} con la información de los tutores.
      */
-    List<TutorResponse> findAll();
+    List<TutorResponse> getAllTutor();
 
     /**
      * Crea un tutor.
@@ -22,8 +22,9 @@ public interface ITutorService {
      * @param tutorRequest Objeto que contiene la información del tutor a crear.
      * @return {@link TutorResponse} con la información del tutor creado.
      * @throws DuplicateResourceException si ya existe un tutor con el mismo correo electrónico, número de teléfono o número de empleado.
+     * @throws ResourceNotFoundException  si el rol del tutor no existe.
      */
-    TutorResponse createTutor(TutorRequest tutorRequest) throws DuplicateResourceException, ResourceNotFoundException;
+    TutorResponse createTutor(TutorRequest tutorRequest);
 
     /**
      * Actualiza los datos de un tutor existente.
@@ -34,7 +35,7 @@ public interface ITutorService {
      * @throws DuplicateResourceException si ya existe un tutor con el mismo correo electrónico, número de teléfono o número de empleado.
      * @throws ResourceNotFoundException  si el tutor no existe.
      */
-    TutorResponse updateTutor(Long tutorId, TutorRequest tutorRequest) throws ResourceNotFoundException, DuplicateResourceException;
+    TutorResponse updateTutor(Long tutorId, TutorRequest tutorRequest);
 
     /**
      * Elimina un tutor existente.
@@ -42,6 +43,6 @@ public interface ITutorService {
      * @param tutorId ID del tutor a eliminar.
      * @throws ResourceNotFoundException si el tutor no existe.
      */
-    void deleteTutor(Long tutorId) throws ResourceNotFoundException;
+    void deleteTutor(Long tutorId);
 
 }

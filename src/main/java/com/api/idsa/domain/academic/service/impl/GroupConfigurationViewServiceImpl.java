@@ -21,19 +21,19 @@ public class GroupConfigurationViewServiceImpl implements IGroupConfigurationVie
 
     // Endpoint para admin puede ver todas las configuraciones de grupos
     @Override
-    public List<GroupConfigurationViewResponse> getGroupConfigurationViewList() {
+    public List<GroupConfigurationViewResponse> getAllGroupConfigurationView() {
         return groupConfigurationViewMapper.toResponseList(groupConfigurationRepository.findAll());
     }
 
     // Endpoint para tutor que obtiene los grupos de un tutor por su código de empleado
     @Override
-    public List<GroupConfigurationViewResponse> getGroupConfigurationViewListByTutor(String employeeCode) {
+    public List<GroupConfigurationViewResponse> getAllGroupConfigurationViewByTutor(String employeeCode) {
         return groupConfigurationViewMapper.toResponseList(groupConfigurationRepository.findByTutor_EmployeeCode(employeeCode));
     }
 
     // Endpoint para tutor que obtiene los grupos de un tutor por su correo electrónico
     @Override
-    public List<GroupConfigurationViewResponse> getGroupConfigurationViewListByTutorEmail(String personUserEmail) {
+    public List<GroupConfigurationViewResponse> getAllGroupConfigurationViewByTutorEmail(String personUserEmail) {
         return groupConfigurationViewMapper.toResponseList(groupConfigurationRepository.findByTutor_Person_User_Email(personUserEmail));
     }
 }

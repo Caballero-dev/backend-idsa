@@ -11,7 +11,22 @@ import com.api.idsa.domain.personnel.model.StudentEntity;
 import com.api.idsa.domain.personnel.model.TutorEntity;
 
 @Entity
-@Table(name = "group_configuration")
+@Table(
+    name = "group_configurations", 
+    uniqueConstraints = {
+        @UniqueConstraint(
+            name = "unique_group_configuration", 
+            columnNames = {
+                "campus_id", 
+                "specialty_id", 
+                "modality_id", 
+                "grade_id", 
+                "group_id", 
+                "generation_id"
+            }
+        )
+    }
+)
 @Data
 @AllArgsConstructor
 @NoArgsConstructor
@@ -27,8 +42,8 @@ public class GroupConfigurationEntity {
     private CampusEntity campus;
 
     @ManyToOne(fetch = FetchType.LAZY)
-    @JoinColumn(name = "speciality_id", nullable = false)
-    private SpecialityEntity speciality;
+    @JoinColumn(name = "specialty_id", nullable = false)
+    private SpecialtyEntity specialty;
 
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "modality_id", nullable = false)

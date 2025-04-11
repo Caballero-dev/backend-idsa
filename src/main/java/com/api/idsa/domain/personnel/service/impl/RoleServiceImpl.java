@@ -5,7 +5,7 @@ import org.springframework.stereotype.Service;
 
 import com.api.idsa.domain.personnel.dto.response.RoleResponse;
 import com.api.idsa.domain.personnel.mapper.IRoleMapper;
-import com.api.idsa.domain.personnel.model.RoleEntity;
+// import com.api.idsa.domain.personnel.model.RoleEntity;
 import com.api.idsa.domain.personnel.repository.IRoleRepository;
 import com.api.idsa.domain.personnel.service.IRoleService;
 
@@ -21,14 +21,16 @@ public class RoleServiceImpl implements IRoleService {
     IRoleMapper roleMapper;
 
     @Override
-    public List<RoleResponse> findAll() {
+    public List<RoleResponse> getAllRole() {
         return roleMapper.toResponseList(roleRepository.findAll());
     }
 
     @Override
-    public List<RoleResponse> findAllExceptAdmin() {
-        List<RoleEntity> roleEntities = roleRepository.findAll();
-        roleEntities.removeIf(role -> "ROLE_ADMIN".equals(role.getRoleName()));
-        return roleMapper.toResponseList(roleEntities);
+    public List<RoleResponse> getAllRoleExceptAdmin() {
+        
+        // List<RoleEntity> roleEntities = roleRepository.findAll();
+        // roleEntities.removeIf(role -> "ROLE_ADMIN".equals(role.getRoleName()));
+
+        return roleMapper.toResponseList(roleRepository.findAllByRoleNameNot("ROLE_ADMIN"));
     }
 }

@@ -5,7 +5,7 @@ import com.api.idsa.domain.academic.dto.response.GenerationResponse;
 import com.api.idsa.domain.academic.dto.response.GradeResponse;
 import com.api.idsa.domain.academic.dto.response.GroupResponse;
 import com.api.idsa.domain.academic.dto.response.ModalityResponse;
-import com.api.idsa.domain.academic.dto.response.SpecialityResponse;
+import com.api.idsa.domain.academic.dto.response.SpecialtyResponse;
 import com.api.idsa.domain.personnel.dto.response.TutorResponse;
 
 import jakarta.validation.constraints.NotNull;
@@ -24,8 +24,8 @@ public class GroupConfigurationRequest {
     @NotNull(message = "Campus cannot be null")
     private CampusResponse campus;
 
-    @NotNull(message = "Speciality cannot be null")
-    private SpecialityResponse speciality;
+    @NotNull(message = "Specialty cannot be null")
+    private SpecialtyResponse specialty;
 
     @NotNull(message = "Modality cannot be null")
     private ModalityResponse modality;

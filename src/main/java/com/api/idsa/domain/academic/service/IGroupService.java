@@ -14,7 +14,7 @@ public interface IGroupService {
      *
      * @return Lista de {@link GroupResponse} con la información de los grupos.
      */
-    List<GroupResponse> findAll();
+    List<GroupResponse> getAllGroup();
 
     /**
      * Crea un grupo.
@@ -23,7 +23,7 @@ public interface IGroupService {
      * @return {@link GroupResponse} con la información del grupo creado
      * @throws DuplicateResourceException si ya existe un grupo con el mismo nombre
      */
-    GroupResponse createGroup(GroupRequest groupRequest) throws DuplicateResourceException;
+    GroupResponse createGroup(GroupRequest groupRequest);
 
     /**
      * Actualiza los datos de un grupo existente.
@@ -34,7 +34,7 @@ public interface IGroupService {
      * @throws ResourceNotFoundException  si el grupo no existe
      * @throws DuplicateResourceException si ya existe un grupo con el mismo nombre
      */
-    GroupResponse updateGroup(Long groupId, GroupRequest groupRequest) throws ResourceNotFoundException, DuplicateResourceException;
+    GroupResponse updateGroup(Long groupId, GroupRequest groupRequest);
 
     /**
      * Elimina un grupo existente.
@@ -42,6 +42,6 @@ public interface IGroupService {
      * @param groupId ID del grupo a eliminar
      * @throws ResourceNotFoundException si el grupo no existe
      */
-    void deleteGroup(Long groupId) throws ResourceNotFoundException;
+    void deleteGroup(Long groupId);
 
 }

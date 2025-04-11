@@ -9,9 +9,9 @@ import lombok.NoArgsConstructor;
 @Builder
 @AllArgsConstructor
 @NoArgsConstructor
-public class SpecialityResponse {
+public class SpecialtyResponse {
 
-    private Long specialityId;
+    private Long specialtyId;
 
     private String name;
 

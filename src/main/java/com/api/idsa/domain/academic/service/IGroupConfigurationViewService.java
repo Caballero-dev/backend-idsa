@@ -11,7 +11,7 @@ public interface IGroupConfigurationViewService {
      *
      * @return Lista de {@link GroupConfigurationViewResponse} que representan las configuraciones de grupos.
      */
-    List<GroupConfigurationViewResponse> getGroupConfigurationViewList();
+    List<GroupConfigurationViewResponse> getAllGroupConfigurationView();
 
     /**
      * Obtiene una lista de vista de configuraciones de grupos por numéro de empleado del tutor.
@@ -19,7 +19,7 @@ public interface IGroupConfigurationViewService {
      * @param employeeCode El código del empleado del tutor.
      * @return Lista de {@link GroupConfigurationViewResponse} que representan las configuraciones de grupos del tutor.
      */
-    List<GroupConfigurationViewResponse> getGroupConfigurationViewListByTutor(String employeeCode);
+    List<GroupConfigurationViewResponse> getAllGroupConfigurationViewByTutor(String employeeCode);
 
     /**
      * Obtiene una lista de vista de configuraciones de grupos por correo electrónico del tutor.
@@ -27,7 +27,7 @@ public interface IGroupConfigurationViewService {
      * @param personUserEmail El correo electrónico del tutor.
      * @return Lista de {@link GroupConfigurationViewResponse} que representan las configuraciones de grupos del tutor.
      */
-    List<GroupConfigurationViewResponse> getGroupConfigurationViewListByTutorEmail(String personUserEmail);
+    List<GroupConfigurationViewResponse> getAllGroupConfigurationViewByTutorEmail(String personUserEmail);
 
 }
 

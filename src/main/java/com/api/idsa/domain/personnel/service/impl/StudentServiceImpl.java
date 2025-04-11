@@ -23,13 +23,13 @@ import java.util.List;
 public class StudentServiceImpl implements IStudentService {
 
     @Autowired
+    IPersonRepository personRepository;
+
+    @Autowired
     IStudentRepository studentRepository;
 
     @Autowired
     ITutorRepository tutorRepository;
-
-    @Autowired
-    IPersonRepository personRepository;
 
     @Autowired
     IGroupConfigurationRepository groupConfigurationRepository;
@@ -38,28 +38,31 @@ public class StudentServiceImpl implements IStudentService {
     IStudentMapper studentMapper;
 
     @Override
-    public List<StudentResponse> findAll() {
+    public List<StudentResponse> getAllStudent() {
         return studentMapper.toResponseList(studentRepository.findAll());
     }
 
     @Override
-    public List<StudentResponse> findByGroupConfigurationId(Long groupConfigurationId) {
+    public List<StudentResponse> getStudentsByGroupConfigurationId(Long groupConfigurationId) {
         return studentMapper.toResponseList(studentRepository.findByGroupConfiguration_GroupConfigurationId(groupConfigurationId));
     }
 
     @Override
-    public StudentResponse createStudent(StudentRequest studentRequest, Long groupConfigurationId) throws DuplicateResourceException, ResourceNotFoundException {
+    public StudentResponse createStudent(StudentRequest studentRequest, Long groupConfigurationId) {
 
         if (studentRepository.existsByStudentCode(studentRequest.getStudentCode())) {
-            throw new DuplicateResourceException("Create", "Student", "StudentCode", studentRequest.getStudentCode());
-        } else if (tutorRepository.existsByEmployeeCode(studentRequest.getStudentCode())) {
-            throw new DuplicateResourceException("Create", "Student", "StudentCode_EmployeeCode", studentRequest.getStudentCode());
-        } else if (studentRepository.existsByPerson_PhoneNumber(studentRequest.getPhoneNumber())) {
-            throw new DuplicateResourceException("Create", "Student", "PhoneNumber", studentRequest.getPhoneNumber());
+            throw new DuplicateResourceException("create", "Student", "studentCode", studentRequest.getStudentCode());
+        }
+        // personRepository.existsByTutor_EmployeeCode(studentRequest.getStudentCode());
+        if (tutorRepository.existsByEmployeeCode(studentRequest.getStudentCode())) {
+            throw new DuplicateResourceException("create", "Student", "studentCode", studentRequest.getStudentCode());
+        }
+        if (studentRepository.existsByPerson_PhoneNumber(studentRequest.getPhoneNumber())) {
+            throw new DuplicateResourceException("create", "Student", "phoneNumber", studentRequest.getPhoneNumber());
         }
 
-        GroupConfigurationEntity groupConfiguration = groupConfigurationRepository.findById(groupConfigurationId)
-                .orElseThrow(() -> new ResourceNotFoundException("Create Student", "GroupConfiguration", groupConfigurationId));
+        GroupConfigurationEntity gcEntity = groupConfigurationRepository.findById(groupConfigurationId)
+                .orElseThrow(() -> new ResourceNotFoundException("create", "GroupConfiguration", groupConfigurationId));
 
         PersonEntity personEntity = studentMapper.toPersonEntity(studentRequest);
         personRepository.save(personEntity);
@@ -67,27 +70,32 @@ public class StudentServiceImpl implements IStudentService {
         StudentEntity studentEntity = new StudentEntity();
         studentEntity.setPerson(personEntity);
         studentEntity.setStudentCode(studentRequest.getStudentCode());
-        studentEntity.setGroupConfiguration(groupConfiguration);
+        studentEntity.setGroupConfiguration(gcEntity);
         studentRepository.save(studentEntity);
 
         return studentMapper.toResponse(studentEntity);
     }
 
     @Override
-    public StudentResponse updateStudent(Long studentId, StudentRequest studentRequest) throws DuplicateResourceException, ResourceNotFoundException {
+    public StudentResponse updateStudent(Long studentId, StudentRequest studentRequest) {
+        
         StudentEntity studentEntity = studentRepository.findById(studentId)
-                .orElseThrow(() -> new ResourceNotFoundException("Update", "Student", studentId));
+                .orElseThrow(() -> new ResourceNotFoundException("update", "Student", studentId));
 
-        // Validar duplicados de studentCode (excepto si es el mismo estudiante)
         if (!studentEntity.getStudentCode().equals(studentRequest.getStudentCode()) && studentRepository.existsByStudentCode(studentRequest.getStudentCode())) {
-            throw new DuplicateResourceException("Update", "Student", "StudentCode", studentRequest.getStudentCode());
-        } else if (tutorRepository.existsByEmployeeCode(studentRequest.getStudentCode())) {
-            throw new DuplicateResourceException("Update", "Student", "StudentCode_EmployeeCode", studentRequest.getStudentCode());
-        } else if (!studentEntity.getPerson().getPhoneNumber().equals(studentRequest.getPhoneNumber()) && studentRepository.existsByPerson_PhoneNumber(studentRequest.getPhoneNumber())) {
-            throw new DuplicateResourceException("Update", "Student", "PhoneNumber", studentRequest.getPhoneNumber());
+            throw new DuplicateResourceException("update", "Student", "studentCode", studentRequest.getStudentCode());
+        }
+        // personRepository.existsByTutor_EmployeeCode(studentRequest.getStudentCode());
+        if (tutorRepository.existsByEmployeeCode(studentRequest.getStudentCode())) {
+            throw new DuplicateResourceException("update", "Student", "studentCode", studentRequest.getStudentCode());
+        }
+        if (!studentEntity.getPerson().getPhoneNumber().equals(studentRequest.getPhoneNumber()) && studentRepository.existsByPerson_PhoneNumber(studentRequest.getPhoneNumber())) {
+            throw new DuplicateResourceException("update", "Student", "phoneNumber", studentRequest.getPhoneNumber());
         }
 
-        // Actualizar datos de la persona
+        // PersonEntity personEntity = studentMapper.toPersonEntity(studentRequest);
+        // personEntity.setPersonId(studentEntity.getPerson().getPersonId());
+
         PersonEntity personEntity = studentEntity.getPerson();
         personEntity.setName(studentRequest.getName());
         personEntity.setFirstSurname(studentRequest.getFirstSurname());
@@ -95,7 +103,6 @@ public class StudentServiceImpl implements IStudentService {
         personEntity.setPhoneNumber(studentRequest.getPhoneNumber());
         personRepository.save(personEntity);
 
-        // Actualizar datos del estudiante
         studentEntity.setPerson(personEntity);
         studentEntity.setStudentCode(studentRequest.getStudentCode());
         studentRepository.save(studentEntity);
@@ -104,9 +111,11 @@ public class StudentServiceImpl implements IStudentService {
     }
 
     @Override
-    public void deleteStudent(Long studentId) throws ResourceNotFoundException {
+    public void deleteStudent(Long studentId) {
+
         StudentEntity studentEntity = studentRepository.findById(studentId)
                 .orElseThrow(() -> new ResourceNotFoundException("Delete", "Student", studentId));
+        
         studentRepository.delete(studentEntity);
     }
 }

@@ -14,7 +14,7 @@ public interface IGenerationService {
      *
      * @return Lista de {@link GenerationResponse} con la información de las generaciones.
      */
-    List<GenerationResponse> findAll();
+    List<GenerationResponse> getAllGeneration();
 
     /**
      * Crea una nueva generación.
@@ -23,7 +23,7 @@ public interface IGenerationService {
      * @return {@link GenerationResponse} con la información de la generación creada.
      * @throws DuplicateResourceException si ya existe una generación con las mismas fechas.
      */
-    GenerationResponse createGeneration(GenerationRequest generationRequest) throws DuplicateResourceException;
+    GenerationResponse createGeneration(GenerationRequest generationRequest);
 
     /**
      * Actualiza los datos de una generación existente.
@@ -32,8 +32,9 @@ public interface IGenerationService {
      * @param request      Objeto que contiene la información actualizada de la generación.
      * @return {@link GenerationResponse} con la información de la generación actualizada.
      * @throws ResourceNotFoundException si la generación no existe.
+     * @throws DuplicateResourceException si ya existe una generación con las mismas fechas.
      */
-    GenerationResponse updateGeneration(Long generationId, GenerationRequest generationRequest) throws DuplicateResourceException, ResourceNotFoundException;
+    GenerationResponse updateGeneration(Long generationId, GenerationRequest generationRequest);
 
     /**
      * Elimina una generación existente.
@@ -41,5 +42,6 @@ public interface IGenerationService {
      * @param generationId ID de la generación a eliminar.
      * @throws ResourceNotFoundException si la generación no existe.
      */
-    void deleteGeneration(Long generationId) throws ResourceNotFoundException;
+    void deleteGeneration(Long generationId);
+
 }

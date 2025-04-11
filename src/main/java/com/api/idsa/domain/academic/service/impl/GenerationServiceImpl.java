@@ -24,15 +24,15 @@ public class GenerationServiceImpl implements IGenerationService {
     IGenerationMapper generationMapper;
 
     @Override
-    public List<GenerationResponse> findAll() {
+    public List<GenerationResponse> getAllGeneration() {
         return generationMapper.toResponseList(generationRepository.findAll());
     }
 
     @Override
-    public GenerationResponse createGeneration(GenerationRequest generationRequest) throws DuplicateResourceException {
+    public GenerationResponse createGeneration(GenerationRequest generationRequest) {
 
         if (generationRepository.existsByStartYearAndEndYear(generationRequest.getYearStart(), generationRequest.getYearEnd())) {
-            throw new DuplicateResourceException("create", "Generation", generationRequest.getYearStart() + " - " + generationRequest.getYearEnd());
+            throw new DuplicateResourceException("create", "Generation", "uniqueGeneration", generationRequest.getYearStart() + " - " + generationRequest.getYearEnd());
         }
 
         GenerationEntity generationEntity = generationMapper.toEntity(generationRequest);
@@ -40,13 +40,13 @@ public class GenerationServiceImpl implements IGenerationService {
     }
 
     @Override
-    public GenerationResponse updateGeneration(Long generationId, GenerationRequest request) throws ResourceNotFoundException, DuplicateResourceException {
+    public GenerationResponse updateGeneration(Long generationId, GenerationRequest request) {
 
         GenerationEntity generationEntity = generationRepository.findById(generationId)
                 .orElseThrow(() -> new ResourceNotFoundException("update", "Generation", generationId));
 
         if (generationRepository.existsByStartYearAndEndYear(request.getYearStart(), request.getYearEnd())) {
-            throw new DuplicateResourceException("update", "Generation", request.getYearStart() + " - " + request.getYearEnd());
+            throw new DuplicateResourceException("update", "Generation", "uniqueGeneration", request.getYearStart() + " - " + request.getYearEnd());
         }
 
         generationEntity.setStartYear(request.getYearStart());
@@ -55,9 +55,12 @@ public class GenerationServiceImpl implements IGenerationService {
     }
 
     @Override
-    public void deleteGeneration(Long generationId) throws ResourceNotFoundException {
+    public void deleteGeneration(Long generationId) {
+
         GenerationEntity generationEntity = generationRepository.findById(generationId)
                 .orElseThrow(() -> new ResourceNotFoundException("delete", "Generation", generationId));
+        
         generationRepository.delete(generationEntity);
     }
+    
 }

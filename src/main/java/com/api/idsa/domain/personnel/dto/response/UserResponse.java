@@ -23,5 +23,6 @@ public class UserResponse {
     private String phoneNumber;
     private ZonedDateTime createdAt;
     private Boolean isActive;
+    private Boolean isVerifiedEmail;
 
 }

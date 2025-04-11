@@ -13,7 +13,7 @@ import java.util.List;
 @Mapper(componentModel = "spring", uses = {
         ITutorMapper.class,
         ICampusMapper.class,
-        ISpecialityMapper.class,
+        ISpecialtyMapper.class,
         IModalityMapper.class,
         IGradeMapper.class,
         IGroupMapper.class,
@@ -24,7 +24,7 @@ public interface IGroupConfigurationMapper {
     @Mapping(source = "groupConfigurationId", target = "groupConfigurationId")
     @Mapping(source = "tutor", target = "tutor")
     @Mapping(source = "campus", target = "campus")
-    @Mapping(source = "speciality", target = "speciality")
+    @Mapping(source = "specialty", target = "specialty")
     @Mapping(source = "modality", target = "modality")
     @Mapping(source = "grade", target = "grade")
     @Mapping(source = "group", target = "group")
@@ -34,7 +34,7 @@ public interface IGroupConfigurationMapper {
     @Mapping(source = "groupConfigurationId", target = "groupConfigurationId")
     @Mapping(source = "tutor", target = "tutor")
     @Mapping(source = "campus", target = "campus")
-    @Mapping(source = "speciality", target = "speciality")
+    @Mapping(source = "specialty", target = "specialty")
     @Mapping(source = "modality", target = "modality")
     @Mapping(source = "grade", target = "grade")
     @Mapping(source = "group", target = "group")
@@ -43,7 +43,7 @@ public interface IGroupConfigurationMapper {
 
     @Mapping(source = "tutor", target = "tutor")
     @Mapping(source = "campus", target = "campus")
-    @Mapping(source = "speciality", target = "speciality")
+    @Mapping(source = "specialty", target = "specialty")
     @Mapping(source = "modality", target = "modality")
     @Mapping(source = "grade", target = "grade")
     @Mapping(source = "group", target = "group")

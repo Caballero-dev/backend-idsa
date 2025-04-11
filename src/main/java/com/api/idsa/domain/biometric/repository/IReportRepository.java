@@ -9,6 +9,9 @@ import java.util.List;
 
 @Repository
 public interface IReportRepository extends JpaRepository<ReportEntity, Long> {
+    
     ReportEntity findByStudent_StudentId(Long studentId);
+    
     List<ReportEntity> findByStudentStudentId(Long studentId);
+
 }

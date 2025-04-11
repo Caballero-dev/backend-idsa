@@ -19,7 +19,8 @@ public class UserRequest {
     @Email(message = "Invalid email format")
     private String email;
 
-    @NotBlank(message = "Password cannot be blank")
+    // Password es opcional para actualización y en creación no es requerido
+    // @NotBlank(message = "Password cannot be blank")
     @Size(min = 8, max = 20, message = "Password must be between 8 and 20 characters")
     @Pattern(regexp = RegexPatterns.PASSWORD, message = "Password contains invalid characters")
     private String password;

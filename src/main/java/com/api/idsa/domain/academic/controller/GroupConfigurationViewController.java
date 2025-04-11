@@ -12,7 +12,7 @@ import com.api.idsa.domain.academic.service.IGroupConfigurationViewService;
 import java.util.List;
 
 @RestController
-@RequestMapping("/group-configuration-view")
+@RequestMapping("/group-configurations-view")
 public class GroupConfigurationViewController {
 
     @Autowired
@@ -20,19 +20,19 @@ public class GroupConfigurationViewController {
 
     // Endpoint para admin puede ver todas las configuraciones de grupos
     @GetMapping
-    public List<GroupConfigurationViewResponse> getGroupConfigurationViewList() {
-        return groupConfigurationViewService.getGroupConfigurationViewList();
+    public List<GroupConfigurationViewResponse> getAllGroupConfigurationView() {
+        return groupConfigurationViewService.getAllGroupConfigurationView();
     }
 
     // Endpoint para tutor puede ver sus configuraciones de grupos por numero de empleado
     @GetMapping("/by-employee-code/{employeeCode}")
-    public List<GroupConfigurationViewResponse> getGroupConfigurationViewListByTutor(@PathVariable String employeeCode) {
-        return groupConfigurationViewService.getGroupConfigurationViewListByTutor(employeeCode);
+    public List<GroupConfigurationViewResponse> getAllGroupConfigurationViewByTutor(@PathVariable String employeeCode) {
+        return groupConfigurationViewService.getAllGroupConfigurationViewByTutor(employeeCode);
     }
 
     @GetMapping("/by-tutor-email/{personUserEmail}")
-    public List<GroupConfigurationViewResponse> getGroupConfigurationViewListByTutorEmail(@PathVariable String personUserEmail) {
-        return groupConfigurationViewService.getGroupConfigurationViewListByTutorEmail(personUserEmail);
+    public List<GroupConfigurationViewResponse> getAllGroupConfigurationViewByTutorEmail(@PathVariable String personUserEmail) {
+        return groupConfigurationViewService.getAllGroupConfigurationViewByTutorEmail(personUserEmail);
     }
 
 }

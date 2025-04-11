@@ -24,12 +24,12 @@ public class GroupServiceImpl implements IGroupService {
     IGroupMapper groupMapper;
 
     @Override
-    public List<GroupResponse> findAll() {
+    public List<GroupResponse> getAllGroup() {
         return groupMapper.toResponseList(groupRepository.findAll());
     }
 
     @Override
-    public GroupResponse createGroup(GroupRequest groupRequest) throws DuplicateResourceException {
+    public GroupResponse createGroup(GroupRequest groupRequest) {
 
         if (groupRepository.existsByGroupName(groupRequest.getName())) {
             throw new DuplicateResourceException("create", "Group", groupRequest.getName());
@@ -40,7 +40,8 @@ public class GroupServiceImpl implements IGroupService {
     }
 
     @Override
-    public GroupResponse updateGroup(Long groupId, GroupRequest groupRequest) throws ResourceNotFoundException, DuplicateResourceException {
+    public GroupResponse updateGroup(Long groupId, GroupRequest groupRequest) {
+
         GroupEntity groupEntity = groupRepository.findById(groupId)
                 .orElseThrow(() -> new ResourceNotFoundException("update", "Group", groupId));
 
@@ -54,8 +55,10 @@ public class GroupServiceImpl implements IGroupService {
 
     @Override
     public void deleteGroup(Long groupId) throws ResourceNotFoundException {
+
         GroupEntity groupEntity = groupRepository.findById(groupId)
                 .orElseThrow(() -> new ResourceNotFoundException("delete", "Group", groupId));
+        
         groupRepository.delete(groupEntity);
     }
 

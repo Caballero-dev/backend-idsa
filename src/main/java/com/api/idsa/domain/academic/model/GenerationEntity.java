@@ -8,7 +8,18 @@ import lombok.NoArgsConstructor;
 import java.time.LocalDate;
 
 @Entity
-@Table(name = "generations")
+@Table(
+    name = "generations",
+    uniqueConstraints = {
+        @UniqueConstraint(
+            name = "unique_generation",
+            columnNames = {
+                "start_year", 
+                "end_year"
+            }
+        )
+    }
+)
 @Data
 @AllArgsConstructor
 @NoArgsConstructor

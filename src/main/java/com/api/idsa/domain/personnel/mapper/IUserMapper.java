@@ -24,6 +24,7 @@ public interface IUserMapper {
     @Mapping(source = "person.phoneNumber", target = "phoneNumber")
     @Mapping(source = "createdAt", target = "createdAt")
     @Mapping(source = "isActive", target = "isActive")
+    @Mapping(source = "isVerifiedEmail", target = "isVerifiedEmail")
     List<UserResponse> toResponseList(List<UserEntity> userEntities);
 
     @Mapping(source = "userId", target = "userId")
@@ -36,6 +37,7 @@ public interface IUserMapper {
     @Mapping(source = "person.phoneNumber", target = "phoneNumber")
     @Mapping(source = "createdAt", target = "createdAt")
     @Mapping(source = "isActive", target = "isActive")
+    @Mapping(source = "isVerifiedEmail", target = "isVerifiedEmail")
     UserResponse toResponse(UserEntity userEntity);
 
     @Mapping(source = "name", target = "name")
@@ -48,7 +50,7 @@ public interface IUserMapper {
     default String mapKey(UserEntity userEntity) {
         return switch (userEntity.getRole().getRoleName()) {
             case "ROLE_TUTOR" -> userEntity.getPerson().getTutor().getEmployeeCode();
-            case "ROLE_STUDENT" -> userEntity.getPerson().getStudent().getStudentCode();
+            // case "ROLE_STUDENT" -> userEntity.getPerson().getStudent().getStudentCode();
             default -> null;
         };
     }

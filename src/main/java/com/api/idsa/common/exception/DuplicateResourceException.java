@@ -7,7 +7,7 @@ public class DuplicateResourceException extends RuntimeException {
     }
 
     public DuplicateResourceException(String action, String entity, String name) {
-        super(String.format("Failed to %s: Entity %s with name %s already exists", action, entity, name));
+        super(String.format("Failed to %s: Entity %s with name: %s already exists", action, entity, name));
     }
 
     public DuplicateResourceException(String action, String entity, String field, String value) {

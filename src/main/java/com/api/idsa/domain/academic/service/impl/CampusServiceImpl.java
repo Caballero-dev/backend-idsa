@@ -24,12 +24,12 @@ public class CampusServiceImpl implements ICampusService {
     ICampusMapper campusMapper;
 
     @Override
-    public List<CampusResponse> findAll() {
+    public List<CampusResponse> getAllCampus() {
         return campusMapper.toResponseList(campusRepository.findAll());
     }
 
     @Override
-    public CampusResponse createCampus(CampusRequest campusRequest) throws DuplicateResourceException {
+    public CampusResponse createCampus(CampusRequest campusRequest) {
 
         if (campusRepository.existsByCampusName(campusRequest.getName())) {
             throw new DuplicateResourceException("create", "Campus", campusRequest.getName());
@@ -40,7 +40,8 @@ public class CampusServiceImpl implements ICampusService {
     }
 
     @Override
-    public CampusResponse updateCampus(Long campusId, CampusRequest campusRequest) throws ResourceNotFoundException, DuplicateResourceException {
+    public CampusResponse updateCampus(Long campusId, CampusRequest campusRequest) {
+        
         CampusEntity campusEntity = campusRepository.findById(campusId)
                 .orElseThrow(() -> new ResourceNotFoundException("update", "Campus", campusId));
 
@@ -53,9 +54,11 @@ public class CampusServiceImpl implements ICampusService {
     }
 
     @Override
-    public void deleteCampus(Long campusId) throws ResourceNotFoundException {
+    public void deleteCampus(Long campusId) {
+
         CampusEntity campusEntity = campusRepository.findById(campusId)
                 .orElseThrow(() -> new ResourceNotFoundException("delete", "Campus", campusId));
+        
         campusRepository.delete(campusEntity);
     }
 

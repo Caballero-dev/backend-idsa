@@ -14,7 +14,7 @@ public interface ICampusService {
      *
      * @return Lista de {@link CampusResponse} con la información de los campus.
      */
-    List<CampusResponse> findAll();
+    List<CampusResponse> getAllCampus();
 
     /**
      * Crea un campus.
@@ -23,7 +23,7 @@ public interface ICampusService {
      * @return {@link CampusResponse} con la información del campus creado.
      * @throws DuplicateResourceException si ya existe un campus con el mismo nombre.
      */
-    CampusResponse createCampus(CampusRequest campusRequest) throws DuplicateResourceException;
+    CampusResponse createCampus(CampusRequest campusRequest);
 
     /**
      * Actualiza los datos de un campus existente.
@@ -32,14 +32,16 @@ public interface ICampusService {
      * @param campusRequest Objeto que contiene la información actualizada del campus.
      * @return {@link CampusResponse} con la información del campus actualizado.
      * @throws ResourceNotFoundException si el campus no existe.
+     * @throws DuplicateResourceException si ya existe un campus con el mismo nombre.
      */
-    CampusResponse updateCampus(Long campusId, CampusRequest campusRequest) throws ResourceNotFoundException, DuplicateResourceException;
+    CampusResponse updateCampus(Long campusId, CampusRequest campusRequest);
 
     /**
      * Elimina un campus existente.
      *
      * @param campusId ID del campus a eliminar.
+     * @throws ResourceNotFoundException si el campus no existe.
      */
-    void deleteCampus(Long campusId) throws ResourceNotFoundException;
+    void deleteCampus(Long campusId);
 
 }

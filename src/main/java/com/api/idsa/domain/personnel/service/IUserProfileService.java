@@ -4,7 +4,7 @@ import com.api.idsa.common.exception.ResourceNotFoundException;
 import com.api.idsa.domain.personnel.dto.request.UpdatePasswordRequest;
 import com.api.idsa.domain.personnel.dto.response.UserProfileResponse;
 
-public interface UserProfileService {
+public interface IUserProfileService {
 
     /**
      * Obtiene el perfil de usuario por correo electrónico.
@@ -13,7 +13,7 @@ public interface UserProfileService {
      * @return  {@link UserProfileResponse} con la información del perfil de usuario.
      * @throws ResourceNotFoundException si no se encuentra el usuario.
      */
-    UserProfileResponse getUserProfileByEmail(String email) throws ResourceNotFoundException;
+    UserProfileResponse getUserProfileByEmail(String email);
 
     /**
      * Actualiza la contraseña del usuario.
@@ -21,6 +21,6 @@ public interface UserProfileService {
      * @param request Objeto que contiene la información de la contraseña a actualizar.
      * @throws ResourceNotFoundException si no se encuentra el usuario.
      */
-    void updatePassword(UpdatePasswordRequest request) throws ResourceNotFoundException;
+    void updatePassword(UpdatePasswordRequest request);
 
 }

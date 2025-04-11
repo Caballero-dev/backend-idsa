@@ -24,17 +24,18 @@ public class GroupConfigurationServiceImpl implements IGroupConfigurationService
     IGroupConfigurationMapper groupConfigurationMapper;
 
     @Override
-    public List<GroupConfigurationResponse> findAll() {
+    public List<GroupConfigurationResponse> getAllGroupConfiguration() {
         return groupConfigurationMapper.toResponseList(groupConfigurationRepository.findAll());
     }
 
+    // FIXME: Verificar si la validación de duplicados es correcta
     @Override
-    public GroupConfigurationResponse createGroupConfiguration(GroupConfigurationRequest groupConfigurationRequest) throws DuplicateResourceException {
+    public GroupConfigurationResponse createGroupConfiguration(GroupConfigurationRequest groupConfigurationRequest) {
         GroupConfigurationEntity groupConfigurationEntity = groupConfigurationMapper.toEntity(groupConfigurationRequest);
 
-        if (groupConfigurationRepository.existsByCampusAndSpecialityAndModalityAndGradeAndGroupAndGeneration(
+        if (groupConfigurationRepository.existsByCampusAndSpecialtyAndModalityAndGradeAndGroupAndGeneration(
                 groupConfigurationEntity.getCampus(),
-                groupConfigurationEntity.getSpeciality(),
+                groupConfigurationEntity.getSpecialty(),
                 groupConfigurationEntity.getModality(),
                 groupConfigurationEntity.getGrade(),
                 groupConfigurationEntity.getGroup(),
@@ -45,7 +46,7 @@ public class GroupConfigurationServiceImpl implements IGroupConfigurationService
                     "GroupConfiguration",
                     "UniqueGroupConfiguration",
                     groupConfigurationRequest.getCampus().getName() + ", " +
-                            groupConfigurationRequest.getSpeciality().getName() + ", " +
+                            groupConfigurationRequest.getSpecialty().getName() + ", " +
                             groupConfigurationRequest.getModality().getName() + ", " +
                             groupConfigurationRequest.getGrade().getName() + ", " +
                             groupConfigurationRequest.getGroup().getName() + ", " +
@@ -56,8 +57,9 @@ public class GroupConfigurationServiceImpl implements IGroupConfigurationService
         return groupConfigurationMapper.toResponse(groupConfigurationRepository.save(groupConfigurationEntity));
     }
 
+    // FIXME: Verificar si la validación de duplicados es correcta
     @Override
-    public GroupConfigurationResponse updateGroupConfiguration(Long groupConfigurationId, GroupConfigurationRequest groupConfigurationRequest) throws ResourceNotFoundException, DuplicateResourceException {
+    public GroupConfigurationResponse updateGroupConfiguration(Long groupConfigurationId, GroupConfigurationRequest groupConfigurationRequest) {
 
         GroupConfigurationEntity groupConfigurationEntity = groupConfigurationRepository.findById(groupConfigurationId)
                 .orElseThrow(() -> new ResourceNotFoundException("update", "GroupConfiguration", groupConfigurationId));
@@ -65,15 +67,15 @@ public class GroupConfigurationServiceImpl implements IGroupConfigurationService
         GroupConfigurationEntity gc = groupConfigurationMapper.toEntity(groupConfigurationRequest);
 
         boolean hasChanged = !groupConfigurationEntity.getCampus().equals(gc.getCampus()) ||
-                !groupConfigurationEntity.getSpeciality().equals(gc.getSpeciality()) ||
+                !groupConfigurationEntity.getSpecialty().equals(gc.getSpecialty()) ||
                 !groupConfigurationEntity.getModality().equals(gc.getModality()) ||
                 !groupConfigurationEntity.getGrade().equals(gc.getGrade()) ||
                 !groupConfigurationEntity.getGroup().equals(gc.getGroup()) ||
                 !groupConfigurationEntity.getGeneration().equals(gc.getGeneration());
 
-        if (hasChanged && groupConfigurationRepository.existsByCampusAndSpecialityAndModalityAndGradeAndGroupAndGeneration(
+        if (hasChanged && groupConfigurationRepository.existsByCampusAndSpecialtyAndModalityAndGradeAndGroupAndGeneration(
                 gc.getCampus(),
-                gc.getSpeciality(),
+                gc.getSpecialty(),
                 gc.getModality(),
                 gc.getGrade(),
                 gc.getGroup(),
@@ -84,7 +86,7 @@ public class GroupConfigurationServiceImpl implements IGroupConfigurationService
                     "GroupConfiguration",
                     "UniqueGroupConfiguration",
                     groupConfigurationRequest.getCampus().getName() + ", " +
-                            groupConfigurationRequest.getSpeciality().getName() + ", " +
+                            groupConfigurationRequest.getSpecialty().getName() + ", " +
                             groupConfigurationRequest.getModality().getName() + ", " +
                             groupConfigurationRequest.getGrade().getName() + ", " +
                             groupConfigurationRequest.getGroup().getName() + ", " +
@@ -93,7 +95,7 @@ public class GroupConfigurationServiceImpl implements IGroupConfigurationService
         }
 
         groupConfigurationEntity.setCampus(gc.getCampus());
-        groupConfigurationEntity.setSpeciality(gc.getSpeciality());
+        groupConfigurationEntity.setSpecialty(gc.getSpecialty());
         groupConfigurationEntity.setModality(gc.getModality());
         groupConfigurationEntity.setGrade(gc.getGrade());
         groupConfigurationEntity.setGroup(gc.getGroup());
@@ -104,8 +106,10 @@ public class GroupConfigurationServiceImpl implements IGroupConfigurationService
 
     @Override
     public void deleteGroupConfiguration(Long groupConfigurationId) throws ResourceNotFoundException {
+
         GroupConfigurationEntity groupConfigurationEntity = groupConfigurationRepository.findById(groupConfigurationId)
                 .orElseThrow(() -> new ResourceNotFoundException("delete", "GroupConfiguration", groupConfigurationId));
+        
         groupConfigurationRepository.delete(groupConfigurationEntity);
     }
 

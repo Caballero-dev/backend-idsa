@@ -1,9 +1,8 @@
 package com.api.idsa.domain.personnel.controller;
 
-import com.api.idsa.common.exception.ResourceNotFoundException;
 import com.api.idsa.domain.personnel.dto.request.UpdatePasswordRequest;
 import com.api.idsa.domain.personnel.dto.response.UserProfileResponse;
-import com.api.idsa.domain.personnel.service.UserProfileService;
+import com.api.idsa.domain.personnel.service.IUserProfileService;
 
 import jakarta.validation.Valid;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -15,15 +14,15 @@ import org.springframework.web.bind.annotation.*;
 public class UserProfileController {
 
     @Autowired
-    UserProfileService userProfileService;
+    IUserProfileService userProfileService;
 
     @GetMapping("/{email}")
-    public ResponseEntity<UserProfileResponse> getUserProfile(@PathVariable String email) throws ResourceNotFoundException {
+    public ResponseEntity<UserProfileResponse> getUserProfileByEmail(@PathVariable String email) {
         return ResponseEntity.ok(userProfileService.getUserProfileByEmail(email));
     }
 
     @PutMapping("/password")
-    public void updatePassword(@Valid @RequestBody UpdatePasswordRequest request) throws ResourceNotFoundException {
+    public void updatePassword(@Valid @RequestBody UpdatePasswordRequest request) {
         userProfileService.updatePassword(request);
     }
 }

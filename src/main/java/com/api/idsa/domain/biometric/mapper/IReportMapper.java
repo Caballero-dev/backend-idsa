@@ -5,8 +5,8 @@ import org.mapstruct.Mapping;
 import org.mapstruct.Named;
 
 import com.api.idsa.domain.biometric.dto.response.ReportResponse;
+import com.api.idsa.domain.biometric.model.BiometricDataEntity;
 import com.api.idsa.domain.biometric.model.ReportEntity;
-import com.api.idsa.domain.biometric.model.ReportImageEntity;
 import com.api.idsa.domain.personnel.mapper.IStudentMapper;
 
 import java.util.List;
@@ -17,33 +17,35 @@ public interface IReportMapper {
 
     @Mapping(source = "reportId", target = "reportId")
     @Mapping(source = "student", target = "student")
-    @Mapping(source = "createdAt", target = "createdAt")
-    @Mapping(source = "images", target = "images", qualifiedByName = "imagesToPaths")
     @Mapping(source = "temperature", target = "temperature")
+    @Mapping(source = "heartRate", target = "heartRate")
+    @Mapping(source = "systolicBloodPressure", target = "systolicBloodPressure")
+    @Mapping(source = "diastolicBloodPressure", target = "diastolicBloodPressure")
     @Mapping(source = "pupilDilationRight", target = "pupilDilationRight")
     @Mapping(source = "pupilDilationLeft", target = "pupilDilationLeft")
-    @Mapping(source = "heartRate", target = "heartRate")
-    @Mapping(source = "oxygenLevels", target = "oxygenLevels")
+    @Mapping(source = "createdAt", target = "createdAt")
+    @Mapping(source = "biometricData", target = "images", qualifiedByName = "imagesToPaths")
     ReportResponse toResponse(ReportEntity reportEntity);
 
     @Mapping(source = "reportId", target = "reportId")
     @Mapping(source = "student", target = "student")
-    @Mapping(source = "createdAt", target = "createdAt")
-    @Mapping(source = "images", target = "images", qualifiedByName = "imagesToPaths")
     @Mapping(source = "temperature", target = "temperature")
+    @Mapping(source = "heartRate", target = "heartRate")
+    @Mapping(source = "systolicBloodPressure", target = "systolicBloodPressure")
+    @Mapping(source = "diastolicBloodPressure", target = "diastolicBloodPressure")
     @Mapping(source = "pupilDilationRight", target = "pupilDilationRight")
     @Mapping(source = "pupilDilationLeft", target = "pupilDilationLeft")
-    @Mapping(source = "heartRate", target = "heartRate")
-    @Mapping(source = "oxygenLevels", target = "oxygenLevels")
+    @Mapping(source = "createdAt", target = "createdAt")
+    @Mapping(source = "biometricData", target = "images", qualifiedByName = "imagesToPaths")
     List<ReportResponse> toResponseList(List<ReportEntity> reportEntities);
 
     @Named("imagesToPaths")
-    default List<String> imagesToPaths(List<ReportImageEntity> images) {
-        if (images == null) {
+    default List<String> imagesToPaths(List<BiometricDataEntity> biometricData) {
+        if (biometricData == null) {
             return null;
         }
-        return images.stream()
-                .map(ReportImageEntity::getImagePath)
+        return biometricData.stream()
+                .map(BiometricDataEntity::getImagePath)
                 .collect(Collectors.toList());
     }
 }

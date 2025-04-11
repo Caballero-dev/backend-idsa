@@ -12,7 +12,7 @@ import com.api.idsa.domain.personnel.service.IRoleService;
 import java.util.List;
 
 @RestController
-@RequestMapping("/role")
+@RequestMapping("/roles")
 public class RoleController {
 
     @Autowired
@@ -20,7 +20,7 @@ public class RoleController {
 
     @GetMapping
     public ResponseEntity<List<RoleResponse>> getAllRoles() {
-        return ResponseEntity.ok(roleService.findAllExceptAdmin());
+        return ResponseEntity.ok(roleService.getAllRoleExceptAdmin());
     }
 
 }

@@ -24,12 +24,12 @@ public class GradeServiceImpl implements IGradeService {
     IGradeMapper gradeMapper;
 
     @Override
-    public List<GradeResponse> findAll() {
+    public List<GradeResponse> getAllGrade() {
         return gradeMapper.toResponseList(gradeRepository.findAll());
     }
 
     @Override
-    public GradeResponse create(GradeRequest gradeRequest) throws DuplicateResourceException {
+    public GradeResponse createGrade(GradeRequest gradeRequest) {
 
         if (gradeRepository.existsByGradeName(gradeRequest.getName())) {
             throw new DuplicateResourceException("create", "Grade", gradeRequest.getName());
@@ -40,8 +40,10 @@ public class GradeServiceImpl implements IGradeService {
     }
 
     @Override
-    public GradeResponse update(Long gradeId, GradeRequest gradeRequest) throws ResourceNotFoundException, DuplicateResourceException {
-        GradeEntity gradeEntity = gradeRepository.findById(gradeId).orElseThrow(() -> new ResourceNotFoundException("update", "Grade", gradeId));
+    public GradeResponse updateGrade(Long gradeId, GradeRequest gradeRequest) {
+
+        GradeEntity gradeEntity = gradeRepository.findById(gradeId)
+                .orElseThrow(() -> new ResourceNotFoundException("update", "Grade", gradeId));
 
         if (!gradeEntity.getGradeName().equals(gradeRequest.getName()) && gradeRepository.existsByGradeName(gradeRequest.getName())) {
             throw new DuplicateResourceException("update", "Grade", gradeRequest.getName());
@@ -52,8 +54,11 @@ public class GradeServiceImpl implements IGradeService {
     }
 
     @Override
-    public void delete(Long gradeId) throws ResourceNotFoundException {
-        GradeEntity gradeEntity = gradeRepository.findById(gradeId).orElseThrow(() -> new ResourceNotFoundException("delete", "Grade", gradeId));
+    public void deleteGrade(Long gradeId) {
+        
+        GradeEntity gradeEntity = gradeRepository.findById(gradeId)
+                .orElseThrow(() -> new ResourceNotFoundException("delete", "Grade", gradeId));
+        
         gradeRepository.delete(gradeEntity);
     }
 

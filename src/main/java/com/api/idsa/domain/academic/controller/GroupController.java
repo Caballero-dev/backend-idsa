@@ -1,7 +1,5 @@
 package com.api.idsa.domain.academic.controller;
 
-import com.api.idsa.common.exception.DuplicateResourceException;
-import com.api.idsa.common.exception.ResourceNotFoundException;
 import com.api.idsa.domain.academic.dto.request.GroupRequest;
 import com.api.idsa.domain.academic.dto.response.GroupResponse;
 import com.api.idsa.domain.academic.service.IGroupService;
@@ -14,7 +12,7 @@ import org.springframework.web.bind.annotation.*;
 import java.util.List;
 
 @RestController
-@RequestMapping("/group")
+@RequestMapping("/groups")
 public class GroupController {
 
     @Autowired
@@ -22,21 +20,21 @@ public class GroupController {
 
     @GetMapping
     public ResponseEntity<List<GroupResponse>> getAllGroups() {
-        return ResponseEntity.ok(groupService.findAll());
+        return ResponseEntity.ok(groupService.getAllGroup());
     }
 
     @PostMapping
-    public ResponseEntity<GroupResponse> createGroup(@Valid @RequestBody GroupRequest groupRequest) throws DuplicateResourceException {
+    public ResponseEntity<GroupResponse> createGroup(@Valid @RequestBody GroupRequest groupRequest) {
         return ResponseEntity.ok(groupService.createGroup(groupRequest));
     }
 
     @PutMapping("/{groupId}")
-    public ResponseEntity<GroupResponse> updateGroup(@PathVariable Long groupId, @Valid @RequestBody GroupRequest groupRequest) throws ResourceNotFoundException, DuplicateResourceException {
+    public ResponseEntity<GroupResponse> updateGroup(@PathVariable Long groupId, @Valid @RequestBody GroupRequest groupRequest) {
         return ResponseEntity.ok(groupService.updateGroup(groupId, groupRequest));
     }
 
     @DeleteMapping("/{groupId}")
-    public void deleteGroup(@PathVariable Long groupId) throws ResourceNotFoundException {
+    public void deleteGroup(@PathVariable Long groupId) {
         groupService.deleteGroup(groupId);
     }
 

@@ -1,7 +1,6 @@
 package com.api.idsa.domain.personnel.model;
 
 import com.api.idsa.domain.academic.model.GroupConfigurationEntity;
-import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import jakarta.persistence.*;
 import lombok.AllArgsConstructor;
 import lombok.Data;
@@ -29,7 +28,6 @@ public class TutorEntity {
     private String employeeCode;
 
     @OneToMany(mappedBy = "tutor")
-    @JsonIgnoreProperties("tutor")
     private List<GroupConfigurationEntity> groupConfigurations;
 
 }

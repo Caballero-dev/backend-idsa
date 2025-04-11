@@ -17,9 +17,6 @@ public class PersonEntity {
     @Column(name = "person_id")
     private Long personId;
 
-    @OneToOne(mappedBy = "person", cascade = CascadeType.ALL)
-    private UserEntity user;
-
     @Column(name = "name", nullable = false, length = 50)
     private String name;
 
@@ -31,6 +28,9 @@ public class PersonEntity {
 
     @Column(name = "phone_number", unique = true, nullable = false, length = 10)
     private String phoneNumber;
+
+    @OneToOne(mappedBy = "person", cascade = CascadeType.ALL)
+    private UserEntity user;
 
     @OneToOne(mappedBy = "person", cascade = CascadeType.ALL)
     private TutorEntity tutor;
