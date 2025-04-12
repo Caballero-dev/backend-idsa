@@ -77,12 +77,12 @@ public class TutorServiceImpl implements ITutorService {
         userEntity.setPerson(personEntity);
         userEntity.setRole(roleEntity);
         userEntity.setEmail(tutorRequest.getEmail());
-        userEntity.setPassword(tutorRequest.getPassword());
         userEntity.setCreatedAt(ZonedDateTime.now());
         userEntity.setIsActive(false);
         userEntity.setIsVerifiedEmail(false);
+        // TODO: implementar el envio de correo de verificacion y set de contraseña
         userRepository.save(userEntity);
-        
+
         personEntity.setUser(userEntity);
 
         TutorEntity tutorEntity = new TutorEntity();

@@ -68,7 +68,7 @@ CREATE TABLE users
     person_id         INT                      NOT NULL,
     role_id           INT                      NOT NULL,
     email             VARCHAR(100) UNIQUE      NOT NULL,
-    password          VARCHAR(255)             NOT NULL,
+    password          VARCHAR(255),
     created_at        TIMESTAMP WITH TIME ZONE NOT NULL,
     is_active         BOOLEAN                  NOT NULL,
     is_verified_email BOOLEAN                  NOT NULL,

@@ -19,12 +19,6 @@ public class TutorRequest {
     @Email(message = "Invalid email format")
     private String email;
 
-    // Password es opcional para actualización
-    // @NotBlank(message = "Password cannot be blank")
-    @Size(min = 8, max = 20, message = "Password must be between 8 and 20 characters")
-    @Pattern(regexp = RegexPatterns.PASSWORD, message = "Password contains invalid characters")
-    private String password;
-
     @NotBlank(message = "Name cannot be blank")
     @Size(min = 3, max = 50, message = "Name must be between 3 and 50 characters")
     @Pattern(regexp = RegexPatterns.ONLY_LETTERS, message = "Name can only contain letters and spaces")
