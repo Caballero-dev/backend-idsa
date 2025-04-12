@@ -30,7 +30,6 @@ public class ErrorMessageResponse {
         private String code;
         private String field;
         private String message;
-        private String rejectedValue;
     }
 
 }

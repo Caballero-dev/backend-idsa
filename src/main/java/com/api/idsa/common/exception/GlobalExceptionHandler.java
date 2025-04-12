@@ -3,7 +3,6 @@ package com.api.idsa.common.exception;
 import org.springframework.dao.DataIntegrityViolationException;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
-import org.springframework.validation.FieldError;
 import org.springframework.web.bind.MethodArgumentNotValidException;
 import org.springframework.web.bind.annotation.ExceptionHandler;
 import org.springframework.web.bind.annotation.RestControllerAdvice;
@@ -90,22 +89,12 @@ public class GlobalExceptionHandler {
 
         List<ErrorMessageResponse.ValidationError> validationErrors = new ArrayList<>();
 
-        ex.getBindingResult().getAllErrors().forEach((error) -> {
-            String fieldName = "";
-            String rejectedValue = "";
-
-            if (error instanceof FieldError) {
-                fieldName = ((FieldError) error).getField();
-                rejectedValue = ((FieldError) error).getRejectedValue() != null ?
-                        ((FieldError) error).getRejectedValue().toString() : "";
-            }
-
+        ex.getBindingResult().getFieldErrors().forEach((error) -> {
             validationErrors.add(
                     ErrorMessageResponse.ValidationError.builder()
                             .code(error.getCode())
-                            .field(fieldName)
+                            .field(error.getField())
                             .message(error.getDefaultMessage())
-                            .rejectedValue(rejectedValue)
                             .build()
             );
         });
