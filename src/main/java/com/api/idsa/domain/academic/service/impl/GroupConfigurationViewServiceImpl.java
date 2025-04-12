@@ -33,7 +33,7 @@ public class GroupConfigurationViewServiceImpl implements IGroupConfigurationVie
 
     // Endpoint para tutor que obtiene los grupos de un tutor por su correo electrónico
     @Override
-    public List<GroupConfigurationViewResponse> getAllGroupConfigurationViewByTutorEmail(String personUserEmail) {
-        return groupConfigurationViewMapper.toResponseList(groupConfigurationRepository.findByTutor_Person_User_Email(personUserEmail));
+    public List<GroupConfigurationViewResponse> getAllGroupConfigurationViewByTutorEmail(String tutorEmail) {
+        return groupConfigurationViewMapper.toResponseList(groupConfigurationRepository.findByTutor_Person_User_Email(tutorEmail));
     }
 }

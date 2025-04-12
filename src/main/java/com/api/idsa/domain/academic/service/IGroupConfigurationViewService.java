@@ -24,10 +24,10 @@ public interface IGroupConfigurationViewService {
     /**
      * Obtiene una lista de vista de configuraciones de grupos por correo electrónico del tutor.
      *
-     * @param personUserEmail El correo electrónico del tutor.
+     * @param tutorEmail El correo electrónico del tutor.
      * @return Lista de {@link GroupConfigurationViewResponse} que representan las configuraciones de grupos del tutor.
      */
-    List<GroupConfigurationViewResponse> getAllGroupConfigurationViewByTutorEmail(String personUserEmail);
+    List<GroupConfigurationViewResponse> getAllGroupConfigurationViewByTutorEmail(String tutorEmail);
 
 }
 

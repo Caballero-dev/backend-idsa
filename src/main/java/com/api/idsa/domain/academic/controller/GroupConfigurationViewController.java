@@ -30,9 +30,9 @@ public class GroupConfigurationViewController {
         return groupConfigurationViewService.getAllGroupConfigurationViewByTutor(employeeCode);
     }
 
-    @GetMapping("/by-tutor-email/{personUserEmail}")
-    public List<GroupConfigurationViewResponse> getAllGroupConfigurationViewByTutorEmail(@PathVariable String personUserEmail) {
-        return groupConfigurationViewService.getAllGroupConfigurationViewByTutorEmail(personUserEmail);
+    @GetMapping("/by-tutor-email/{tutorEmail}")
+    public List<GroupConfigurationViewResponse> getAllGroupConfigurationViewByTutorEmail(@PathVariable String tutorEmail) {
+        return groupConfigurationViewService.getAllGroupConfigurationViewByTutorEmail(tutorEmail);
     }
 
 }
