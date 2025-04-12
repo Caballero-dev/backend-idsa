@@ -1,12 +1,10 @@
 package com.api.idsa.common.response;
 
-import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Data;
-import lombok.NoArgsConstructor;
 
-import java.util.ArrayList;
 import java.util.List;
+import java.util.Map;
 
 @Data
 @Builder
@@ -19,16 +17,12 @@ public class ErrorMessageResponse {
     private String message;
     private String path;
 
-    @Builder.Default
-    private List<ValidationError> validationErrors = new ArrayList<>();
+    private Map<String, List<ValidationError>> validationErrors;
 
     @Data
     @Builder
-    @NoArgsConstructor
-    @AllArgsConstructor
     public static class ValidationError {
         private String code;
-        private String field;
         private String message;
     }
 

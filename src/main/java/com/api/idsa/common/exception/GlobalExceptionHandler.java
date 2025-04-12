@@ -13,7 +13,9 @@ import com.api.idsa.common.response.ErrorMessageResponse;
 import java.time.LocalDateTime;
 import java.time.format.DateTimeFormatter;
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 
 @RestControllerAdvice
 public class GlobalExceptionHandler {
@@ -84,19 +86,22 @@ public class GlobalExceptionHandler {
     }
 
     @ExceptionHandler(MethodArgumentNotValidException.class)
-    public ResponseEntity<ErrorMessageResponse> handleValidationExceptions(
-            MethodArgumentNotValidException ex, WebRequest request) {
+    public ResponseEntity<ErrorMessageResponse> handleValidationExceptions(MethodArgumentNotValidException ex, WebRequest request) {
 
-        List<ErrorMessageResponse.ValidationError> validationErrors = new ArrayList<>();
+        Map<String, List<ErrorMessageResponse.ValidationError>> validationErrors = new HashMap<>();
 
         ex.getBindingResult().getFieldErrors().forEach((error) -> {
-            validationErrors.add(
-                    ErrorMessageResponse.ValidationError.builder()
-                            .code(error.getCode())
-                            .field(error.getField())
-                            .message(error.getDefaultMessage())
-                            .build()
-            );
+            String fieldName = error.getField();
+
+            ErrorMessageResponse.ValidationError validationError = ErrorMessageResponse.ValidationError.builder()
+                    .code(error.getCode())
+                    .message(error.getDefaultMessage())
+                    .build();
+                    
+            if (!validationErrors.containsKey(fieldName)) {
+                validationErrors.put(fieldName, new ArrayList<>());
+            }
+            validationErrors.get(fieldName).add(validationError);
         });
 
         ErrorMessageResponse errorResponse = ErrorMessageResponse.builder()
