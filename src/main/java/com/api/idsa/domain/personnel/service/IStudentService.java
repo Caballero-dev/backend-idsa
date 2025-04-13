@@ -5,7 +5,8 @@ import com.api.idsa.common.exception.ResourceNotFoundException;
 import com.api.idsa.domain.personnel.dto.request.StudentRequest;
 import com.api.idsa.domain.personnel.dto.response.StudentResponse;
 
-import java.util.List;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
 
 public interface IStudentService {
 
@@ -14,7 +15,7 @@ public interface IStudentService {
      *
      * @return Lista de  {@link StudentResponse} con la información de los estudiantes.
      */
-    List<StudentResponse> getAllStudent();
+    Page<StudentResponse> getAllStudent(Pageable pageable);
 
     /**
      * Obtiene una lista de estudiantes por groupConfigurationId.
@@ -22,7 +23,7 @@ public interface IStudentService {
      * @param groupConfigurationId ID de la configuración del grupo.
      * @return Lista de {@link StudentResponse} con la información de los estudiantes.
      */
-    List<StudentResponse> getStudentsByGroupConfigurationId(Long groupConfigurationId);
+    Page<StudentResponse> getStudentsByGroupConfigurationId(Long groupConfigurationId, Pageable pageable);
 
     /**
      * Crea un nuevo estudiante.

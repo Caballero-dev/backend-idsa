@@ -11,13 +11,12 @@ import com.api.idsa.domain.personnel.model.PersonEntity;
 import com.api.idsa.domain.personnel.model.StudentEntity;
 import com.api.idsa.domain.personnel.repository.IPersonRepository;
 import com.api.idsa.domain.personnel.repository.IStudentRepository;
-import com.api.idsa.domain.personnel.repository.ITutorRepository;
 import com.api.idsa.domain.personnel.service.IStudentService;
 
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
-
-import java.util.List;
 
 @Service
 public class StudentServiceImpl implements IStudentService {
@@ -29,22 +28,21 @@ public class StudentServiceImpl implements IStudentService {
     IStudentRepository studentRepository;
 
     @Autowired
-    ITutorRepository tutorRepository;
-
-    @Autowired
     IGroupConfigurationRepository groupConfigurationRepository;
 
     @Autowired
     IStudentMapper studentMapper;
 
     @Override
-    public List<StudentResponse> getAllStudent() {
-        return studentMapper.toResponseList(studentRepository.findAll());
+    public Page<StudentResponse> getAllStudent(Pageable pageable) {
+        Page<StudentEntity> studentPage = studentRepository.findAll(pageable);
+        return studentPage.map(studentMapper::toResponse);
     }
 
     @Override
-    public List<StudentResponse> getStudentsByGroupConfigurationId(Long groupConfigurationId) {
-        return studentMapper.toResponseList(studentRepository.findByGroupConfiguration_GroupConfigurationId(groupConfigurationId));
+    public Page<StudentResponse> getStudentsByGroupConfigurationId(Long groupConfigurationId, Pageable pageable) {
+        Page<StudentEntity> studentPage = studentRepository.findByGroupConfiguration_GroupConfigurationId(groupConfigurationId, pageable);
+        return studentPage.map(studentMapper::toResponse);
     }
 
     @Override
@@ -53,11 +51,10 @@ public class StudentServiceImpl implements IStudentService {
         if (studentRepository.existsByStudentCode(studentRequest.getStudentCode())) {
             throw new DuplicateResourceException("create", "Student", "studentCode", studentRequest.getStudentCode());
         }
-        // personRepository.existsByTutor_EmployeeCode(studentRequest.getStudentCode());
-        if (tutorRepository.existsByEmployeeCode(studentRequest.getStudentCode())) {
+        if (personRepository.existsByTutor_EmployeeCode(studentRequest.getStudentCode())) {
             throw new DuplicateResourceException("create", "Student", "studentCode", studentRequest.getStudentCode());
         }
-        if (studentRepository.existsByPerson_PhoneNumber(studentRequest.getPhoneNumber())) {
+        if (personRepository.existsByPhoneNumber(studentRequest.getPhoneNumber())) {
             throw new DuplicateResourceException("create", "Student", "phoneNumber", studentRequest.getPhoneNumber());
         }
 
@@ -85,16 +82,12 @@ public class StudentServiceImpl implements IStudentService {
         if (!studentEntity.getStudentCode().equals(studentRequest.getStudentCode()) && studentRepository.existsByStudentCode(studentRequest.getStudentCode())) {
             throw new DuplicateResourceException("update", "Student", "studentCode", studentRequest.getStudentCode());
         }
-        // personRepository.existsByTutor_EmployeeCode(studentRequest.getStudentCode());
-        if (tutorRepository.existsByEmployeeCode(studentRequest.getStudentCode())) {
+        if (personRepository.existsByTutor_EmployeeCode(studentRequest.getStudentCode())) {
             throw new DuplicateResourceException("update", "Student", "studentCode", studentRequest.getStudentCode());
         }
-        if (!studentEntity.getPerson().getPhoneNumber().equals(studentRequest.getPhoneNumber()) && studentRepository.existsByPerson_PhoneNumber(studentRequest.getPhoneNumber())) {
+        if (!studentEntity.getPerson().getPhoneNumber().equals(studentRequest.getPhoneNumber()) && personRepository.existsByPhoneNumber(studentRequest.getPhoneNumber())) {
             throw new DuplicateResourceException("update", "Student", "phoneNumber", studentRequest.getPhoneNumber());
         }
-
-        // PersonEntity personEntity = studentMapper.toPersonEntity(studentRequest);
-        // personEntity.setPersonId(studentEntity.getPerson().getPersonId());
 
         PersonEntity personEntity = studentEntity.getPerson();
         personEntity.setName(studentRequest.getName());
