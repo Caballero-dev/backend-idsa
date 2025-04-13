@@ -8,11 +8,10 @@ import com.api.idsa.domain.academic.mapper.IGenerationMapper;
 import com.api.idsa.domain.academic.model.GenerationEntity;
 import com.api.idsa.domain.academic.repository.IGenerationRepository;
 import com.api.idsa.domain.academic.service.IGenerationService;
-
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
-
-import java.util.List;
 
 @Service
 public class GenerationServiceImpl implements IGenerationService {
@@ -24,8 +23,9 @@ public class GenerationServiceImpl implements IGenerationService {
     IGenerationMapper generationMapper;
 
     @Override
-    public List<GenerationResponse> getAllGeneration() {
-        return generationMapper.toResponseList(generationRepository.findAll());
+    public Page<GenerationResponse> getAllGeneration(Pageable pageable) {
+        Page<GenerationEntity> generationPage = generationRepository.findAll(pageable);
+        return generationPage.map(generationMapper::toResponse);
     }
 
     @Override

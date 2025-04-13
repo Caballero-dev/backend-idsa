@@ -5,7 +5,8 @@ import com.api.idsa.common.exception.ResourceNotFoundException;
 import com.api.idsa.domain.academic.dto.request.GenerationRequest;
 import com.api.idsa.domain.academic.dto.response.GenerationResponse;
 
-import java.util.List;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
 
 public interface IGenerationService {
 
@@ -14,7 +15,7 @@ public interface IGenerationService {
      *
      * @return Lista de {@link GenerationResponse} con la información de las generaciones.
      */
-    List<GenerationResponse> getAllGeneration();
+    Page<GenerationResponse> getAllGeneration(Pageable pageable);
 
     /**
      * Crea una nueva generación.
