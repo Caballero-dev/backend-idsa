@@ -10,9 +10,9 @@ import com.api.idsa.domain.academic.repository.IModalityRepository;
 import com.api.idsa.domain.academic.service.IModalityService;
 
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
-
-import java.util.List;
 
 @Service
 public class ModalityServiceImpl implements IModalityService {
@@ -24,8 +24,9 @@ public class ModalityServiceImpl implements IModalityService {
     IModalityMapper modalityMapper;
 
     @Override
-    public List<ModalityResponse> getAllModality() {
-        return modalityMapper.toResponseList(modalityRepository.findAll());
+    public Page<ModalityResponse> getAllModality(Pageable pageable) {
+        Page<ModalityEntity> modalityPage = modalityRepository.findAll(pageable);
+        return modalityPage.map(modalityMapper::toResponse);
     }
 
     @Override

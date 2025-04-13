@@ -5,7 +5,8 @@ import com.api.idsa.common.exception.ResourceNotFoundException;
 import com.api.idsa.domain.academic.dto.request.ModalityRequest;
 import com.api.idsa.domain.academic.dto.response.ModalityResponse;
 
-import java.util.List;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
 
 public interface IModalityService {
 
@@ -14,7 +15,7 @@ public interface IModalityService {
      *
      * @return Lista de {@link ModalityResponse} con la información de las modalidades.
      */
-    List<ModalityResponse> getAllModality();
+    Page<ModalityResponse> getAllModality(Pageable pageable);
 
     /**
      * Crea una modalidad
