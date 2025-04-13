@@ -1,5 +1,7 @@
 package com.api.idsa.domain.academic.repository;
 
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.stereotype.Repository;
 
@@ -10,8 +12,6 @@ import com.api.idsa.domain.academic.model.GroupConfigurationEntity;
 import com.api.idsa.domain.academic.model.GroupEntity;
 import com.api.idsa.domain.academic.model.ModalityEntity;
 import com.api.idsa.domain.academic.model.SpecialtyEntity;
-
-import java.util.List;
 
 @Repository
 public interface IGroupConfigurationRepository extends JpaRepository<GroupConfigurationEntity, Long> {
@@ -25,8 +25,8 @@ public interface IGroupConfigurationRepository extends JpaRepository<GroupConfig
             GenerationEntity generation
     );
 
-    List<GroupConfigurationEntity> findByTutor_EmployeeCode(String employeeCode);
+    Page<GroupConfigurationEntity> findByTutor_EmployeeCode(String employeeCode, Pageable pageable);
 
-    List<GroupConfigurationEntity> findByTutor_Person_User_Email(String personUserEmail);
+    Page<GroupConfigurationEntity> findByTutor_Person_User_Email(String personUserEmail, Pageable pageable);
 
 }

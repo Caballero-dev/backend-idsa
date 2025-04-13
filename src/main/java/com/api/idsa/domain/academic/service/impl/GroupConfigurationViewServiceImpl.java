@@ -1,14 +1,15 @@
 package com.api.idsa.domain.academic.service.impl;
 
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 
 import com.api.idsa.domain.academic.dto.response.GroupConfigurationViewResponse;
 import com.api.idsa.domain.academic.mapper.IGroupConfigurationViewMapper;
+import com.api.idsa.domain.academic.model.GroupConfigurationEntity;
 import com.api.idsa.domain.academic.repository.IGroupConfigurationRepository;
 import com.api.idsa.domain.academic.service.IGroupConfigurationViewService;
-
-import java.util.List;
 
 @Service
 public class GroupConfigurationViewServiceImpl implements IGroupConfigurationViewService {
@@ -21,19 +22,22 @@ public class GroupConfigurationViewServiceImpl implements IGroupConfigurationVie
 
     // Endpoint para admin puede ver todas las configuraciones de grupos
     @Override
-    public List<GroupConfigurationViewResponse> getAllGroupConfigurationView() {
-        return groupConfigurationViewMapper.toResponseList(groupConfigurationRepository.findAll());
+    public Page<GroupConfigurationViewResponse> getAllGroupConfigurationView(Pageable pageable) {
+        Page<GroupConfigurationEntity> groupConfigurationPage = groupConfigurationRepository.findAll(pageable);
+        return groupConfigurationPage.map(groupConfigurationViewMapper::toResponse);
     }
 
     // Endpoint para tutor que obtiene los grupos de un tutor por su código de empleado
     @Override
-    public List<GroupConfigurationViewResponse> getAllGroupConfigurationViewByTutor(String employeeCode) {
-        return groupConfigurationViewMapper.toResponseList(groupConfigurationRepository.findByTutor_EmployeeCode(employeeCode));
+    public Page<GroupConfigurationViewResponse> getAllGroupConfigurationViewByTutor(String employeeCode, Pageable pageable) {
+        Page<GroupConfigurationEntity> groupConfigurationPage = groupConfigurationRepository.findByTutor_EmployeeCode(employeeCode, pageable);
+        return groupConfigurationPage.map(groupConfigurationViewMapper::toResponse);
     }
 
     // Endpoint para tutor que obtiene los grupos de un tutor por su correo electrónico
     @Override
-    public List<GroupConfigurationViewResponse> getAllGroupConfigurationViewByTutorEmail(String tutorEmail) {
-        return groupConfigurationViewMapper.toResponseList(groupConfigurationRepository.findByTutor_Person_User_Email(tutorEmail));
+    public Page<GroupConfigurationViewResponse> getAllGroupConfigurationViewByTutorEmail(String tutorEmail, Pageable pageable) {
+        Page<GroupConfigurationEntity> groupConfigurationPage = groupConfigurationRepository.findByTutor_Person_User_Email(tutorEmail, pageable);
+        return groupConfigurationPage.map(groupConfigurationViewMapper::toResponse);
     }
 }

@@ -1,6 +1,7 @@
 package com.api.idsa.domain.academic.service;
 
-import java.util.List;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
 
 import com.api.idsa.domain.academic.dto.response.GroupConfigurationViewResponse;
 
@@ -11,7 +12,7 @@ public interface IGroupConfigurationViewService {
      *
      * @return Lista de {@link GroupConfigurationViewResponse} que representan las configuraciones de grupos.
      */
-    List<GroupConfigurationViewResponse> getAllGroupConfigurationView();
+    Page<GroupConfigurationViewResponse> getAllGroupConfigurationView(Pageable pageable);
 
     /**
      * Obtiene una lista de vista de configuraciones de grupos por numéro de empleado del tutor.
@@ -19,7 +20,7 @@ public interface IGroupConfigurationViewService {
      * @param employeeCode El código del empleado del tutor.
      * @return Lista de {@link GroupConfigurationViewResponse} que representan las configuraciones de grupos del tutor.
      */
-    List<GroupConfigurationViewResponse> getAllGroupConfigurationViewByTutor(String employeeCode);
+    Page<GroupConfigurationViewResponse> getAllGroupConfigurationViewByTutor(String employeeCode, Pageable pageable);
 
     /**
      * Obtiene una lista de vista de configuraciones de grupos por correo electrónico del tutor.
@@ -27,7 +28,7 @@ public interface IGroupConfigurationViewService {
      * @param tutorEmail El correo electrónico del tutor.
      * @return Lista de {@link GroupConfigurationViewResponse} que representan las configuraciones de grupos del tutor.
      */
-    List<GroupConfigurationViewResponse> getAllGroupConfigurationViewByTutorEmail(String tutorEmail);
+    Page<GroupConfigurationViewResponse> getAllGroupConfigurationViewByTutorEmail(String tutorEmail, Pageable pageable);
 
 }
 
