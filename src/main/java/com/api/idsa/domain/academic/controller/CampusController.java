@@ -10,7 +10,6 @@ import jakarta.validation.Valid;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
-import org.springframework.data.web.PageableDefault;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
@@ -25,7 +24,11 @@ public class CampusController {
     ICampusService campusService;
 
     @GetMapping
-    public ResponseEntity<ApiResponse<List<CampusResponse>>> getAllCampus(@PageableDefault(page = 0, size = 100) Pageable pageable) {
+    public ResponseEntity<ApiResponse<List<CampusResponse>>> getAllCampus(
+        @RequestParam(defaultValue = "0") int page,
+        @RequestParam(defaultValue = "100") int size
+    ) {
+        Pageable pageable = Pageable.ofSize(size).withPage(page); 
         Page<CampusResponse> campusPage = campusService.getAllCampus(pageable);
         return ResponseEntity.status(HttpStatus.OK).body(
             new ApiResponse<List<CampusResponse>>(
