@@ -5,7 +5,8 @@ import com.api.idsa.common.exception.ResourceNotFoundException;
 import com.api.idsa.domain.academic.dto.request.GroupConfigurationRequest;
 import com.api.idsa.domain.academic.dto.response.GroupConfigurationResponse;
 
-import java.util.List;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
 
 public interface IGroupConfigurationService {
 
@@ -14,7 +15,7 @@ public interface IGroupConfigurationService {
      *
      * @return Lista de {@link GroupConfigurationResponse} con la información de las configuraciones de grupos.
      */
-    List<GroupConfigurationResponse> getAllGroupConfiguration();
+    Page<GroupConfigurationResponse> getAllGroupConfiguration(Pageable pageable);
 
     /**
      * Crea una nueva configuración de grupo.

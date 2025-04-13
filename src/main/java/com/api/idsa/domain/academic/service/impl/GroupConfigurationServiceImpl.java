@@ -10,9 +10,9 @@ import com.api.idsa.domain.academic.repository.IGroupConfigurationRepository;
 import com.api.idsa.domain.academic.service.IGroupConfigurationService;
 
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
-
-import java.util.List;
 
 @Service
 public class GroupConfigurationServiceImpl implements IGroupConfigurationService {
@@ -24,11 +24,11 @@ public class GroupConfigurationServiceImpl implements IGroupConfigurationService
     IGroupConfigurationMapper groupConfigurationMapper;
 
     @Override
-    public List<GroupConfigurationResponse> getAllGroupConfiguration() {
-        return groupConfigurationMapper.toResponseList(groupConfigurationRepository.findAll());
+    public Page<GroupConfigurationResponse> getAllGroupConfiguration(Pageable pageable) {
+        Page<GroupConfigurationEntity> groupConfigurationPage = groupConfigurationRepository.findAll(pageable);
+        return groupConfigurationPage.map(groupConfigurationMapper::toResponse);
     }
 
-    // FIXME: Verificar si la validación de duplicados es correcta
     @Override
     public GroupConfigurationResponse createGroupConfiguration(GroupConfigurationRequest groupConfigurationRequest) {
         GroupConfigurationEntity groupConfigurationEntity = groupConfigurationMapper.toEntity(groupConfigurationRequest);
@@ -57,7 +57,6 @@ public class GroupConfigurationServiceImpl implements IGroupConfigurationService
         return groupConfigurationMapper.toResponse(groupConfigurationRepository.save(groupConfigurationEntity));
     }
 
-    // FIXME: Verificar si la validación de duplicados es correcta
     @Override
     public GroupConfigurationResponse updateGroupConfiguration(Long groupConfigurationId, GroupConfigurationRequest groupConfigurationRequest) {
 
