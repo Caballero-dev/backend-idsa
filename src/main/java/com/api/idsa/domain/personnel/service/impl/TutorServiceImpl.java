@@ -11,17 +11,17 @@ import com.api.idsa.domain.personnel.model.TutorEntity;
 import com.api.idsa.domain.personnel.model.UserEntity;
 import com.api.idsa.domain.personnel.repository.IPersonRepository;
 import com.api.idsa.domain.personnel.repository.IRoleRepository;
-import com.api.idsa.domain.personnel.repository.IStudentRepository;
 import com.api.idsa.domain.personnel.repository.ITutorRepository;
 import com.api.idsa.domain.personnel.repository.IUserRepository;
 import com.api.idsa.domain.personnel.service.ITutorService;
 
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.time.ZonedDateTime;
-import java.util.List;
 
 @Service
 public class TutorServiceImpl implements ITutorService {
@@ -39,14 +39,12 @@ public class TutorServiceImpl implements ITutorService {
     ITutorRepository tutorRepository;
 
     @Autowired
-    IStudentRepository studentRepository;
-
-    @Autowired
     ITutorMapper tutorMapper;
 
     @Override
-    public List<TutorResponse> getAllTutor() {
-        return tutorMapper.toResponseList(tutorRepository.findAll());
+    public Page<TutorResponse> getAllTutor(Pageable pageable) {
+        Page<TutorEntity> tutorPage = tutorRepository.findAll(pageable);
+        return tutorPage.map(tutorMapper::toResponse);
     }
 
     @Transactional
@@ -56,8 +54,7 @@ public class TutorServiceImpl implements ITutorService {
         if (tutorRepository.existsByEmployeeCode(tutorRequest.getEmployeeCode())) {
             throw new DuplicateResourceException("create", "Tutor", "employeeCode", tutorRequest.getEmployeeCode());
         }
-        // personRepository.existsByTutor_EmployeeCode(tutorRequest.getEmployeeCode());
-        if (studentRepository.existsByStudentCode(tutorRequest.getEmployeeCode())) {
+        if (personRepository.existsByStudent_StudentCode(tutorRequest.getEmployeeCode())) {
             throw new DuplicateResourceException("create", "Tutor", "employeeCode", tutorRequest.getEmployeeCode());
         } 
         if (personRepository.existsByPhoneNumber(tutorRequest.getPhoneNumber())) {
@@ -103,8 +100,7 @@ public class TutorServiceImpl implements ITutorService {
         if (!tutorEntity.getEmployeeCode().equals(tutorRequest.getEmployeeCode()) && tutorRepository.existsByEmployeeCode(tutorRequest.getEmployeeCode())) {
             throw new DuplicateResourceException("update", "Tutor", "employeeCode", tutorRequest.getEmployeeCode());
         }
-        // personRepository.existsByTutor_EmployeeCode(tutorRequest.getEmployeeCode());
-        if (studentRepository.existsByStudentCode(tutorRequest.getEmployeeCode())) {
+        if (personRepository.existsByStudent_StudentCode(tutorRequest.getEmployeeCode())) {
             throw new DuplicateResourceException("update", "Tutor", "employeeCode", tutorRequest.getEmployeeCode());
         }
         if (!tutorEntity.getPerson().getPhoneNumber().equals(tutorRequest.getPhoneNumber()) && personRepository.existsByPhoneNumber(tutorRequest.getPhoneNumber())) {
@@ -113,9 +109,6 @@ public class TutorServiceImpl implements ITutorService {
         if (!tutorEntity.getPerson().getUser().getEmail().equals(tutorRequest.getEmail()) && userRepository.existsByEmail(tutorRequest.getEmail())) {
             throw new DuplicateResourceException("update", "Tutor", "email", tutorRequest.getEmail());
         }
-
-        // PersonEntity personEntity = tutorMapper.toPersonEntity(tutorRequest);
-        // personEntity.setPersonId(tutorEntity.getPerson().getPersonId());
 
         PersonEntity person = tutorEntity.getPerson();
         person.setName(tutorRequest.getName());
@@ -128,7 +121,6 @@ public class TutorServiceImpl implements ITutorService {
         // enviar un correo de verificacion y colocae isActive = false, isVerifiedEmail = false
         UserEntity userEntity = tutorEntity.getPerson().getUser();
         userEntity.setPerson(person);
-        // user.setEmail(tutorRequest.getEmail());
         if (!userEntity.getEmail().equals(tutorRequest.getEmail())) {
             userEntity.setIsActive(false);
             userEntity.setIsVerifiedEmail(false);

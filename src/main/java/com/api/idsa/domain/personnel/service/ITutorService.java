@@ -5,7 +5,8 @@ import com.api.idsa.common.exception.ResourceNotFoundException;
 import com.api.idsa.domain.personnel.dto.request.TutorRequest;
 import com.api.idsa.domain.personnel.dto.response.TutorResponse;
 
-import java.util.List;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
 
 public interface ITutorService {
 
@@ -14,7 +15,7 @@ public interface ITutorService {
      *
      * @return Lista de {@link TutorResponse} con la información de los tutores.
      */
-    List<TutorResponse> getAllTutor();
+    Page<TutorResponse> getAllTutor(Pageable pageable);
 
     /**
      * Crea un tutor.
