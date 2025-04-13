@@ -10,9 +10,9 @@ import com.api.idsa.domain.academic.repository.IGradeRepository;
 import com.api.idsa.domain.academic.service.IGradeService;
 
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
-
-import java.util.List;
 
 @Service
 public class GradeServiceImpl implements IGradeService {
@@ -24,8 +24,9 @@ public class GradeServiceImpl implements IGradeService {
     IGradeMapper gradeMapper;
 
     @Override
-    public List<GradeResponse> getAllGrade() {
-        return gradeMapper.toResponseList(gradeRepository.findAll());
+    public Page<GradeResponse> getAllGrade(Pageable pageable) {
+        Page<GradeEntity> gradePage = gradeRepository.findAll(pageable);
+        return gradePage.map(gradeMapper::toResponse);
     }
 
     @Override

@@ -5,7 +5,8 @@ import com.api.idsa.common.exception.ResourceNotFoundException;
 import com.api.idsa.domain.academic.dto.request.GradeRequest;
 import com.api.idsa.domain.academic.dto.response.GradeResponse;
 
-import java.util.List;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
 
 public interface IGradeService {
 
@@ -14,7 +15,7 @@ public interface IGradeService {
      *
      * @return Lista de {@link GradeResponse} con la información de los grados.
      */
-    List<GradeResponse> getAllGrade();
+    Page<GradeResponse> getAllGrade(Pageable pageable);
 
     /**
      * Crea un grado.
