@@ -5,7 +5,9 @@ import com.api.idsa.common.exception.ResourceNotFoundException;
 import com.api.idsa.domain.academic.dto.request.CampusRequest;
 import com.api.idsa.domain.academic.dto.response.CampusResponse;
 
-import java.util.List;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
+
 
 public interface ICampusService {
 
@@ -14,7 +16,7 @@ public interface ICampusService {
      *
      * @return Lista de {@link CampusResponse} con la información de los campus.
      */
-    List<CampusResponse> getAllCampus();
+    Page<CampusResponse> getAllCampus(Pageable pageable);
 
     /**
      * Crea un campus.

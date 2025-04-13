@@ -10,9 +10,9 @@ import com.api.idsa.domain.academic.repository.ICampusRepository;
 import com.api.idsa.domain.academic.service.ICampusService;
 
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
-
-import java.util.List;
 
 @Service
 public class CampusServiceImpl implements ICampusService {
@@ -24,8 +24,9 @@ public class CampusServiceImpl implements ICampusService {
     ICampusMapper campusMapper;
 
     @Override
-    public List<CampusResponse> getAllCampus() {
-        return campusMapper.toResponseList(campusRepository.findAll());
+    public Page<CampusResponse> getAllCampus(Pageable pageable) {
+        Page<CampusEntity> campusPage = campusRepository.findAll(pageable);
+        return campusPage.map(campusMapper::toResponse);
     }
 
     @Override

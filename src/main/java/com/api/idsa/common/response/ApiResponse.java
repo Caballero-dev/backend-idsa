@@ -20,6 +20,7 @@ public class ApiResponse<T> {
     private int statusCode;
     private String message;
     private T data;
+    private PageInfo pageInfo;
 
     public ApiResponse(HttpStatus status, String message, T data) {
         this.status = status.name();
@@ -27,5 +28,10 @@ public class ApiResponse<T> {
         this.message = message;
         this.data = data;
     }
-
+    
+    public ApiResponse(HttpStatus status, String message, T data, PageInfo pageInfo) {
+        this(status, message, data);
+        this.pageInfo = pageInfo;
+    }
+    
 }
