@@ -1,11 +1,16 @@
 package com.api.idsa.domain.academic.controller;
 
+import com.api.idsa.common.response.ApiResponse;
+import com.api.idsa.common.response.PageInfo;
 import com.api.idsa.domain.academic.dto.request.GroupRequest;
 import com.api.idsa.domain.academic.dto.response.GroupResponse;
 import com.api.idsa.domain.academic.service.IGroupService;
 
 import jakarta.validation.Valid;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
+import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
@@ -16,21 +21,45 @@ import java.util.List;
 public class GroupController {
 
     @Autowired
-    private IGroupService groupService;
+    IGroupService groupService;
 
     @GetMapping
-    public ResponseEntity<List<GroupResponse>> getAllGroups() {
-        return ResponseEntity.ok(groupService.getAllGroup());
+    public ResponseEntity<ApiResponse<List<GroupResponse>>> getAllGroups(
+        @RequestParam(defaultValue = "0") int page,
+        @RequestParam(defaultValue = "100") int size
+    ) {
+        Pageable pageable = Pageable.ofSize(size).withPage(page);
+        Page<GroupResponse> groupPage = groupService.getAllGroup(pageable);
+        return ResponseEntity.status(HttpStatus.OK).body(
+            new ApiResponse<List<GroupResponse>>(
+                HttpStatus.OK,
+                "Groups retrieved successfully",
+                groupPage.getContent(),
+                PageInfo.fromPage(groupPage)
+            )
+        );
     }
 
     @PostMapping
-    public ResponseEntity<GroupResponse> createGroup(@Valid @RequestBody GroupRequest groupRequest) {
-        return ResponseEntity.ok(groupService.createGroup(groupRequest));
+    public ResponseEntity<ApiResponse<GroupResponse>> createGroup(@Valid @RequestBody GroupRequest groupRequest) {
+        return ResponseEntity.status(HttpStatus.CREATED).body(
+            new ApiResponse<GroupResponse>(
+                HttpStatus.CREATED,
+                "Group created successfully",
+                groupService.createGroup(groupRequest)
+            )
+        );
     }
 
     @PutMapping("/{groupId}")
-    public ResponseEntity<GroupResponse> updateGroup(@PathVariable Long groupId, @Valid @RequestBody GroupRequest groupRequest) {
-        return ResponseEntity.ok(groupService.updateGroup(groupId, groupRequest));
+    public ResponseEntity<ApiResponse<GroupResponse>> updateGroup(@PathVariable Long groupId, @Valid @RequestBody GroupRequest groupRequest) {
+        return ResponseEntity.status(HttpStatus.OK).body(
+            new ApiResponse<GroupResponse>(
+                HttpStatus.OK,
+                "Group updated successfully",
+                groupService.updateGroup(groupId, groupRequest)
+            )
+        );
     }
 
     @DeleteMapping("/{groupId}")

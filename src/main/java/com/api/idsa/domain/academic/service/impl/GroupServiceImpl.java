@@ -10,9 +10,9 @@ import com.api.idsa.domain.academic.repository.IGroupRepository;
 import com.api.idsa.domain.academic.service.IGroupService;
 
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
-
-import java.util.List;
 
 @Service
 public class GroupServiceImpl implements IGroupService {
@@ -24,8 +24,9 @@ public class GroupServiceImpl implements IGroupService {
     IGroupMapper groupMapper;
 
     @Override
-    public List<GroupResponse> getAllGroup() {
-        return groupMapper.toResponseList(groupRepository.findAll());
+    public Page<GroupResponse> getAllGroup(Pageable pageable) {
+        Page<GroupEntity> groupPage = groupRepository.findAll(pageable);
+        return groupPage.map(groupMapper::toResponse);
     }
 
     @Override

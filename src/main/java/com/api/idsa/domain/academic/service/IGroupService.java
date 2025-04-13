@@ -5,7 +5,8 @@ import com.api.idsa.common.exception.ResourceNotFoundException;
 import com.api.idsa.domain.academic.dto.request.GroupRequest;
 import com.api.idsa.domain.academic.dto.response.GroupResponse;
 
-import java.util.List;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
 
 public interface IGroupService {
 
@@ -14,7 +15,7 @@ public interface IGroupService {
      *
      * @return Lista de {@link GroupResponse} con la información de los grupos.
      */
-    List<GroupResponse> getAllGroup();
+    Page<GroupResponse> getAllGroup(Pageable pageable);
 
     /**
      * Crea un grupo.
