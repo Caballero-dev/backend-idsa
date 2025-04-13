@@ -3,6 +3,7 @@ package com.api.idsa.domain.personnel.dto.request;
 import com.api.idsa.common.util.RegexPatterns;
 
 import jakarta.validation.constraints.*;
+import jakarta.validation.groups.Default;
 import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.NoArgsConstructor;
@@ -12,6 +13,8 @@ import lombok.NoArgsConstructor;
 @NoArgsConstructor
 public class UserRequest {
 
+    public interface PasswordUpdate extends Default {}
+
     @NotNull(message = "Role cannot be null")
     private RoleRequest role;
 
@@ -20,7 +23,7 @@ public class UserRequest {
     private String email;
 
     // Password es opcional para actualización y en creación no es requerido
-    // @NotBlank(message = "Password cannot be blank")
+    @NotBlank(groups = PasswordUpdate.class, message = "Password cannot be blank")
     @Size(min = 8, max = 20, message = "Password must be between 8 and 20 characters")
     @Pattern(regexp = RegexPatterns.PASSWORD, message = "Password contains invalid characters")
     private String password;

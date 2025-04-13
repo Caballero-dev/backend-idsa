@@ -17,11 +17,12 @@ import com.api.idsa.domain.personnel.repository.IUserRepository;
 import com.api.idsa.domain.personnel.service.IUserService;
 
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.time.ZonedDateTime;
-import java.util.List;
 
 @Service
 public class UserServiceImpl implements IUserService {
@@ -42,26 +43,21 @@ public class UserServiceImpl implements IUserService {
     IUserMapper userMapper;
 
     @Override
-    public List<UserResponse> getAllUser() {
-        return userMapper.toResponseList(userRepository.findAll());
+    public Page<UserResponse> getAllUser(Pageable pageable) {
+        Page<UserEntity> userPage = userRepository.findAll(pageable);
+        return userPage.map(userMapper::toResponse);
     }
 
     @Override
-    public List<UserResponse> getAllActiveExceptAdmin() {
-        // List<UserEntity> userRepositories = userRepository.findAllByIsActiveTrue();
-        // userRepositories.removeIf(user -> "ROLE_ADMIN".equals(user.getRole().getRoleName()));
-        return userMapper.toResponseList(
-            userRepository.findAllByIsActiveTrueAndRole_RoleNameIsNot("ROLE_ADMIN")
-        );
+    public Page<UserResponse> getAllActiveExceptAdmin(Pageable pageable) {
+        Page<UserEntity> userPage = userRepository.findAllByIsActiveTrueAndRole_RoleNameIsNot("ROLE_ADMIN", pageable);
+        return userPage.map(userMapper::toResponse);
     }
 
     @Override
-    public List<UserResponse> getAllInactiveExceptAdmin() {
-        // List<UserEntity> userRepositories = userRepository.findAllByIsActiveFalse();
-        // userRepositories.removeIf(user -> "ROLE_ADMIN".equals(user.getRole().getRoleName()));
-        return userMapper.toResponseList(
-            userRepository.findAllByIsActiveFalseAndRole_RoleNameIsNot("ROLE_ADMIN")
-        );
+    public Page<UserResponse> getAllInactiveExceptAdmin(Pageable pageable) {
+        Page<UserEntity> userPage = userRepository.findAllByIsActiveFalseAndRole_RoleNameIsNot("ROLE_ADMIN", pageable);
+        return userPage.map(userMapper::toResponse);
     }
 
     @Transactional
@@ -81,18 +77,14 @@ public class UserServiceImpl implements IUserService {
             throw new DuplicateResourceException("create", "User", "key_studentCode", userRequest.getKey());
         }
 
-        // Obtener el rol del usuario, Si el rol no existe, lanzar una excepción
         RoleEntity roleEntity = roleRepository.findByRoleName(userRequest.getRole().getRoleId())
                 .orElseThrow(() -> new ResourceNotFoundException("create", "User", "RoleName", userRequest.getRole().getRoleId()));
 
-        // Sí es rol admin denegar la creación
         if ("ROLE_ADMIN".equals(roleEntity.getRoleName())) throw new UserRoleCreationDeniedException();
 
-        // Guardar la persona
         PersonEntity personEntity = userMapper.toPersonEntity(userRequest);
         personRepository.save(personEntity);
 
-        // Guardar el tutor
         if (userRequest.getRole().getRoleId().equals("ROLE_TUTOR")) {
             TutorEntity tutorEntity = new TutorEntity();
             tutorEntity.setPerson(personEntity);
@@ -101,7 +93,6 @@ public class UserServiceImpl implements IUserService {
             personEntity.setTutor(tutorEntity);
         }
 
-        // Guardar el usuario
         UserEntity userEntity = new UserEntity();
         userEntity.setPerson(personEntity);
         userEntity.setRole(roleEntity);
@@ -111,7 +102,6 @@ public class UserServiceImpl implements IUserService {
         userEntity.setIsActive(false);
         userEntity.setIsVerifiedEmail(false);
         userRepository.save(userEntity);
-
         // TODO: implementar logica de envio de correo de verificacion y colocar contraseña
 
         return userMapper.toResponse(userEntity);
@@ -143,9 +133,6 @@ public class UserServiceImpl implements IUserService {
 
         if ("ROLE_ADMIN".equals(updateUserRequest.getRole().getRoleId())) throw new UserRoleCreationDeniedException("Update of user with the role 'ADMIN' is denied");
 
-        // PersonEntity personEntity = userMapper.toPersonEntity(updateUserRequest);
-        // personEntity.setPersonId(userEntity.getPerson().getPersonId());
-
         PersonEntity person = userEntity.getPerson();
         person.setName(updateUserRequest.getName());
         person.setFirstSurname(updateUserRequest.getFirstSurname());
@@ -153,7 +140,6 @@ public class UserServiceImpl implements IUserService {
         person.setPhoneNumber(updateUserRequest.getPhoneNumber());
         personRepository.save(person);
 
-        // Actualizar datos del tutor
         if (updateUserRequest.getRole().getRoleId().equals("ROLE_TUTOR")) {
             TutorEntity tutor = userEntity.getPerson().getTutor();
             tutor.setPerson(person);
@@ -162,7 +148,6 @@ public class UserServiceImpl implements IUserService {
             person.setTutor(tutor);
         }
 
-        // Actualizar datos del usuario
         if (!userEntity.getEmail().equals(updateUserRequest.getEmail())){
             userEntity.setIsActive(false);
             userEntity.setIsVerifiedEmail(false);

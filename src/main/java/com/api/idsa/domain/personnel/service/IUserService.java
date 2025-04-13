@@ -6,7 +6,8 @@ import com.api.idsa.common.exception.UserRoleCreationDeniedException;
 import com.api.idsa.domain.personnel.dto.request.UserRequest;
 import com.api.idsa.domain.personnel.dto.response.UserResponse;
 
-import java.util.List;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
 
 public interface IUserService {
 
@@ -15,21 +16,21 @@ public interface IUserService {
      *
      * @return Lista de {@link UserResponse} con la información de los usuarios.
      */
-    List<UserResponse> getAllUser();
+    Page<UserResponse> getAllUser(Pageable pageable);
 
     /**
      * Obtiene los usuarios activos diferentes de "ROLE_ADMIN".
      *
      * @return Lista de {@link UserResponse} con la información de los usuarios activos.
      */
-    List<UserResponse> getAllActiveExceptAdmin();
+    Page<UserResponse> getAllActiveExceptAdmin(Pageable pageable);
 
     /**
      * Obtiene ls usuarios inactivos diferentes de "ROLE_ADMIN".
      *
      * @return Lista de {@link UserResponse} con la información de los usuarios inactivos.
      */
-    List<UserResponse> getAllInactiveExceptAdmin();
+    Page<UserResponse> getAllInactiveExceptAdmin(Pageable pageable);
 
     /**
      * Crea un nuevo usuario.
