@@ -5,7 +5,8 @@ import com.api.idsa.common.exception.ResourceNotFoundException;
 import com.api.idsa.domain.academic.dto.request.SpecialtyRequest;
 import com.api.idsa.domain.academic.dto.response.SpecialtyResponse;
 
-import java.util.List;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
 
 public interface ISpecialtyService {
 
@@ -14,7 +15,7 @@ public interface ISpecialtyService {
      *
      * @return Lista de {@link SpecialtyResponse} con todas las especialidades.
      */
-    List<SpecialtyResponse> getAllSpecialty();
+    Page<SpecialtyResponse> getAllSpecialty(Pageable pageable);
 
     /**
      * Crea una nueva especialidad.

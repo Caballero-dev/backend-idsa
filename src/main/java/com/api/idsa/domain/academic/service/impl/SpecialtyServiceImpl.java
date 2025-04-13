@@ -10,9 +10,9 @@ import com.api.idsa.domain.academic.repository.ISpecialtyRepository;
 import com.api.idsa.domain.academic.service.ISpecialtyService;
 
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
-
-import java.util.List;
 
 @Service
 public class SpecialtyServiceImpl implements ISpecialtyService {
@@ -24,8 +24,9 @@ public class SpecialtyServiceImpl implements ISpecialtyService {
     ISpecialtyMapper specialtyMapper;
 
     @Override
-    public List<SpecialtyResponse> getAllSpecialty() {
-        return specialtyMapper.toResponseList(specialtyRepository.findAll());
+    public Page<SpecialtyResponse> getAllSpecialty(Pageable pageable) {
+        Page<SpecialtyEntity> specialtyPage = specialtyRepository.findAll(pageable);
+        return specialtyPage.map(specialtyMapper::toResponse);
     }
 
     @Override
