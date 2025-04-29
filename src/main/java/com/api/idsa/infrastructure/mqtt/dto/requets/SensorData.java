@@ -11,7 +11,7 @@ import lombok.NoArgsConstructor;
 @AllArgsConstructor
 public class SensorData {
 
-    private Long student_id;
+    private String student_id;
     private BigDecimal temperature;
     private BigDecimal heart_rate;
     private BigDecimal systolic_blood_pressure;
