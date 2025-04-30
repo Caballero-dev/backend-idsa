@@ -10,7 +10,7 @@ import org.springframework.messaging.MessageHandler;
 import org.springframework.messaging.MessagingException;
 import org.springframework.stereotype.Service;
 
-import com.api.idsa.infrastructure.mqtt.dto.requets.SensorData;
+import com.api.idsa.infrastructure.mqtt.dto.request.SensorData;
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
@@ -26,7 +26,6 @@ public class MqttMessageHandler implements MessageHandler {
         try {
             // Obtener el payload como String
             String payload = message.getPayload().toString();
-            // logger.debug("Mensaje MQTT recibido: {}", payload);
 
             // Validación básica del payload
             if (payload == null || payload.isEmpty()) {

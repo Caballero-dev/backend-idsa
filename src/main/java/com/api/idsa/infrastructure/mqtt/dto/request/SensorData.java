@@ -1,4 +1,4 @@
-package com.api.idsa.infrastructure.mqtt.dto.requets;
+package com.api.idsa.infrastructure.mqtt.dto.request;
 
 import java.math.BigDecimal;
 
