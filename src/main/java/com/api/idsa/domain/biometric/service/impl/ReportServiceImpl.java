@@ -5,9 +5,9 @@ import org.springframework.stereotype.Service;
 
 import com.api.idsa.domain.biometric.dto.response.ReportResponse;
 import com.api.idsa.domain.biometric.mapper.IReportMapper;
-import com.api.idsa.domain.biometric.model.ReportEntity;
 import com.api.idsa.domain.biometric.repository.IReportRepository;
 import com.api.idsa.domain.biometric.service.IReportService;
+import com.api.idsa.infrastructure.fileStorage.service.IFileStorageService;
 
 import java.util.List;
 
@@ -20,16 +20,35 @@ public class ReportServiceImpl implements IReportService {
     @Autowired
     private IReportMapper reportMapper;
 
+    @Autowired
+    IFileStorageService fileStorageService;
+
     @Override
     public List<ReportResponse> findAll() {
-        List<ReportEntity> reports = reportRepository.findAll();
-        return reportMapper.toResponseList(reports);
+        List<ReportResponse> reports = reportMapper.toResponseList(reportRepository.findAll()).stream()
+                .map(r -> {
+                    r.setImages(generateImageUrl(r.getImages()));
+                    return r;
+                })
+                .toList();
+        return reports;
     }
 
     @Override
     public List<ReportResponse> getReportsByStudentId(Long studentId) {
-        List<ReportEntity> reports = reportRepository.findByStudentStudentId(studentId);
-        return reportMapper.toResponseList(reports);
+        List<ReportResponse> reports = reportMapper.toResponseList(reportRepository.findByStudentStudentId(studentId)).stream()
+                .map(r -> {
+                    r.setImages(generateImageUrl(r.getImages()));
+                    return r;
+                })
+                .toList();
+        return reports;
+    }
+
+    private List<String> generateImageUrl(List<String> fileNames) {
+        return fileNames.stream()
+                .map(fileName -> fileStorageService.generateImageUrl(fileName))
+                .toList();
     }
 
 }
