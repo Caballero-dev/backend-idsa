@@ -37,6 +37,11 @@ public class ImageController {
                     contentType = MediaType.IMAGE_JPEG_VALUE;
                 }
 
+                if (!contentType.startsWith("image/")) {
+                    System.out.println("Invalid content type: " + contentType);
+                    return ResponseEntity.badRequest().body(null);
+                }
+
                 return ResponseEntity.ok()
                         .contentType(MediaType.parseMediaType(contentType))
                         .header(HttpHeaders.CONTENT_DISPOSITION, "inline; filename=\"" + resource.getFilename() + "\"")

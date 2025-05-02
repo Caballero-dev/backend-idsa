@@ -22,6 +22,10 @@ public class FileStorageConfig {
     public void init() {
         try {
             Path path = Paths.get(basePath);
+            if (Files.exists(path)) {
+                log.info("Storage directory already exists at: {}", path.toAbsolutePath());
+                return;
+            }
             Files.createDirectories(path);
             log.info("Storage directory initialized at: {}", path.toAbsolutePath());
         } catch (IOException e) {

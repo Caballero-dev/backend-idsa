@@ -12,6 +12,7 @@ import org.springframework.stereotype.Service;
 import com.api.idsa.domain.biometric.dto.request.BiometricDataRequest;
 import com.api.idsa.domain.biometric.service.IBiometricDataService;
 import com.fasterxml.jackson.core.JsonProcessingException;
+import com.fasterxml.jackson.databind.JsonMappingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
 
 import jakarta.validation.ConstraintViolation;
@@ -56,6 +57,9 @@ public class MqttMessageHandler implements MessageHandler {
 
         try {
             biometricData = objectMapper.readValue(payload, BiometricDataRequest.class);
+        } catch (JsonMappingException e) {
+            log.warn("JSON structure error: {}", e.getMessage());
+            return null;
         } catch (JsonProcessingException e) {
             log.warn("Error deserializing JSON: {}", e.getMessage());
             return null;

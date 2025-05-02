@@ -25,6 +25,8 @@ public interface IFileStorageService {
     /**
      * Obtiene la ruta completa del archivo almacenado
      * 
+     * @param fileName El nombre del archivo
+     * @return La ruta del archivo
      */
     Path getFilePath(String fileName);
 
