@@ -15,6 +15,8 @@ import com.api.idsa.domain.personnel.model.StudentEntity;
 import com.api.idsa.domain.personnel.repository.IStudentRepository;
 import com.api.idsa.infrastructure.fileStorage.service.IFileStorageService;
 
+import jakarta.transaction.Transactional;
+
 @Service
 public class BiometricDataServiceImpl implements IBiometricDataService {
 
@@ -31,6 +33,7 @@ public class BiometricDataServiceImpl implements IBiometricDataService {
     IFileStorageService fileStorageService;
 
     @Override
+    @Transactional
     public void createBiometricData(BiometricDataRequest biometricDataRequest) {
 
         StudentEntity student = studentRepository.findByStudentCode(biometricDataRequest.getStudentId())

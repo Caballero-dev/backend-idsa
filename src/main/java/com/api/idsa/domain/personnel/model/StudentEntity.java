@@ -34,10 +34,10 @@ public class StudentEntity {
     @Column(name = "student_code", length = 20, nullable = false, unique = true)
     private String studentCode;
 
-    @OneToMany(mappedBy = "student")
+    @OneToMany(mappedBy = "student", cascade = CascadeType.ALL)
     private List<BiometricDataEntity> biometricData;
 
-    @OneToMany(mappedBy = "student")
+    @OneToMany(mappedBy = "student", cascade = CascadeType.ALL)
     private List<ReportEntity> reports;
 
 }

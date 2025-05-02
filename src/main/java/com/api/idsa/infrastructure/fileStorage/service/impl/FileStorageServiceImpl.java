@@ -8,6 +8,7 @@ import org.springframework.web.servlet.support.ServletUriComponentsBuilder;
 
 import java.io.IOException;
 import java.nio.file.Files;
+import java.nio.file.NoSuchFileException;
 import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.util.Base64;
@@ -48,6 +49,27 @@ public class FileStorageServiceImpl implements IFileStorageService {
     @Override
     public Path getFilePath(String fileName) {
         return Paths.get(basePath).resolve(fileName);
+    }
+    
+    @Override
+    public void deleteFile(String fileName) {
+        try {
+            if (fileName == null || fileName.isEmpty()) {
+                return;
+            }
+            
+            Path filePath = getFilePath(fileName);
+            if (Files.exists(filePath)) {
+                Files.delete(filePath);
+                return;
+            } else {
+
+            }
+        } catch (NoSuchFileException e) {
+            throw new RuntimeException("File not found", e);
+        } catch (IOException e) {
+            throw new RuntimeException("Error deleting file", e);
+        }
     }
 
 }

@@ -30,4 +30,11 @@ public interface IFileStorageService {
      */
     Path getFilePath(String fileName);
 
+    /**
+     * Elimina un archivo por su nombre
+     * 
+     * @param fileName El nombre del archivo a eliminar
+     */
+    void deleteFile(String fileName);
+
 }

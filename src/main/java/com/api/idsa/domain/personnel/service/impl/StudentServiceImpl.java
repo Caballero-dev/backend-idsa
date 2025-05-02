@@ -4,6 +4,7 @@ import com.api.idsa.common.exception.DuplicateResourceException;
 import com.api.idsa.common.exception.ResourceNotFoundException;
 import com.api.idsa.domain.academic.model.GroupConfigurationEntity;
 import com.api.idsa.domain.academic.repository.IGroupConfigurationRepository;
+import com.api.idsa.domain.biometric.model.BiometricDataEntity;
 import com.api.idsa.domain.personnel.dto.request.StudentRequest;
 import com.api.idsa.domain.personnel.dto.response.StudentResponse;
 import com.api.idsa.domain.personnel.mapper.IStudentMapper;
@@ -12,11 +13,15 @@ import com.api.idsa.domain.personnel.model.StudentEntity;
 import com.api.idsa.domain.personnel.repository.IPersonRepository;
 import com.api.idsa.domain.personnel.repository.IStudentRepository;
 import com.api.idsa.domain.personnel.service.IStudentService;
+import com.api.idsa.infrastructure.fileStorage.service.IFileStorageService;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
+
+import java.util.List;
 
 @Service
 public class StudentServiceImpl implements IStudentService {
@@ -32,6 +37,9 @@ public class StudentServiceImpl implements IStudentService {
 
     @Autowired
     IStudentMapper studentMapper;
+    
+    @Autowired
+    IFileStorageService fileStorageService;
 
     @Override
     public Page<StudentResponse> getAllStudent(Pageable pageable) {
@@ -104,11 +112,24 @@ public class StudentServiceImpl implements IStudentService {
     }
 
     @Override
+    @Transactional
     public void deleteStudent(Long studentId) {
 
         StudentEntity studentEntity = studentRepository.findById(studentId)
                 .orElseThrow(() -> new ResourceNotFoundException("Delete", "Student", studentId));
         
+        deleteStudentBiometricImages(studentEntity);
         studentRepository.delete(studentEntity);
+    }
+    
+    private void deleteStudentBiometricImages(StudentEntity student) {
+        List<BiometricDataEntity> biometricDataList = student.getBiometricData();
+
+        if (biometricDataList == null || biometricDataList.isEmpty()) return;
+
+        for (BiometricDataEntity biometricData : biometricDataList) {
+            fileStorageService.deleteFile(biometricData.getImagePath());    
+        }
+
     }
 }
