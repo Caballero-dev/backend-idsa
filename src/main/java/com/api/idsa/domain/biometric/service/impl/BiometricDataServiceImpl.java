@@ -34,7 +34,7 @@ public class BiometricDataServiceImpl implements IBiometricDataService {
 
     @Override
     @Transactional
-    public void createBiometricData(BiometricDataRequest biometricDataRequest) {
+    public BiometricDataEntity createBiometricData(BiometricDataRequest biometricDataRequest) {
 
         StudentEntity student = studentRepository.findByStudentCode(biometricDataRequest.getStudentId())
                 .orElseThrow(() -> new ResourceNotFoundException("Create", "BiometricData", "StudentCode", biometricDataRequest.getStudentId()));
@@ -46,6 +46,8 @@ public class BiometricDataServiceImpl implements IBiometricDataService {
         biometricDataEntity.setImagePath(fileName);
         biometricDataEntity.setCreatedAt(ZonedDateTime.now());
         biometricDataRepository.save(biometricDataEntity);
+
+        return biometricDataEntity;
     }
 
 }

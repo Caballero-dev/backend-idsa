@@ -10,7 +10,9 @@ import org.springframework.messaging.MessagingException;
 import org.springframework.stereotype.Service;
 
 import com.api.idsa.domain.biometric.dto.request.BiometricDataRequest;
+import com.api.idsa.domain.biometric.model.BiometricDataEntity;
 import com.api.idsa.domain.biometric.service.IBiometricDataService;
+import com.api.idsa.domain.biometric.service.IReportService;
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.JsonMappingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
@@ -32,6 +34,9 @@ public class MqttMessageHandler implements MessageHandler {
     @Autowired
     private IBiometricDataService biometricDataService;
 
+    @Autowired
+    private IReportService reportService;
+
     @Override
     public void handleMessage(Message<?> message) throws MessagingException {
         try {
@@ -45,7 +50,7 @@ public class MqttMessageHandler implements MessageHandler {
             BiometricDataRequest biometricData = deserializePayload(payload);
             if (biometricData == null) return;
 
-            biometricDataService.createBiometricData(biometricData);
+            processBiometricData(biometricData);
 
         } catch (Exception e) {
             log.error("Error procesing message: {}", e.getMessage());
@@ -83,6 +88,11 @@ public class MqttMessageHandler implements MessageHandler {
         }
 
         return true;
+    }
+
+    private void processBiometricData(BiometricDataRequest biometricData) {
+        BiometricDataEntity biometricDataEntity = biometricDataService.createBiometricData(biometricData);
+        reportService.createReport(biometricDataEntity.getStudent(), biometricDataEntity.getCreatedAt());
     }
 
 }
