@@ -73,8 +73,8 @@ public class ReportServiceImpl implements IReportService {
 
         System.out.println("Se consulta el conteo de registros: " + recordCount);
         
-        if ( recordCount == RECORDS_THRESHOLD ) {
-            // Si el conteo de registros es igual al umbral, se genera el reporte
+        if (recordCount >= RECORDS_THRESHOLD) {
+            // Si el conteo de registros es mayor o igual al umbral, se genera el reporte
 
             List<BiometricDataEntity> biometricDataList = startDate != null ?
                     biometricDataRepository.findByStudent_StudentIdAndCreatedAtBetween(studentEntity.getStudentId(), startDate, endDate) :
