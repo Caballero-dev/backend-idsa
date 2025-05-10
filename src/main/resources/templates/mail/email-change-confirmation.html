@@ -1,0 +1,45 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <title>Confirma tu nueva dirección de correo electrónico</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            line-height: 1.6;
+            color: #333;
+            max-width: 600px;
+            margin: 0 auto;
+            padding: 20px;
+        }
+        .button {
+            display: inline-block;
+            padding: 12px 24px;
+            background-color: #28a745;
+            color: white;
+            text-decoration: none;
+            border-radius: 4px;
+            margin: 20px 0;
+        }
+        .footer {
+            margin-top: 30px;
+            font-size: 12px;
+            color: #666;
+        }
+    </style>
+</head>
+<body>
+    <h2>Confirmar Cambio de Correo Electrónico</h2>
+    <p>Has solicitado cambiar tu dirección de correo electrónico. Para confirmar este cambio, por favor haz clic en el botón de abajo:</p>
+    
+    <a th:href="${confirmationUrl}" class="button">Confirmar Nueva Dirección de Correo</a>
+    
+    <p>Si no solicitaste este cambio, por favor ignora este correo o contacta a soporte si tienes inquietudes.</p>
+    
+    <p>Este enlace expirará en 24 horas.</p>
+    
+    <div class="footer">
+        <p>Este es un mensaje automático, por favor no respondas a este correo.</p>
+    </div>
+</body>
+</html> 
