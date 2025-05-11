@@ -30,15 +30,15 @@ public class ImageController {
             Path filePath = fileStorageService.getFilePath(fileName);
             Resource resource = new UrlResource(filePath.toUri());
 
-            if (resource.exists()) {
-
+            if (!resource.exists()) {
+                return ResponseEntity.notFound().build();
+            }
                 String contentType = Files.probeContentType(filePath);
                 if (contentType == null) {
                     contentType = MediaType.IMAGE_JPEG_VALUE;
                 }
 
                 if (!contentType.startsWith("image/")) {
-                    System.out.println("Invalid content type: " + contentType);
                     return ResponseEntity.badRequest().body(null);
                 }
 
@@ -46,9 +46,7 @@ public class ImageController {
                         .contentType(MediaType.parseMediaType(contentType))
                         .header(HttpHeaders.CONTENT_DISPOSITION, "inline; filename=\"" + resource.getFilename() + "\"")
                         .body(resource);
-            } else {
-                return ResponseEntity.notFound().build();
-            }
+            
         } catch (IOException e) {
             return ResponseEntity.internalServerError().build();
         }

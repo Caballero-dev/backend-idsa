@@ -15,10 +15,13 @@ import com.api.idsa.domain.personnel.repository.IRoleRepository;
 import com.api.idsa.domain.personnel.repository.ITutorRepository;
 import com.api.idsa.domain.personnel.repository.IUserRepository;
 import com.api.idsa.domain.personnel.service.IUserService;
+import com.api.idsa.infrastructure.mail.service.MailService;
+import com.api.idsa.security.provider.EmailTokenProvider;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
+import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -28,19 +31,28 @@ import java.time.ZonedDateTime;
 public class UserServiceImpl implements IUserService {
 
     @Autowired
-    IPersonRepository personRepository;
+    private IPersonRepository personRepository;
 
     @Autowired
-    ITutorRepository tutorRepository;
+    private ITutorRepository tutorRepository;
 
     @Autowired
-    IRoleRepository roleRepository;
+    private IRoleRepository roleRepository;
 
     @Autowired
-    IUserRepository userRepository;
+    private IUserRepository userRepository;
 
     @Autowired
-    IUserMapper userMapper;
+    private IUserMapper userMapper;
+
+    @Autowired
+    private EmailTokenProvider emailTokenProvider;
+
+    @Autowired
+    private MailService mailService;
+    
+    @Autowired
+    private PasswordEncoder passwordEncoder;
 
     @Override
     public Page<UserResponse> getAllUser(Pageable pageable) {
@@ -60,8 +72,8 @@ public class UserServiceImpl implements IUserService {
         return userPage.map(userMapper::toResponse);
     }
 
-    @Transactional
     @Override
+    @Transactional
     public UserResponse createUser(UserRequest userRequest) {
 
         if (userRepository.existsByEmail(userRequest.getEmail())) {
@@ -97,18 +109,19 @@ public class UserServiceImpl implements IUserService {
         userEntity.setPerson(personEntity);
         userEntity.setRole(roleEntity);
         userEntity.setEmail(userRequest.getEmail());
-        userEntity.setPassword(userRequest.getPassword());
         userEntity.setCreatedAt(ZonedDateTime.now());
         userEntity.setIsActive(false);
         userEntity.setIsVerifiedEmail(false);
         userRepository.save(userEntity);
-        // TODO: implementar logica de envio de correo de verificacion y colocar contraseña
+
+        String token = emailTokenProvider.generateVerificationToken(userEntity.getEmail(), "EMAIL_VERIFICATION");
+        mailService.sendVerificationEmail(userEntity.getEmail(), token);
 
         return userMapper.toResponse(userEntity);
     }
 
-    @Transactional
     @Override
+    @Transactional
     public UserResponse updateUser(Long userId, boolean isUpdatePassword, UserRequest updateUserRequest) {
 
         UserEntity userEntity = userRepository.findById(userId)
@@ -124,7 +137,7 @@ public class UserServiceImpl implements IUserService {
             userEntity.getPerson().getTutor() != null &&
             !userEntity.getPerson().getTutor().getEmployeeCode().equals(updateUserRequest.getKey()) &&
             personRepository.existsByTutor_EmployeeCode(updateUserRequest.getKey())
-            ) {
+        ) {
             throw new DuplicateResourceException("update", "User", "key_employeeCode", updateUserRequest.getKey());
         }
         if (personRepository.existsByStudent_StudentCode(updateUserRequest.getKey())) {
@@ -152,9 +165,11 @@ public class UserServiceImpl implements IUserService {
             userEntity.setIsActive(false);
             userEntity.setIsVerifiedEmail(false);
             userEntity.setEmail(updateUserRequest.getEmail());
-            // TODO: implementar logica verificación del nuevo correo
+            
+            String token = emailTokenProvider.generateVerificationToken(updateUserRequest.getEmail(), "EMAIL_CHANGE");
+            mailService.sendEmailChangeConfirmation(updateUserRequest.getEmail(), token);
         }
-        if (isUpdatePassword) userEntity.setPassword(updateUserRequest.getPassword());
+        if (isUpdatePassword) userEntity.setPassword(passwordEncoder.encode(updateUserRequest.getPassword()));
 
         userRepository.save(userEntity);
 

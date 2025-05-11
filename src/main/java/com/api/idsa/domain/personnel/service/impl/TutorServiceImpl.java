@@ -14,6 +14,8 @@ import com.api.idsa.domain.personnel.repository.IRoleRepository;
 import com.api.idsa.domain.personnel.repository.ITutorRepository;
 import com.api.idsa.domain.personnel.repository.IUserRepository;
 import com.api.idsa.domain.personnel.service.ITutorService;
+import com.api.idsa.infrastructure.mail.service.MailService;
+import com.api.idsa.security.provider.EmailTokenProvider;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
@@ -27,19 +29,25 @@ import java.time.ZonedDateTime;
 public class TutorServiceImpl implements ITutorService {
 
     @Autowired
-    IPersonRepository personRepository;
+    private IPersonRepository personRepository;
 
     @Autowired
-    IRoleRepository roleRepository;
+    private IRoleRepository roleRepository;
 
     @Autowired
-    IUserRepository userRepository;
+    private IUserRepository userRepository;
 
     @Autowired
-    ITutorRepository tutorRepository;
+    private ITutorRepository tutorRepository;
 
     @Autowired
-    ITutorMapper tutorMapper;
+    private ITutorMapper tutorMapper;
+
+    @Autowired
+    private EmailTokenProvider emailTokenProvider;
+
+    @Autowired
+    private MailService mailService;
 
     @Override
     public Page<TutorResponse> getAllTutor(Pageable pageable) {
@@ -47,8 +55,8 @@ public class TutorServiceImpl implements ITutorService {
         return tutorPage.map(tutorMapper::toResponse);
     }
 
-    @Transactional
     @Override
+    @Transactional
     public TutorResponse createTutor(TutorRequest tutorRequest) {
 
         if (tutorRepository.existsByEmployeeCode(tutorRequest.getEmployeeCode())) {
@@ -77,8 +85,10 @@ public class TutorServiceImpl implements ITutorService {
         userEntity.setCreatedAt(ZonedDateTime.now());
         userEntity.setIsActive(false);
         userEntity.setIsVerifiedEmail(false);
-        // TODO: implementar el envio de correo de verificacion y set de contraseña
         userRepository.save(userEntity);
+
+        String token = emailTokenProvider.generateVerificationToken(userEntity.getEmail(), "EMAIL_VERIFICATION");
+        mailService.sendVerificationEmail(userEntity.getEmail(), token);
 
         personEntity.setUser(userEntity);
 
@@ -90,8 +100,8 @@ public class TutorServiceImpl implements ITutorService {
         return tutorMapper.toResponse(tutorEntity);
     }
 
-    @Transactional
     @Override
+    @Transactional
     public TutorResponse updateTutor(Long tutorId, TutorRequest tutorRequest) {
 
         TutorEntity tutorEntity = tutorRepository.findById(tutorId)
@@ -117,14 +127,15 @@ public class TutorServiceImpl implements ITutorService {
         person.setPhoneNumber(tutorRequest.getPhoneNumber());
         personRepository.save(person);
 
-        // TODO: verificar cuando se actualiza el correo electronico si es diferente al que ya tiene
-        // enviar un correo de verificacion y colocae isActive = false, isVerifiedEmail = false
         UserEntity userEntity = tutorEntity.getPerson().getUser();
         userEntity.setPerson(person);
         if (!userEntity.getEmail().equals(tutorRequest.getEmail())) {
             userEntity.setIsActive(false);
             userEntity.setIsVerifiedEmail(false);
             userEntity.setEmail(tutorRequest.getEmail());
+
+            String token = emailTokenProvider.generateVerificationToken(tutorRequest.getEmail(), "EMAIL_CHANGE");
+            mailService.sendEmailChangeConfirmation(tutorRequest.getEmail(), token);
         }
         userRepository.save(userEntity);
         
@@ -139,7 +150,7 @@ public class TutorServiceImpl implements ITutorService {
 
     @Override
     public void deleteTutor(Long tutorId) throws ResourceNotFoundException {
-
+        // FIXME: Si tiene grupos asignados se decir que no se puede elimininar por que tiene grupos asignados, que en confiuguración grupo cambie el tutor por otro
         TutorEntity tutorEntity = tutorRepository.findById(tutorId)
                 .orElseThrow(() -> new ResourceNotFoundException("delete", "Tutor", tutorId));
         

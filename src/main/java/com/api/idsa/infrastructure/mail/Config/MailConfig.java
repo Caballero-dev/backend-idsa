@@ -1,4 +1,4 @@
-package com.api.idsa.infrastructure.mail.Config;
+package com.api.idsa.infrastructure.mail.config;
 
 import java.util.Properties;
 
