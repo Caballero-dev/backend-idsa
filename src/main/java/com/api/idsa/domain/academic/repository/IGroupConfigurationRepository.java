@@ -1,0 +1,32 @@
+package com.api.idsa.domain.academic.repository;
+
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
+import org.springframework.data.jpa.repository.JpaRepository;
+import org.springframework.stereotype.Repository;
+
+import com.api.idsa.domain.academic.model.CampusEntity;
+import com.api.idsa.domain.academic.model.GenerationEntity;
+import com.api.idsa.domain.academic.model.GradeEntity;
+import com.api.idsa.domain.academic.model.GroupConfigurationEntity;
+import com.api.idsa.domain.academic.model.GroupEntity;
+import com.api.idsa.domain.academic.model.ModalityEntity;
+import com.api.idsa.domain.academic.model.SpecialtyEntity;
+
+@Repository
+public interface IGroupConfigurationRepository extends JpaRepository<GroupConfigurationEntity, Long> {
+
+    boolean existsByCampusAndSpecialtyAndModalityAndGradeAndGroupAndGeneration(
+            CampusEntity campus,
+            SpecialtyEntity specialty,
+            ModalityEntity modality,
+            GradeEntity grade,
+            GroupEntity group,
+            GenerationEntity generation
+    );
+
+    Page<GroupConfigurationEntity> findByTutor_EmployeeCode(String employeeCode, Pageable pageable);
+
+    Page<GroupConfigurationEntity> findByTutor_Person_User_Email(String personUserEmail, Pageable pageable);
+
+}
