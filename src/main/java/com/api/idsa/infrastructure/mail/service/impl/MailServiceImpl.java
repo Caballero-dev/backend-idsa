@@ -25,31 +25,37 @@ public class MailServiceImpl implements MailService {
     @Value("${app.frontend.url}")
     private String frontendUrl;
 
+    @Value("${jwt.verification.expiration}")
+    private int verificationExpirationInMinutes;
+
     @Override
     public void sendVerificationEmail(String to, String token) {
         Context context = new Context();
         context.setVariable("verificationUrl", frontendUrl + "/verify-email?token=" + token);
+        context.setVariable("verificationExpiration", verificationExpirationInMinutes);
 
         String emailContent = templateEngine.process("mail/verification-email", context);
-        sendHtmlEmail(to, "Verify your email address", emailContent);
+        sendHtmlEmail(to, "Verifica tu dirección de correo electrónico", emailContent);
     }
 
     @Override
     public void sendPasswordResetEmail(String to, String token) {
         Context context = new Context();
         context.setVariable("resetUrl", frontendUrl + "/reset-password?token=" + token);
+        context.setVariable("resetExpiration", verificationExpirationInMinutes);
 
         String emailContent = templateEngine.process("mail/password-reset-email", context);
-        sendHtmlEmail(to, "Reset your password", emailContent);
+        sendHtmlEmail(to, "Restablece tu contraseña", emailContent);
     }
 
     @Override
     public void sendEmailChangeConfirmation(String to, String token) {
         Context context = new Context();
         context.setVariable("confirmationUrl", frontendUrl + "/confirm-email-change?token=" + token);
+        context.setVariable("confirmationExpiration", verificationExpirationInMinutes);
 
         String emailContent = templateEngine.process("mail/email-change-confirmation", context);
-        sendHtmlEmail(to, "Confirm your new email address", emailContent);
+        sendHtmlEmail(to, "Confirma tu nuevo correo electrónico", emailContent);
     }
 
     private void sendHtmlEmail(String to, String subject, String htmlContent) {

@@ -1,17 +1,22 @@
 <!DOCTYPE html>
 <html xmlns:th="http://www.thymeleaf.org">
+
 <head>
     <meta charset="UTF-8">
     <title>Verifica tu dirección de correo electrónico</title>
     <style>
-        body {
+        .container {
             font-family: Arial, sans-serif;
             line-height: 1.6;
             color: #333;
             max-width: 600px;
             margin: 0 auto;
             padding: 20px;
+            border: 1px solid #ccc;
+            border-radius: 10px;
+            align-items: center;
         }
+
         .button {
             display: inline-block;
             padding: 12px 24px;
@@ -22,6 +27,7 @@
             margin: 20px 0;
             cursor: pointer;
         }
+
         .footer {
             margin-top: 30px;
             font-size: 12px;
@@ -29,18 +35,23 @@
         }
     </style>
 </head>
+
 <body>
-    <h2>¡Bienvenido a IDSA!</h2>
-    <p>Gracias por registrarte. Para completar tu registro y establecer tu contraseña, por favor haz clic en el botón de abajo:</p>
-    
-    <a th:href="${verificationUrl}" target="_blank" class="button" style="color: white;">Verificar Correo Electrónico</a>
-    
-    <p>Si no solicitaste esta verificación, por favor ignora este correo.</p>
-    
-    <p>Este enlace expirará en 24 horas.</p>
-    
-    <div class="footer">
-        <p>Este es un mensaje automático, por favor no respondas a este correo.</p>
+    <div class="container">
+        <h2>¡Bienvenido a IDSA!</h2>
+        <p>Gracias por registrarte. Para completar tu registro y establecer tu contraseña, por favor haz clic en el botón de abajo:</p>
+
+        <a th:href="${verificationUrl}" target="_blank" class="button" style="color: white;">Verificar Correo
+            Electrónico</a>
+
+        <p>Si no solicitaste esta verificación, por favor ignora este correo.</p>
+
+        <p>Este enlace expirará en <span th:text="${verificationExpiration}"></span> minutos.</p>
+
+        <div class="footer">
+            <p>Este es un mensaje automático, por favor no respondas a este correo.</p>
+        </div>
     </div>
 </body>
-</html> 
+
+</html>
