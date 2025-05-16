@@ -4,6 +4,7 @@ package com.api.idsa.security.service.impl;
 import java.util.Collections;
 
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.security.authentication.DisabledException;
 import org.springframework.security.core.authority.SimpleGrantedAuthority;
 import org.springframework.security.core.userdetails.User;
 import org.springframework.security.core.userdetails.UserDetails;
@@ -27,6 +28,10 @@ public class UserDetailsServiceImpl implements UserDetailsService {
     public UserDetails loadUserByUsername(String email) throws UsernameNotFoundException {
         UserEntity userEntity = userRepository.findByEmail(email)
                 .orElseThrow(() -> new UsernameNotFoundException("User not found with email: " + email));
+
+        if (!userEntity.getIsVerifiedEmail()) throw new DisabledException("User is not verified");
+
+        if (!userEntity.getIsActive()) throw new DisabledException("User is not active");
 
         return new User(
             userEntity.getEmail(),

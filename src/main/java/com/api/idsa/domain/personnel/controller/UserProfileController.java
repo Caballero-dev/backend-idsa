@@ -29,7 +29,7 @@ public class UserProfileController {
         );
     }
 
-    @PutMapping("/password")
+    @PutMapping("/update-password")
     public void updatePassword(@Valid @RequestBody UpdatePasswordRequest request) {
         userProfileService.updatePassword(request);
     }

@@ -1,6 +1,7 @@
 package com.api.idsa.security.provider;
 
 import io.jsonwebtoken.*;
+import io.jsonwebtoken.io.Decoders;
 import io.jsonwebtoken.security.Keys;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Component;
@@ -8,68 +9,79 @@ import org.springframework.stereotype.Component;
 import java.util.Date;
 import java.util.HashMap;
 import java.util.Map;
+import java.util.concurrent.TimeUnit;
+import java.util.function.Function;
 
 import javax.crypto.SecretKey;
 
 @Component
 public class EmailTokenProvider {
 
-    @Value("${jwt.verification.secret}")
-    private String verificationSecret;
+    @Value("${jwt.verification.secret-key}")
+    private String jwtVerificationSecretKey;
 
     @Value("${jwt.verification.expiration}")
-    private int verificationExpirationInMs;
+    private int jwtVerificationExpirationInMinutes;
 
     private SecretKey getSigningKey() {
-        return Keys.hmacShaKeyFor(verificationSecret.getBytes());
+        byte[] keyBytes = Decoders.BASE64.decode(jwtVerificationSecretKey);
+        return Keys.hmacShaKeyFor(keyBytes);
     }
 
     public String generateVerificationToken(String email, String type) {
-        Date now = new Date();
-        Date expiryDate = new Date(now.getTime() + verificationExpirationInMs);
+        return generateVerificationToken(new HashMap<>(), email, type);
+    }
 
-        Map<String, Object> claims = new HashMap<>();
-        claims.put("type", type);
+    public String generateVerificationToken(Map<String, Object> claims, String email, String type) {
+        return createToken(claims, email, type, jwtVerificationExpirationInMinutes);
+    }
+
+    private String createToken(Map<String, Object> claims, String email, String type, int expiration) {
+        Date now = new Date();
+        Date expiryDate = new Date(now.getTime() + TimeUnit.MINUTES.toMillis(expiration));
 
         return Jwts.builder()
-                .subject(email)
+                .header().type(type).and()
                 .claims(claims)
+                .subject(email)
                 .issuedAt(now)
                 .expiration(expiryDate)
                 .signWith(getSigningKey())
                 .compact();
     }
 
-    public String getEmailFromToken(String token) {
-        Claims claims = Jwts.parser()
+    public String extractUsername(String token) {
+        return extractClaim(token, Claims::getSubject);
+    }
+
+    public String extractType(String token) {
+        return extractHeader(token, JwsHeader::getType);
+    }
+
+    private <T> T extractClaim(String token, Function<Claims, T> claimsResolver) {
+        final Claims claims = extractAllClaims(token);
+        return claimsResolver.apply(claims);
+    }
+
+    private Claims extractAllClaims(String token) {
+        return Jwts.parser()
                 .verifyWith(getSigningKey())
                 .build()
                 .parseSignedClaims(token)
                 .getPayload();
-
-        return claims.getSubject();
     }
 
-    public String getTokenType(String token) {
-        Claims claims = Jwts.parser()
+    private <T> T extractHeader(String token, Function<JwsHeader, T> headerResolver) {
+        final JwsHeader header = extractAllHeader(token);
+        return headerResolver.apply(header);
+    }
+
+    private JwsHeader extractAllHeader(String token) {
+        return Jwts.parser()
                 .verifyWith(getSigningKey())
                 .build()
                 .parseSignedClaims(token)
-                .getPayload();
-
-        return claims.get("type", String.class);
-    }
-
-    public boolean validateToken(String token) {
-        try {
-            Jwts.parser()
-                    .verifyWith(getSigningKey())
-                    .build()
-                    .parseSignedClaims(token);
-            return true;
-        } catch (JwtException | IllegalArgumentException e) {
-            return false;
-        }
+                .getHeader();
     }
 
 }

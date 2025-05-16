@@ -34,7 +34,10 @@ public class SecurityConfig {
                 .sessionManagement(session -> session.sessionCreationPolicy(SessionCreationPolicy.STATELESS))
                 .authenticationProvider(authenticationProvider())
                 .authorizeHttpRequests(auth -> auth
-                        .requestMatchers("/auth/**").permitAll()
+                        .requestMatchers(
+                                "/auth/login", "/auth/refresh-token", "/auth/verify-email",
+                                "/auth/forgot-password", "/auth/reset-password", "/auth/confirm-email-change")
+                        .permitAll()
                         .requestMatchers("/admin/**").hasAuthority("ROLE_ADMIN")
                         .requestMatchers("/common/**", "/image/**").hasAnyAuthority("ROLE_ADMIN", "ROLE_TUTOR")
                         .anyRequest().authenticated())
@@ -49,7 +52,6 @@ public class SecurityConfig {
         authenticationProvider.setPasswordEncoder(passwordEncoder());
         return authenticationProvider;
     }
-
 
     @Bean
     public AuthenticationManager authenticationManager(AuthenticationConfiguration config) throws Exception {

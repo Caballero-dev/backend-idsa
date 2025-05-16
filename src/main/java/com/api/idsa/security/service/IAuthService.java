@@ -4,16 +4,23 @@ import com.api.idsa.security.dto.request.ForgotPasswordRequest;
 import com.api.idsa.security.dto.request.LoginRequest;
 import com.api.idsa.security.dto.request.PasswordSetRequest;
 import com.api.idsa.security.dto.request.ResetPasswordRequest;
-import com.api.idsa.security.dto.response.LoginResponse;
+
+import jakarta.servlet.http.HttpServletResponse;
 
 public interface IAuthService {
 
     /**
      * Inicia sesión en la aplicación
      * @param loginRequest Objeto que contiene la información del usuario para iniciar sesión.
-     * @return {@link LoginResponse} con la información del usuario autenticado.
+     * @param response HttpServletResponse para manejar la respuesta HTTP.
      */
-    LoginResponse login(LoginRequest loginRequest);
+    void login(LoginRequest loginRequest, HttpServletResponse response);
+
+    /** 
+     * Cierra la sesión del usuario
+     * @param response respuesta HTTP
+     */
+    void logout(HttpServletResponse response);
 
     /**
      * Verifica el correo electrónico y establece la contraseña del usuario.
