@@ -8,15 +8,20 @@ import com.api.idsa.security.dto.request.ForgotPasswordRequest;
 import com.api.idsa.security.dto.request.LoginRequest;
 import com.api.idsa.security.dto.request.PasswordSetRequest;
 import com.api.idsa.security.dto.request.ResetPasswordRequest;
-import com.api.idsa.security.dto.response.LoginResponse;
 import com.api.idsa.security.provider.EmailTokenProvider;
 import com.api.idsa.security.provider.JwtTokenProvider;
 import com.api.idsa.security.service.IAuthService;
+import com.api.idsa.security.service.ICookieService;
+
+import jakarta.servlet.http.HttpServletResponse;
 
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.http.HttpHeaders;
+import org.springframework.http.ResponseCookie;
 import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.core.Authentication;
+import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -34,33 +39,46 @@ public class AuthServiceImpl implements IAuthService {
     private EmailTokenProvider emailTokenProvider;
 
     @Autowired
-    private IUserRepository userRepository;
+    private ICookieService cookieService;
 
+    
     @Autowired
     private PasswordEncoder passwordEncoder;
 
     @Autowired
     private MailService mailService;
 
-    @Override
-    public LoginResponse login(LoginRequest loginRequest) {
-        Authentication authentication = authenticationManager.authenticate(
-                new UsernamePasswordAuthenticationToken(loginRequest.getEmail(), loginRequest.getPassword()));
+    @Autowired
+    private IUserRepository userRepository;
 
-        return LoginResponse.builder()
-                .token(jwtTokenProvider.generateToken(authentication))
-                .build();
+    @Override
+    public void login(LoginRequest loginRequest, HttpServletResponse response) {
+        Authentication authentication = authenticationManager.authenticate(
+            new UsernamePasswordAuthenticationToken(
+                loginRequest.getEmail(),
+                loginRequest.getPassword()
+            )
+        );
+
+        UserDetails userDetails = (UserDetails) authentication.getPrincipal();
+        String accessToken = jwtTokenProvider.generateAccessToken(userDetails);
+
+        ResponseCookie accessTokenCookie = cookieService.createAccessTokenCookie(accessToken);
+        response.addHeader(HttpHeaders.SET_COOKIE, accessTokenCookie.toString());
+    }
+
+    @Override
+    public void logout(HttpServletResponse response) {
+        ResponseCookie accessTokenCookie = cookieService.deleteAccessTokenCookie();
+        response.addHeader(HttpHeaders.SET_COOKIE, accessTokenCookie.toString());
     }
 
     @Override
     @Transactional
     public void verifyEmailAndSetPassword(PasswordSetRequest passwordSetRequest) {
-        if (!emailTokenProvider.validateToken(passwordSetRequest.getToken())) {
-            throw new RuntimeException("Invalid or expired token");
-        }
 
-        String email = emailTokenProvider.getEmailFromToken(passwordSetRequest.getToken());
-        String type = emailTokenProvider.getTokenType(passwordSetRequest.getToken());
+        String email = emailTokenProvider.extractUsername(passwordSetRequest.getToken());
+        String type = emailTokenProvider.extractType(passwordSetRequest.getToken());
 
         if (!"EMAIL_VERIFICATION".equals(type)) {
             throw new RuntimeException("Invalid token type");
@@ -89,12 +107,9 @@ public class AuthServiceImpl implements IAuthService {
     @Override
     @Transactional
     public void resetPassword(ResetPasswordRequest resetPasswordRequest) {
-        if (!emailTokenProvider.validateToken(resetPasswordRequest.getToken())) {
-            throw new RuntimeException("Invalid or expired token");
-        }
 
-        String email = emailTokenProvider.getEmailFromToken(resetPasswordRequest.getToken());
-        String type = emailTokenProvider.getTokenType(resetPasswordRequest.getToken());
+        String email = emailTokenProvider.extractUsername(resetPasswordRequest.getToken());
+        String type = emailTokenProvider.extractType(resetPasswordRequest.getToken());
 
         if (!"PASSWORD_RESET".equals(type)) {
             throw new RuntimeException("Invalid token type");
@@ -110,18 +125,15 @@ public class AuthServiceImpl implements IAuthService {
     @Override
     @Transactional
     public void confirmEmailChange(String token) {
-        if (!emailTokenProvider.validateToken(token)) {
-            throw new RuntimeException("Invalid or expired token");
-        }
 
-        String newEmail = emailTokenProvider.getEmailFromToken(token);
-        String type = emailTokenProvider.getTokenType(token);
+        String newEmail = emailTokenProvider.extractUsername(token);
+        String type = emailTokenProvider.extractType(token);
 
         if (!"EMAIL_CHANGE".equals(type)) {
             throw new RuntimeException("Invalid token type");
         }
 
-        UserEntity userEntity = userRepository.findByEmail(emailTokenProvider.getEmailFromToken(token))
+        UserEntity userEntity = userRepository.findByEmail(emailTokenProvider.extractUsername(token))
                 .orElseThrow(() -> new ResourceNotFoundException("update", "User", "email", newEmail));
 
         userEntity.setIsVerifiedEmail(true);

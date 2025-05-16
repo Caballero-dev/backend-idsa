@@ -41,11 +41,11 @@ public class UserProfileServiceImpl implements IUserProfileService {
                 .orElseThrow(() -> new ResourceNotFoundException("Update", "User", "email", request.getEmail()));
 
         if (!passwordEncoder.matches(request.getCurrentPassword(), user.getPassword())) {
-            throw new IncorrectPasswordException("La contraseña actual es incorrecta");
+            throw new IncorrectPasswordException("The current password is incorrect");
         }
 
         if (request.getCurrentPassword().equals(request.getNewPassword())) {
-            throw new IncorrectPasswordException("La nueva contraseña no puede ser igual a la actual");
+            throw new IncorrectPasswordException("The new password cannot be equal to the current password");
         }
 
         user.setPassword(passwordEncoder.encode(request.getNewPassword()));
