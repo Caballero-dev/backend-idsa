@@ -1,36 +1,33 @@
 package com.api.idsa.security.controller;
 
-import com.api.idsa.common.response.ApiResponse;
 import com.api.idsa.security.dto.request.ForgotPasswordRequest;
 import com.api.idsa.security.dto.request.LoginRequest;
 import com.api.idsa.security.dto.request.PasswordSetRequest;
 import com.api.idsa.security.dto.request.ResetPasswordRequest;
-import com.api.idsa.security.dto.response.LoginResponse;
 import com.api.idsa.security.service.IAuthService;
 
+import jakarta.servlet.http.HttpServletResponse;
 import jakarta.validation.Valid;
 
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.http.HttpStatus;
-import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
 @RestController
 @RequestMapping("/auth")
 public class AuthController {
+    // TODO: agregar controlador de refresh token, volver a pedir correo de verificacion, etc.
 
     @Autowired
     private IAuthService authService;
 
     @PostMapping("/login")
-    public ResponseEntity<ApiResponse<LoginResponse>> login(@Valid @RequestBody LoginRequest request) {
-        return ResponseEntity.status(HttpStatus.OK).body(
-            new ApiResponse<LoginResponse>(
-                HttpStatus.OK,
-                "Login successful",
-                authService.login(request)
-            )
-        );
+    public void login(@Valid @RequestBody LoginRequest request, HttpServletResponse response) {
+        authService.login(request, response);
+    }
+
+    @PostMapping("/logout")
+    public void logout(HttpServletResponse response) {
+        authService.logout(response);
     }
 
     @PostMapping("/verify-email")
@@ -48,7 +45,7 @@ public class AuthController {
         authService.resetPassword(resetPasswordRequest);
     }
 
-    @GetMapping("/confirm-email-change")
+    @PostMapping("/confirm-email-change")
     public void confirmEmailChange(@RequestParam String token) {
         authService.confirmEmailChange(token);
     }
