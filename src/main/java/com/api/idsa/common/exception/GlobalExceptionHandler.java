@@ -120,7 +120,7 @@ public class GlobalExceptionHandler {
         return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(apiError);
     }
 
-    @ExceptionHandler(AuthenticationException .class)
+    @ExceptionHandler(AuthenticationException.class)
     public ResponseEntity<ApiError> handleAuthenticationException(AuthenticationException ex, WebRequest request) {
         ApiError apiError = new ApiError(
             HttpStatus.UNAUTHORIZED,
