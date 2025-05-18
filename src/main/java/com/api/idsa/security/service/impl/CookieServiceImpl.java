@@ -15,8 +15,6 @@ import jakarta.servlet.http.HttpServletRequest;
 @Service
 public class CookieServiceImpl implements ICookieService {
 
-    // FIXME: verificar el refresh token
-
     @Value("${jwt.cookie.domain}")
     private String cookieDomain;
 
@@ -26,9 +24,20 @@ public class CookieServiceImpl implements ICookieService {
     @Value("${jwt.cookie.access-token.expiration}")
     private int accessTokenExpirationInMinutes;
 
+    @Value("${jwt.cookie.refresh-token.name}")
+    private String refreshTokenName;
+
+    @Value("${jwt.cookie.refresh-token.expiration}")
+    private int refreshTokenExpirationInMinutes;
+
     @Override
     public ResponseCookie createAccessTokenCookie(String token) {
         return createSecureCookie(accessTokenName, token, accessTokenExpirationInMinutes);
+    }
+
+    @Override
+    public ResponseCookie createRefreshTokenCookie(String token) {
+        return createSecureCookie(refreshTokenName, token, refreshTokenExpirationInMinutes);
     }
 
     @Override
@@ -37,8 +46,18 @@ public class CookieServiceImpl implements ICookieService {
     }
 
     @Override
+    public ResponseCookie deleteRefreshTokenCookie() {
+        return deleteCookie(refreshTokenName);
+    }
+
+    @Override
     public String getAccessTokenFromCookie(HttpServletRequest request) {
         return getCookie(request, accessTokenName);
+    }
+
+    @Override
+    public String getRefreshTokenFromCookie(HttpServletRequest request) {
+        return getCookie(request, refreshTokenName);
     }
 
     private ResponseCookie createSecureCookie(String name, String value, int maxAge) {

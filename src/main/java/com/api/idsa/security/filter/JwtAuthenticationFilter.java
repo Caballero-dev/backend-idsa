@@ -30,7 +30,8 @@ public class JwtAuthenticationFilter extends OncePerRequestFilter {
         "/auth/verify-email",
         "/auth/forgot-password",
         "/auth/reset-password",
-        "/auth/confirm-email-change"
+        "/auth/confirm-email-change",
+        "/auth/refresh-token"
     );
 
     @Autowired
@@ -56,18 +57,18 @@ public class JwtAuthenticationFilter extends OncePerRequestFilter {
             throws ServletException, IOException {
         final String jwt = cookieService.getAccessTokenFromCookie(request);
 
-        if (jwt == null) {
+        if (jwt == null || jwt.isEmpty()) {
             filterChain.doFilter(request, response);
             return;
         }
 
         try {
-            String userEmail = jwtTokenProvider.extractUsername(jwt);
+            String userEmail = jwtTokenProvider.extractUsername(jwt, true);
 
             if (userEmail != null && SecurityContextHolder.getContext().getAuthentication() == null) {
                 UserDetails userDetails = userDetailsService.loadUserByUsername(userEmail);
 
-                if (jwtTokenProvider.isTokenValid(jwt, userDetails)) {
+                if (jwtTokenProvider.isTokenValid(jwt, userDetails, true)) {
                     UsernamePasswordAuthenticationToken authentication = new UsernamePasswordAuthenticationToken(
                         userDetails, 
                         null, 

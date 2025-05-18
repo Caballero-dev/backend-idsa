@@ -150,4 +150,24 @@ public class GlobalExceptionHandler {
         return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body(apiError);
     }
 
+    @ExceptionHandler(RefreshTokenException.class)
+    public ResponseEntity<ApiError> handleRefreshTokenException(RefreshTokenException ex, WebRequest request) {
+        ApiError apiError = new ApiError(
+            HttpStatus.UNAUTHORIZED,
+            ex.getMessage(),
+            request.getDescription(false).replace("uri=", "")
+        );
+        return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body(apiError);
+    }
+
+    @ExceptionHandler(Exception.class)
+    public ResponseEntity<ApiError> handleGlobalException(Exception ex, WebRequest request) {
+        ApiError apiError = new ApiError(
+            HttpStatus.INTERNAL_SERVER_ERROR,
+            "An unexpected error occurred",
+            request.getDescription(false).replace("uri=", "")
+        );
+        return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(apiError);
+    }
+
 }

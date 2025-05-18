@@ -6,6 +6,7 @@ import com.api.idsa.security.dto.request.PasswordSetRequest;
 import com.api.idsa.security.dto.request.ResetPasswordRequest;
 import com.api.idsa.security.service.IAuthService;
 
+import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
 import jakarta.validation.Valid;
 
@@ -28,6 +29,11 @@ public class AuthController {
     @PostMapping("/logout")
     public void logout(HttpServletResponse response) {
         authService.logout(response);
+    }
+
+    @PostMapping("/refresh-token")
+    public void refreshToken(HttpServletRequest request, HttpServletResponse response) {
+        authService.refreshToken(request, response);
     }
 
     @PostMapping("/verify-email")

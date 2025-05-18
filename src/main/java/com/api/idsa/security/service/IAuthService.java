@@ -5,6 +5,7 @@ import com.api.idsa.security.dto.request.LoginRequest;
 import com.api.idsa.security.dto.request.PasswordSetRequest;
 import com.api.idsa.security.dto.request.ResetPasswordRequest;
 
+import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
 
 public interface IAuthService {
@@ -21,6 +22,13 @@ public interface IAuthService {
      * @param response respuesta HTTP
      */
     void logout(HttpServletResponse response);
+
+    /**
+     * Refresca el token de acceso.
+     * @param request HttpServletRequest para obtener el token de acceso.
+     * @param response HttpServletResponse para manejar la respuesta HTTP.
+     */
+    void refreshToken(HttpServletRequest request, HttpServletResponse response);
 
     /**
      * Verifica el correo electrónico y establece la contraseña del usuario.
