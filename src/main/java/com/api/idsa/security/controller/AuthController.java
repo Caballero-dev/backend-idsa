@@ -16,7 +16,7 @@ import org.springframework.web.bind.annotation.*;
 @RestController
 @RequestMapping("/auth")
 public class AuthController {
-    // TODO: agregar controlador de refresh token, volver a pedir correo de verificacion, etc.
+    // TODO: agregar controlador de volver a pedir correo de verificacion, etc.
 
     @Autowired
     private IAuthService authService;

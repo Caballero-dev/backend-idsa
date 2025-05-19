@@ -153,11 +153,11 @@ public class GlobalExceptionHandler {
     @ExceptionHandler(RefreshTokenException.class)
     public ResponseEntity<ApiError> handleRefreshTokenException(RefreshTokenException ex, WebRequest request) {
         ApiError apiError = new ApiError(
-            HttpStatus.UNAUTHORIZED,
+            ex.getHttpStatus(),
             ex.getMessage(),
             request.getDescription(false).replace("uri=", "")
         );
-        return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body(apiError);
+        return ResponseEntity.status(ex.getHttpStatus()).body(apiError);
     }
 
     @ExceptionHandler(Exception.class)

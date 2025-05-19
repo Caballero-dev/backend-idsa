@@ -1,6 +1,7 @@
 package com.api.idsa.security.provider;
 
 import io.jsonwebtoken.Claims;
+import io.jsonwebtoken.ExpiredJwtException;
 import io.jsonwebtoken.Jwts;
 import io.jsonwebtoken.io.Decoders;
 import io.jsonwebtoken.security.Keys;
@@ -19,6 +20,12 @@ import java.util.function.Function;
 
 @Component
 public class JwtTokenProvider {
+
+    @Value("${jwt.min-pre-expiration-time-to-renew-token}")
+    private int minPreExpirationTimeToRenewToken;
+
+    @Value("${jwt.max-post-expiration-time-to-renew-token}")
+    private int maxPostExpirationTimeToRenewToken;
 
     @Value("${jwt.access-token.secret-key}")
     private String jwtAccessSecretKey;
@@ -74,13 +81,35 @@ public class JwtTokenProvider {
         return extractClaim(token, Claims::getSubject, isAccessToken);
     }
 
-    // public String extractType(String token, boolean isAccessToken) {
-    //     return extractHeader(token, JwsHeader::getType, isAccessToken);
-    // }
-
     public boolean isTokenValid(String token, UserDetails userDetails, boolean isAccessToken) {
         final String username = extractUsername(token, isAccessToken);
         return (username.equals(userDetails.getUsername())) && !isTokenExpired(token, isAccessToken);
+    }
+
+    public TokenRefreshStatus checkAccessTokenRefreshStatus(String token) {
+        try {
+            Date expirationDate = extractExpirationSafely(token, true);
+            long timeToExpiration = expirationDate.getTime() - System.currentTimeMillis();
+
+            System.out.println("tiempo de expiración en minutos: " + expirationDate.toLocaleString());
+
+            if (timeToExpiration > 0) {
+                if (timeToExpiration > TimeUnit.MINUTES.toMillis(minPreExpirationTimeToRenewToken)) {
+                    return TokenRefreshStatus.VALID;
+                } else {
+                    return TokenRefreshStatus.NEEDS_REFRESH;
+                }
+            } else {
+                long timeSinceExpiration = -timeToExpiration;
+                if (timeSinceExpiration > TimeUnit.MINUTES.toMillis(maxPostExpirationTimeToRenewToken)) {
+                    return TokenRefreshStatus.EXPIRED_NON_REFRESHABLE;
+                } else {
+                    return TokenRefreshStatus.EXPIRED_REFRESHABLE;
+                }
+            }
+        } catch (Exception e) {
+            return TokenRefreshStatus.INVALID;
+        }
     }
 
     private boolean isTokenExpired(String token, boolean isAccessToken) {
@@ -89,6 +118,14 @@ public class JwtTokenProvider {
 
     private Date extractExpiration(String token, boolean isAccessToken) {
         return extractClaim(token, Claims::getExpiration, isAccessToken);
+    }
+
+    private Date extractExpirationSafely(String token, boolean isAccessToken) {
+        try {
+            return extractClaim(token, Claims::getExpiration, isAccessToken);
+        } catch (ExpiredJwtException e) {
+            return e.getClaims().getExpiration();
+        }
     }
 
     private <T> T extractClaim(String token, Function<Claims, T> claimsResolver, boolean isAccessToken) {
@@ -105,18 +142,34 @@ public class JwtTokenProvider {
                 .getPayload();
     }
 
-    // private <T> T extractHeader(String token, Function<JwsHeader, T> headerResolver, boolean isAccessToken) {
-    //     final JwsHeader header = extractAllHeader(token, isAccessToken);
-    //     return headerResolver.apply(header);
-    // }
+    /**
+     * Enum que representa los posibles estados de un token para refresh
+     */
+    public enum TokenRefreshStatus {
+        /**
+         * Token válido y lejos de expirar - no necesita refresh
+         */
+        VALID,
 
-    // private JwsHeader extractAllHeader(String token, boolean isAccessToken) {
-    //     SecretKey signingKey = isAccessToken ? getAccessSigningKey() : getRefreshSigningKey();
-    //     return Jwts.parser()
-    //             .verifyWith(signingKey)
-    //             .build()
-    //             .parseSignedClaims(token)
-    //             .getHeader();
-    // }
+        /**
+         * Token válido pero cerca de expirar - necesita refresh
+         */
+        NEEDS_REFRESH,
+
+        /**
+         * Token expirado pero dentro del período de gracia - permite refresh
+         */
+        EXPIRED_REFRESHABLE,
+
+        /**
+         * Token expirado fuera del período de gracia - no permite refresh
+         */
+        EXPIRED_NON_REFRESHABLE,
+
+        /**
+         * Token inválido - no permite refresh
+         */
+        INVALID
+    }
 
 }

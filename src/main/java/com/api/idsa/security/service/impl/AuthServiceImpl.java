@@ -11,6 +11,7 @@ import com.api.idsa.security.dto.request.PasswordSetRequest;
 import com.api.idsa.security.dto.request.ResetPasswordRequest;
 import com.api.idsa.security.provider.EmailTokenProvider;
 import com.api.idsa.security.provider.JwtTokenProvider;
+import com.api.idsa.security.provider.JwtTokenProvider.TokenRefreshStatus;
 import com.api.idsa.security.service.IAuthService;
 import com.api.idsa.security.service.ICookieService;
 
@@ -21,6 +22,7 @@ import jakarta.servlet.http.HttpServletResponse;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpHeaders;
+import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseCookie;
 import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
@@ -89,24 +91,49 @@ public class AuthServiceImpl implements IAuthService {
     @Override
     public void refreshToken(HttpServletRequest request, HttpServletResponse response) {
         String refreshToken = cookieService.getRefreshTokenFromCookie(request);
+        String accessToken = cookieService.getAccessTokenFromCookie(request);
 
         if (refreshToken == null || refreshToken.isEmpty()) {
-            throw new RefreshTokenException("Refresh not found", "refresh_token_not_found");
+            throw new RefreshTokenException("Refresh token not found", "refresh_token_not_found", HttpStatus.BAD_REQUEST);
+        }
+        if (accessToken == null || accessToken.isEmpty()) {
+            throw new RefreshTokenException("Access token not found", "access_token_not_found", HttpStatus.BAD_REQUEST);
         }
 
         try {
             String userEmail = jwtTokenProvider.extractUsername(refreshToken, false);
             UserDetails userDetails = userDetailsService.loadUserByUsername(userEmail);
 
-            if (jwtTokenProvider.isTokenValid(refreshToken, userDetails, false)) {
-                String newAccessToken = jwtTokenProvider.generateToken(userDetails, true);
-                ResponseCookie accessTokenCookie = cookieService.createAccessTokenCookie(newAccessToken);
-                response.addHeader(HttpHeaders.SET_COOKIE, accessTokenCookie.toString());
+            if (!jwtTokenProvider.isTokenValid(refreshToken, userDetails, false)) {
+                clearAuthCookies(response);
+                throw new RefreshTokenException("Invalid refresh token", "invalid_refresh_token", HttpStatus.UNAUTHORIZED);
             }
+
+            TokenRefreshStatus tokenStatus = jwtTokenProvider.checkAccessTokenRefreshStatus(accessToken);
+
+            switch (tokenStatus) {
+                case VALID:
+                    throw new RefreshTokenException("Access token is still valid", "access_token_valid", HttpStatus.BAD_REQUEST);
+                case NEEDS_REFRESH:
+                case EXPIRED_REFRESHABLE:
+                    String newAccessToken = jwtTokenProvider.generateToken(userDetails, true);
+                    ResponseCookie newAccessTokenCookie = cookieService.createAccessTokenCookie(newAccessToken);
+                    response.addHeader(HttpHeaders.SET_COOKIE, newAccessTokenCookie.toString());
+                    break;
+                case EXPIRED_NON_REFRESHABLE:
+                clearAuthCookies(response);
+                    throw new RefreshTokenException("Access token expired and non-refreshable", "expired_non_refreshable_access_token", HttpStatus.UNAUTHORIZED);
+                case INVALID:
+                    clearAuthCookies(response);
+                    throw new RefreshTokenException("Invalid access token", "invalid_access_token", HttpStatus.UNAUTHORIZED);
+            }
+
         } catch (ExpiredJwtException e) {
-            throw new RefreshTokenException("Refresh token has expired", "expired_refresh_token");
+            clearAuthCookies(response);
+            throw new RefreshTokenException("Refresh token has expired", "expired_refresh_token", HttpStatus.UNAUTHORIZED);
         } catch (JwtException e) {
-            throw new RefreshTokenException("Invalid refresh token", "invalid_refresh_token");
+            clearAuthCookies(response);
+            throw new RefreshTokenException("Invalid refresh token", "invalid_refresh_token", HttpStatus.UNAUTHORIZED);
         }
     }
 
@@ -176,6 +203,13 @@ public class AuthServiceImpl implements IAuthService {
         userEntity.setIsVerifiedEmail(true);
         userEntity.setIsActive(true);
         userRepository.save(userEntity);
+    }
+
+    private void clearAuthCookies(HttpServletResponse response) {
+        ResponseCookie accessTokenCookie = cookieService.deleteAccessTokenCookie();
+        ResponseCookie refreshTokenCookie = cookieService.deleteRefreshTokenCookie();
+        response.addHeader(HttpHeaders.SET_COOKIE, accessTokenCookie.toString());
+        response.addHeader(HttpHeaders.SET_COOKIE, refreshTokenCookie.toString());
     }
 
 }

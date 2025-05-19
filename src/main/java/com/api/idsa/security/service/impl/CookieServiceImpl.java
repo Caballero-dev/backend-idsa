@@ -30,9 +30,12 @@ public class CookieServiceImpl implements ICookieService {
     @Value("${jwt.cookie.refresh-token.expiration}")
     private int refreshTokenExpirationInMinutes;
 
+    @Value("${jwt.max-post-expiration-time-to-renew-token}")
+    private int maxPostExpirationTimeToRenewToken;
+
     @Override
     public ResponseCookie createAccessTokenCookie(String token) {
-        return createSecureCookie(accessTokenName, token, accessTokenExpirationInMinutes);
+        return createSecureCookie(accessTokenName, token, accessTokenExpirationInMinutes + maxPostExpirationTimeToRenewToken);
     }
 
     @Override
