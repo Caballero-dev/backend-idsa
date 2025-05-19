@@ -54,4 +54,11 @@ public interface IAuthService {
      */
     void confirmEmailChange(String token);
 
+    /**
+     * Reenvía un correo electrónico según el token proporcionado.
+     * El tipo de email a enviar se determina automáticamente según el tipo del token.
+     * 
+     * @param token Token para determinar el tipo de correo y el destinatario
+     */
+    void resendEmailByToken(String token);
 }

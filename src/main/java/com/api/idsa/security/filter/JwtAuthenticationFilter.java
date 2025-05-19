@@ -31,7 +31,8 @@ public class JwtAuthenticationFilter extends OncePerRequestFilter {
         "/auth/forgot-password",
         "/auth/reset-password",
         "/auth/confirm-email-change",
-        "/auth/refresh-token"
+        "/auth/refresh-token",
+        "/auth/resend-email"
     );
 
     @Autowired

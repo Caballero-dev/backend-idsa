@@ -36,7 +36,8 @@ public class SecurityConfig {
                 .authorizeHttpRequests(auth -> auth
                         .requestMatchers(
                                 "/auth/login", "/auth/refresh-token", "/auth/verify-email",
-                                "/auth/forgot-password", "/auth/reset-password", "/auth/confirm-email-change")
+                                "/auth/forgot-password", "/auth/reset-password", "/auth/confirm-email-change",
+                                "/auth/resend-email")
                         .permitAll()
                         .requestMatchers("/admin/**").hasAuthority("ROLE_ADMIN")
                         .requestMatchers("/common/**", "/image/**").hasAnyAuthority("ROLE_ADMIN", "ROLE_TUTOR")

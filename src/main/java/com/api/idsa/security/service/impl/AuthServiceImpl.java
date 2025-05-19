@@ -1,5 +1,6 @@
 package com.api.idsa.security.service.impl;
 
+import com.api.idsa.common.exception.EmailTokenException;
 import com.api.idsa.common.exception.RefreshTokenException;
 import com.api.idsa.common.exception.ResourceNotFoundException;
 import com.api.idsa.domain.personnel.model.UserEntity;
@@ -145,7 +146,7 @@ public class AuthServiceImpl implements IAuthService {
         String type = emailTokenProvider.extractType(passwordSetRequest.getToken());
 
         if (!"EMAIL_VERIFICATION".equals(type)) {
-            throw new RuntimeException("Invalid token type");
+            throw new EmailTokenException("Invalid token type", "invalid_token_type", HttpStatus.BAD_REQUEST);
         }
 
         UserEntity userEntity = userRepository.findByEmail(email)
@@ -176,7 +177,7 @@ public class AuthServiceImpl implements IAuthService {
         String type = emailTokenProvider.extractType(resetPasswordRequest.getToken());
 
         if (!"PASSWORD_RESET".equals(type)) {
-            throw new RuntimeException("Invalid token type");
+            throw new EmailTokenException("Invalid token type", "invalid_token_type", HttpStatus.BAD_REQUEST);
         }
 
         UserEntity userEntity = userRepository.findByEmail(email)
@@ -194,7 +195,7 @@ public class AuthServiceImpl implements IAuthService {
         String type = emailTokenProvider.extractType(token);
 
         if (!"EMAIL_CHANGE".equals(type)) {
-            throw new RuntimeException("Invalid token type");
+            throw new EmailTokenException("Invalid token type", "invalid_token_type", HttpStatus.BAD_REQUEST);
         }
 
         UserEntity userEntity = userRepository.findByEmail(emailTokenProvider.extractUsername(token))
@@ -205,6 +206,58 @@ public class AuthServiceImpl implements IAuthService {
         userRepository.save(userEntity);
     }
 
+    @Override
+    public void resendEmailByToken(String token) {
+        try {
+            String email = emailTokenProvider.extractUsername(token);
+            String tokenType = emailTokenProvider.extractType(token);
+
+            processEmailResend(email, tokenType);
+
+        } catch (ExpiredJwtException e) {
+            String email = e.getClaims().getSubject();
+            String tokenType = e.getHeader().getType();
+
+            processEmailResend(email, tokenType);
+        } catch (JwtException e) {
+            throw new EmailTokenException("Invalid token", "invalid_token", HttpStatus.UNAUTHORIZED);
+        }
+    }
+
+    private void processEmailResend(String email, String tokenType) {
+        UserEntity userEntity = userRepository.findByEmail(email)
+                .orElseThrow(() -> new ResourceNotFoundException("resend email", "User", "email", email));
+        
+        switch (tokenType) {
+            case "EMAIL_VERIFICATION":
+                if (userEntity.getIsVerifiedEmail()) {
+                    throw new EmailTokenException("Email has already been verified", "verified_email", HttpStatus.BAD_REQUEST);
+                }
+                String verificationToken = emailTokenProvider.generateVerificationToken(email, tokenType);
+                mailService.sendVerificationEmail(email, verificationToken);
+                break;
+                
+            case "PASSWORD_RESET":
+                if (!userEntity.getIsActive()) {
+                    throw new EmailTokenException("User account is not active", "account_not_active", HttpStatus.BAD_REQUEST);
+                }
+                String resetToken = emailTokenProvider.generateVerificationToken(email, tokenType);
+                mailService.sendPasswordResetEmail(email, resetToken);
+                break;
+                
+            case "EMAIL_CHANGE":
+                if (userEntity.getIsVerifiedEmail()) {
+                    throw new EmailTokenException("Email has already been verified", "verified_email", HttpStatus.BAD_REQUEST);
+                }
+                String emailChangeToken = emailTokenProvider.generateVerificationToken(email, tokenType);
+                mailService.sendEmailChangeConfirmation(email, emailChangeToken);
+                break;
+                
+            default:
+                throw new EmailTokenException("Unknown email type: " + tokenType, "unknown_email_type", HttpStatus.BAD_REQUEST);
+        }
+    }
+    
     private void clearAuthCookies(HttpServletResponse response) {
         ResponseCookie accessTokenCookie = cookieService.deleteAccessTokenCookie();
         ResponseCookie refreshTokenCookie = cookieService.deleteRefreshTokenCookie();

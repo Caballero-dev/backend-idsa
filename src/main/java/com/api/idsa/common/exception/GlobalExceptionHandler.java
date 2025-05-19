@@ -150,6 +150,16 @@ public class GlobalExceptionHandler {
         return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body(apiError);
     }
 
+    @ExceptionHandler(EmailTokenException.class)
+    public ResponseEntity<ApiError> handleEmailTokenException(EmailTokenException ex, WebRequest request) {
+        ApiError apiError = new ApiError(
+            ex.getHttpStatus(),
+            ex.getMessage(),
+            request.getDescription(false).replace("uri=", "")
+        );
+        return ResponseEntity.status(ex.getHttpStatus()).body(apiError);
+    }
+
     @ExceptionHandler(RefreshTokenException.class)
     public ResponseEntity<ApiError> handleRefreshTokenException(RefreshTokenException ex, WebRequest request) {
         ApiError apiError = new ApiError(
