@@ -10,6 +10,9 @@ import org.springframework.beans.factory.annotation.Value;
 import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.stereotype.Component;
 
+import com.api.idsa.security.enums.TokenRefreshStatus;
+import com.api.idsa.security.enums.TokenType;
+
 import javax.crypto.SecretKey;
 
 import java.util.Date;
@@ -56,11 +59,11 @@ public class JwtTokenProvider {
     }
 
     public String generateAccessToken(Map<String, Object> claims, UserDetails userDetails) {
-        return createToken(claims, userDetails, jwtAccessExpirationInMinutes, getAccessSigningKey(), "ACCESS_TOKEN");
+        return createToken(claims, userDetails, jwtAccessExpirationInMinutes, getAccessSigningKey(), TokenType.ACCESS_TOKEN.toString());
     }
 
     public String generateRefreshToken(Map<String, Object> claims, UserDetails userDetails) {
-        return createToken(claims, userDetails, jwtRefreshExpirationInMinutes, getRefreshSigningKey(), "REFRESH_TOKEN");
+        return createToken(claims, userDetails, jwtRefreshExpirationInMinutes, getRefreshSigningKey(), TokenType.REFRESH_TOKEN.toString());
     }
 
     private String createToken(Map<String, Object> claims, UserDetails userDetails, int expiration, SecretKey signingKey, String type) {
@@ -90,8 +93,6 @@ public class JwtTokenProvider {
         try {
             Date expirationDate = extractExpirationSafely(token, true);
             long timeToExpiration = expirationDate.getTime() - System.currentTimeMillis();
-
-            System.out.println("tiempo de expiración en minutos: " + expirationDate.toLocaleString());
 
             if (timeToExpiration > 0) {
                 if (timeToExpiration > TimeUnit.MINUTES.toMillis(minPreExpirationTimeToRenewToken)) {
@@ -140,36 +141,6 @@ public class JwtTokenProvider {
                 .build()
                 .parseSignedClaims(token)
                 .getPayload();
-    }
-
-    /**
-     * Enum que representa los posibles estados de un token para refresh
-     */
-    public enum TokenRefreshStatus {
-        /**
-         * Token válido y lejos de expirar - no necesita refresh
-         */
-        VALID,
-
-        /**
-         * Token válido pero cerca de expirar - necesita refresh
-         */
-        NEEDS_REFRESH,
-
-        /**
-         * Token expirado pero dentro del período de gracia - permite refresh
-         */
-        EXPIRED_REFRESHABLE,
-
-        /**
-         * Token expirado fuera del período de gracia - no permite refresh
-         */
-        EXPIRED_NON_REFRESHABLE,
-
-        /**
-         * Token inválido - no permite refresh
-         */
-        INVALID
     }
 
 }
