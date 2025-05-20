@@ -1,5 +1,6 @@
 package com.api.idsa.security.filter;
 
+import com.api.idsa.security.enums.TokenType;
 import com.api.idsa.security.provider.JwtTokenProvider;
 import com.api.idsa.security.service.ICookieService;
 
@@ -64,6 +65,13 @@ public class JwtAuthenticationFilter extends OncePerRequestFilter {
         }
 
         try {
+            TokenType tokenType = jwtTokenProvider.extractTokenType(jwt, true);
+
+            if (tokenType != TokenType.ACCESS_TOKEN) {
+                filterChain.doFilter(request, response);
+                return;
+            }
+
             String userEmail = jwtTokenProvider.extractUsername(jwt, true);
 
             if (userEmail != null && SecurityContextHolder.getContext().getAuthentication() == null) {

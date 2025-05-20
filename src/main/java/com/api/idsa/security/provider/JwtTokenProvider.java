@@ -2,6 +2,7 @@ package com.api.idsa.security.provider;
 
 import io.jsonwebtoken.Claims;
 import io.jsonwebtoken.ExpiredJwtException;
+import io.jsonwebtoken.JwsHeader;
 import io.jsonwebtoken.Jwts;
 import io.jsonwebtoken.io.Decoders;
 import io.jsonwebtoken.security.Keys;
@@ -59,11 +60,11 @@ public class JwtTokenProvider {
     }
 
     public String generateAccessToken(Map<String, Object> claims, UserDetails userDetails) {
-        return createToken(claims, userDetails, jwtAccessExpirationInMinutes, getAccessSigningKey(), TokenType.ACCESS_TOKEN.toString());
+        return createToken(claims, userDetails, jwtAccessExpirationInMinutes, getAccessSigningKey(), TokenType.ACCESS_TOKEN.name());
     }
 
     public String generateRefreshToken(Map<String, Object> claims, UserDetails userDetails) {
-        return createToken(claims, userDetails, jwtRefreshExpirationInMinutes, getRefreshSigningKey(), TokenType.REFRESH_TOKEN.toString());
+        return createToken(claims, userDetails, jwtRefreshExpirationInMinutes, getRefreshSigningKey(), TokenType.REFRESH_TOKEN.name());
     }
 
     private String createToken(Map<String, Object> claims, UserDetails userDetails, int expiration, SecretKey signingKey, String type) {
@@ -87,6 +88,11 @@ public class JwtTokenProvider {
     public boolean isTokenValid(String token, UserDetails userDetails, boolean isAccessToken) {
         final String username = extractUsername(token, isAccessToken);
         return (username.equals(userDetails.getUsername())) && !isTokenExpired(token, isAccessToken);
+    }
+
+    public TokenType extractTokenType(String token, boolean isAccessToken) {
+        String typeStr = extractAllHeader(token, JwsHeader::getType, isAccessToken);
+        return TokenType.safeValueOf(typeStr);
     }
 
     public TokenRefreshStatus checkAccessTokenRefreshStatus(String token) {
@@ -142,5 +148,21 @@ public class JwtTokenProvider {
                 .parseSignedClaims(token)
                 .getPayload();
     }
+
+    private <T> T extractAllHeader(String token, Function<JwsHeader, T> headerResolver, boolean isAccessToken) {
+        final JwsHeader header = extractAllHeader(token, isAccessToken);
+        return headerResolver.apply(header);
+    }
+
+    private JwsHeader extractAllHeader(String token, boolean isAccessToken) {
+        SecretKey signingKey = isAccessToken ? getAccessSigningKey() : getRefreshSigningKey();
+        return Jwts.parser()
+                .verifyWith(signingKey)
+                .build()
+                .parseSignedClaims(token)
+                .getHeader();
+    }
+
+
 
 }

@@ -43,7 +43,7 @@ public class EmailTokenProvider {
         Date expiryDate = new Date(now.getTime() + TimeUnit.MINUTES.toMillis(expiration));
 
         return Jwts.builder()
-                .header().type(type.toString()).and()
+                .header().type(type.name()).and()
                 .claims(claims)
                 .subject(email)
                 .issuedAt(now)

@@ -103,6 +103,15 @@ public class AuthServiceImpl implements IAuthService {
         }
 
         try {
+
+            TokenType accessTokenType = jwtTokenProvider.extractTokenType(accessToken, true);
+            TokenType refreshTokenType = jwtTokenProvider.extractTokenType(refreshToken, false);
+
+            if (accessTokenType != TokenType.ACCESS_TOKEN || refreshTokenType != TokenType.REFRESH_TOKEN) {
+                clearAuthCookies(response);
+                throw new RefreshTokenException("Invalid token type", "invalid_token_type", HttpStatus.UNAUTHORIZED);
+            }
+
             String userEmail = jwtTokenProvider.extractUsername(refreshToken, false);
             UserDetails userDetails = userDetailsService.loadUserByUsername(userEmail);
 
