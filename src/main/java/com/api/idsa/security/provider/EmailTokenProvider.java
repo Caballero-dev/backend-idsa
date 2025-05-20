@@ -6,6 +6,8 @@ import io.jsonwebtoken.security.Keys;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Component;
 
+import com.api.idsa.security.enums.TokenType;
+
 import java.util.Date;
 import java.util.HashMap;
 import java.util.Map;
@@ -28,20 +30,20 @@ public class EmailTokenProvider {
         return Keys.hmacShaKeyFor(keyBytes);
     }
 
-    public String generateVerificationToken(String email, String type) {
+    public String generateVerificationToken(String email, TokenType type) {
         return generateVerificationToken(new HashMap<>(), email, type);
     }
 
-    public String generateVerificationToken(Map<String, Object> claims, String email, String type) {
+    public String generateVerificationToken(Map<String, Object> claims, String email, TokenType type) {
         return createToken(claims, email, type, jwtVerificationExpirationInMinutes);
     }
 
-    private String createToken(Map<String, Object> claims, String email, String type, int expiration) {
+    private String createToken(Map<String, Object> claims, String email, TokenType type, int expiration) {
         Date now = new Date();
         Date expiryDate = new Date(now.getTime() + TimeUnit.MINUTES.toMillis(expiration));
 
         return Jwts.builder()
-                .header().type(type).and()
+                .header().type(type.toString()).and()
                 .claims(claims)
                 .subject(email)
                 .issuedAt(now)
@@ -54,8 +56,9 @@ public class EmailTokenProvider {
         return extractClaim(token, Claims::getSubject);
     }
 
-    public String extractType(String token) {
-        return extractHeader(token, JwsHeader::getType);
+    public TokenType extractType(String token) {
+        String typeStr = extractHeader(token, JwsHeader::getType);
+        return TokenType.safeValueOf(typeStr);
     }
 
     private <T> T extractClaim(String token, Function<Claims, T> claimsResolver) {
