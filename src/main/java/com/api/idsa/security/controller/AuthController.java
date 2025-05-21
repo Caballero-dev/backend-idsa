@@ -4,8 +4,10 @@ import com.api.idsa.security.dto.request.ForgotPasswordRequest;
 import com.api.idsa.security.dto.request.LoginRequest;
 import com.api.idsa.security.dto.request.PasswordSetRequest;
 import com.api.idsa.security.dto.request.ResetPasswordRequest;
+import com.api.idsa.security.dto.request.ResendEmailByTokenRequest;
 import com.api.idsa.security.service.IAuthService;
 
+import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
 import jakarta.validation.Valid;
 
@@ -15,7 +17,6 @@ import org.springframework.web.bind.annotation.*;
 @RestController
 @RequestMapping("/auth")
 public class AuthController {
-    // TODO: agregar controlador de refresh token, volver a pedir correo de verificacion, etc.
 
     @Autowired
     private IAuthService authService;
@@ -28,6 +29,11 @@ public class AuthController {
     @PostMapping("/logout")
     public void logout(HttpServletResponse response) {
         authService.logout(response);
+    }
+
+    @PostMapping("/refresh-token")
+    public void refreshToken(HttpServletRequest request, HttpServletResponse response) {
+        authService.refreshToken(request, response);
     }
 
     @PostMapping("/verify-email")
@@ -48,6 +54,11 @@ public class AuthController {
     @PostMapping("/confirm-email-change")
     public void confirmEmailChange(@RequestParam String token) {
         authService.confirmEmailChange(token);
+    }
+
+    @PostMapping("/resend-email")
+    public void resendEmailByToken(@Valid @RequestBody ResendEmailByTokenRequest request) {
+        authService.resendEmailByToken(request.getToken());
     }
 
 }

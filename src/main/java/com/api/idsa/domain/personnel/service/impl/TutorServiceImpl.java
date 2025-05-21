@@ -15,6 +15,7 @@ import com.api.idsa.domain.personnel.repository.ITutorRepository;
 import com.api.idsa.domain.personnel.repository.IUserRepository;
 import com.api.idsa.domain.personnel.service.ITutorService;
 import com.api.idsa.infrastructure.mail.service.MailService;
+import com.api.idsa.security.enums.TokenType;
 import com.api.idsa.security.provider.EmailTokenProvider;
 
 import org.springframework.beans.factory.annotation.Autowired;
@@ -87,7 +88,7 @@ public class TutorServiceImpl implements ITutorService {
         userEntity.setIsVerifiedEmail(false);
         userRepository.save(userEntity);
 
-        String token = emailTokenProvider.generateVerificationToken(userEntity.getEmail(), "EMAIL_VERIFICATION");
+        String token = emailTokenProvider.generateVerificationToken(userEntity.getEmail(), TokenType.EMAIL_VERIFICATION);
         mailService.sendVerificationEmail(userEntity.getEmail(), token);
 
         personEntity.setUser(userEntity);
@@ -134,7 +135,7 @@ public class TutorServiceImpl implements ITutorService {
             userEntity.setIsVerifiedEmail(false);
             userEntity.setEmail(tutorRequest.getEmail());
 
-            String token = emailTokenProvider.generateVerificationToken(tutorRequest.getEmail(), "EMAIL_CHANGE");
+            String token = emailTokenProvider.generateVerificationToken(tutorRequest.getEmail(), TokenType.EMAIL_CHANGE);
             mailService.sendEmailChangeConfirmation(tutorRequest.getEmail(), token);
         }
         userRepository.save(userEntity);

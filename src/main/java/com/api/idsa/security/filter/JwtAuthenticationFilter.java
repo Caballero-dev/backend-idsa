@@ -1,5 +1,6 @@
 package com.api.idsa.security.filter;
 
+import com.api.idsa.security.enums.TokenType;
 import com.api.idsa.security.provider.JwtTokenProvider;
 import com.api.idsa.security.service.ICookieService;
 
@@ -16,11 +17,27 @@ import org.springframework.security.core.userdetails.UserDetailsService;
 import org.springframework.security.web.authentication.WebAuthenticationDetailsSource;
 import org.springframework.stereotype.Component;
 import org.springframework.web.filter.OncePerRequestFilter;
+import org.springframework.web.servlet.HandlerExceptionResolver;
 
 import java.io.IOException;
+import java.util.Arrays;
+import java.util.List;
 
 @Component
 public class JwtAuthenticationFilter extends OncePerRequestFilter {
+
+    private static final List<String> PUBLIC_PATHS = Arrays.asList(
+        "/auth/login",
+        "/auth/verify-email",
+        "/auth/forgot-password",
+        "/auth/reset-password",
+        "/auth/confirm-email-change",
+        "/auth/refresh-token",
+        "/auth/resend-email"
+    );
+
+    @Autowired
+    private HandlerExceptionResolver handlerExceptionResolver;
 
     @Autowired
     private JwtTokenProvider jwtTokenProvider;
@@ -32,23 +49,35 @@ public class JwtAuthenticationFilter extends OncePerRequestFilter {
     private ICookieService cookieService;
 
     @Override
+    protected boolean shouldNotFilter(HttpServletRequest request) {
+        String path = request.getServletPath();
+        return PUBLIC_PATHS.stream().anyMatch(path::startsWith);
+    }
+
+    @Override
     protected void doFilterInternal(HttpServletRequest request, HttpServletResponse response, FilterChain filterChain)
             throws ServletException, IOException {
         final String jwt = cookieService.getAccessTokenFromCookie(request);
 
-        if (jwt == null) {
+        if (jwt == null || jwt.isEmpty()) {
             filterChain.doFilter(request, response);
             return;
         }
 
         try {
-            // FIXME: check if the token is expired
-            String userEmail = jwtTokenProvider.extractUsername(jwt);
+            TokenType tokenType = jwtTokenProvider.extractTokenType(jwt, true);
+
+            if (tokenType != TokenType.ACCESS_TOKEN) {
+                filterChain.doFilter(request, response);
+                return;
+            }
+
+            String userEmail = jwtTokenProvider.extractUsername(jwt, true);
 
             if (userEmail != null && SecurityContextHolder.getContext().getAuthentication() == null) {
                 UserDetails userDetails = userDetailsService.loadUserByUsername(userEmail);
 
-                if (jwtTokenProvider.isTokenValid(jwt, userDetails)) {
+                if (jwtTokenProvider.isTokenValid(jwt, userDetails, true)) {
                     UsernamePasswordAuthenticationToken authentication = new UsernamePasswordAuthenticationToken(
                         userDetails, 
                         null, 
@@ -58,10 +87,10 @@ public class JwtAuthenticationFilter extends OncePerRequestFilter {
                     SecurityContextHolder.getContext().setAuthentication(authentication);
                 }
             }
+            filterChain.doFilter(request, response);
         } catch (Exception ex) {
-            logger.error("Could not set user authentication in security context: " + ex.getMessage());
+            handlerExceptionResolver.resolveException(request, response, null, ex);
         }
-        filterChain.doFilter(request, response);
     }
 
 }

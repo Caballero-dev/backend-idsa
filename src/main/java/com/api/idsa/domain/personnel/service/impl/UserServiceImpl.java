@@ -16,6 +16,7 @@ import com.api.idsa.domain.personnel.repository.ITutorRepository;
 import com.api.idsa.domain.personnel.repository.IUserRepository;
 import com.api.idsa.domain.personnel.service.IUserService;
 import com.api.idsa.infrastructure.mail.service.MailService;
+import com.api.idsa.security.enums.TokenType;
 import com.api.idsa.security.provider.EmailTokenProvider;
 
 import org.springframework.beans.factory.annotation.Autowired;
@@ -114,7 +115,7 @@ public class UserServiceImpl implements IUserService {
         userEntity.setIsVerifiedEmail(false);
         userRepository.save(userEntity);
 
-        String token = emailTokenProvider.generateVerificationToken(userEntity.getEmail(), "EMAIL_VERIFICATION");
+        String token = emailTokenProvider.generateVerificationToken(userEntity.getEmail(), TokenType.EMAIL_VERIFICATION);
         mailService.sendVerificationEmail(userEntity.getEmail(), token);
 
         return userMapper.toResponse(userEntity);
@@ -166,7 +167,7 @@ public class UserServiceImpl implements IUserService {
             userEntity.setIsVerifiedEmail(false);
             userEntity.setEmail(updateUserRequest.getEmail());
             
-            String token = emailTokenProvider.generateVerificationToken(updateUserRequest.getEmail(), "EMAIL_CHANGE");
+            String token = emailTokenProvider.generateVerificationToken(updateUserRequest.getEmail(), TokenType.EMAIL_CHANGE);
             mailService.sendEmailChangeConfirmation(updateUserRequest.getEmail(), token);
         }
         if (isUpdatePassword) userEntity.setPassword(passwordEncoder.encode(updateUserRequest.getPassword()));

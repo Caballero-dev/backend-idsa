@@ -6,6 +6,7 @@ import com.api.idsa.domain.personnel.model.UserEntity;
 import com.api.idsa.domain.personnel.repository.IRoleRepository;
 import com.api.idsa.domain.personnel.repository.IUserRepository;
 import com.api.idsa.infrastructure.mail.service.MailService;
+import com.api.idsa.security.enums.TokenType;
 import com.api.idsa.security.provider.EmailTokenProvider;
 
 import jakarta.annotation.PostConstruct;
@@ -73,7 +74,7 @@ public class DataInitializationConfig {
 
             userRepository.save(adminUser);
 
-            String token = emailTokenProvider.generateVerificationToken(adminEmail, "EMAIL_VERIFICATION");
+            String token = emailTokenProvider.generateVerificationToken(adminEmail, TokenType.EMAIL_VERIFICATION);
             mailService.sendVerificationEmail(adminEmail, token);
         }
     }
