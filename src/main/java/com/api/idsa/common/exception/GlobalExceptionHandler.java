@@ -3,6 +3,9 @@ package com.api.idsa.common.exception;
 import org.springframework.dao.DataIntegrityViolationException;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.authentication.DisabledException;
+import org.springframework.security.authentication.LockedException;
+import org.springframework.security.authentication.BadCredentialsException;
 import org.springframework.security.core.AuthenticationException;
 import org.springframework.web.bind.MethodArgumentNotValidException;
 import org.springframework.web.bind.MissingServletRequestParameterException;
@@ -120,13 +123,47 @@ public class GlobalExceptionHandler {
         return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(apiError);
     }
 
-    @ExceptionHandler(AuthenticationException.class)
-    public ResponseEntity<ApiError> handleAuthenticationException(AuthenticationException ex, WebRequest request) {
+    @ExceptionHandler(BadCredentialsException.class)
+    public ResponseEntity<ApiError> handleBadCredentialsException(BadCredentialsException ex, WebRequest request) {
         ApiError apiError = new ApiError(
             HttpStatus.UNAUTHORIZED,
-            ex.getMessage(),
+            ex.getMessage() + " <<invalid_credentials>>",
             request.getDescription(false).replace("uri=", "")
         );
+        return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body(apiError);
+    }
+
+    @ExceptionHandler(AuthenticationException.class)
+    public ResponseEntity<ApiError> handleAuthenticationException(AuthenticationException ex, WebRequest request) {
+
+        ApiError apiError;
+        String path = request.getDescription(false).replace("uri=", "");
+
+        if (ex.getCause() instanceof LockedException) {
+            apiError = new ApiError(
+                HttpStatus.UNAUTHORIZED,
+                ex.getMessage() + " <<unverified_email>>",
+                path
+            );
+        } else if (ex.getCause() instanceof DisabledException) {
+            apiError = new ApiError(
+                HttpStatus.UNAUTHORIZED,
+                ex.getMessage() + " <<account_inactive>>",
+                path
+            );
+        } else if (ex.getCause() instanceof UnverifiedUserException) {
+            apiError = new ApiError(
+                HttpStatus.UNAUTHORIZED,
+                ex.getMessage(),
+                path
+            );
+        } else {
+            apiError = new ApiError(
+                HttpStatus.UNAUTHORIZED,
+                ex.getMessage() + " <<authentication_failed>>",
+                path
+            );
+        }
         return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body(apiError);
     }
 

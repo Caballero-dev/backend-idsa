@@ -205,7 +205,7 @@ public class AuthServiceImpl implements IAuthService {
         }
 
         if (!userEntity.getIsVerifiedEmail()) {
-            throw new EmailTokenException("Email has not been verified", "email_not_verified", HttpStatus.BAD_REQUEST);
+            throw new EmailTokenException("Email has not been verified", "unverified_email", HttpStatus.BAD_REQUEST);
         }
 
         userEntity.setPassword(passwordEncoder.encode(resetPasswordRequest.getNewPassword()));
