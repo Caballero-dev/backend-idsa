@@ -9,23 +9,20 @@ import com.api.idsa.infrastructure.mail.service.MailService;
 import com.api.idsa.security.dto.request.ForgotPasswordRequest;
 import com.api.idsa.security.dto.request.LoginRequest;
 import com.api.idsa.security.dto.request.PasswordSetRequest;
+import com.api.idsa.security.dto.request.RefreshTokenRequest;
 import com.api.idsa.security.dto.request.ResetPasswordRequest;
+import com.api.idsa.security.dto.response.TokenResponse;
 import com.api.idsa.security.enums.TokenType;
 import com.api.idsa.security.enums.TokenRefreshStatus;
 import com.api.idsa.security.provider.EmailTokenProvider;
 import com.api.idsa.security.provider.JwtTokenProvider;
 import com.api.idsa.security.service.IAuthService;
-import com.api.idsa.security.service.ICookieService;
 
 import io.jsonwebtoken.ExpiredJwtException;
 import io.jsonwebtoken.JwtException;
-import jakarta.servlet.http.HttpServletRequest;
-import jakarta.servlet.http.HttpServletResponse;
 
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpStatus;
-import org.springframework.http.ResponseCookie;
 import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.core.Authentication;
@@ -48,9 +45,6 @@ public class AuthServiceImpl implements IAuthService {
     private EmailTokenProvider emailTokenProvider;
 
     @Autowired
-    private ICookieService cookieService;
-
-    @Autowired
     private PasswordEncoder passwordEncoder;
 
     @Autowired
@@ -63,7 +57,7 @@ public class AuthServiceImpl implements IAuthService {
     private UserDetailsService userDetailsService;
 
     @Override
-    public void login(LoginRequest loginRequest, HttpServletResponse response) {
+    public TokenResponse login(LoginRequest loginRequest) {
         Authentication authentication = authenticationManager.authenticate(
             new UsernamePasswordAuthenticationToken(
                 loginRequest.getEmail(),
@@ -75,32 +69,16 @@ public class AuthServiceImpl implements IAuthService {
         String accessToken = jwtTokenProvider.generateToken(userDetails, true);
         String refreshToken = jwtTokenProvider.generateToken(userDetails, false);
 
-        ResponseCookie accessTokenCookie = cookieService.createAccessTokenCookie(accessToken);
-        ResponseCookie refreshTokenCookie = cookieService.createRefreshTokenCookie(refreshToken);
-
-        response.addHeader(HttpHeaders.SET_COOKIE, accessTokenCookie.toString());
-        response.addHeader(HttpHeaders.SET_COOKIE, refreshTokenCookie.toString());
+        return TokenResponse.builder()
+                .accessToken(accessToken)
+                .refreshToken(refreshToken)
+                .build();
     }
 
     @Override
-    public void logout(HttpServletResponse response) {
-        ResponseCookie accessTokenCookie = cookieService.deleteAccessTokenCookie();
-        ResponseCookie refreshTokenCookie = cookieService.deleteRefreshTokenCookie();
-        response.addHeader(HttpHeaders.SET_COOKIE, accessTokenCookie.toString());
-        response.addHeader(HttpHeaders.SET_COOKIE, refreshTokenCookie.toString());
-    }
-
-    @Override
-    public void refreshToken(HttpServletRequest request, HttpServletResponse response) {
-        String refreshToken = cookieService.getRefreshTokenFromCookie(request);
-        String accessToken = cookieService.getAccessTokenFromCookie(request);
-
-        if (refreshToken == null || refreshToken.isEmpty()) {
-            throw new RefreshTokenException("Refresh token not found", "refresh_token_not_found", HttpStatus.UNAUTHORIZED);
-        }
-        if (accessToken == null || accessToken.isEmpty()) {
-            throw new RefreshTokenException("Access token not found", "access_token_not_found", HttpStatus.UNAUTHORIZED);
-        }
+    public TokenResponse refreshToken(RefreshTokenRequest refreshTokenRequest) {
+        String refreshToken = refreshTokenRequest.getRefreshToken();
+        String accessToken = refreshTokenRequest.getAccessToken();
 
         try {
 
@@ -108,7 +86,6 @@ public class AuthServiceImpl implements IAuthService {
             TokenType refreshTokenType = jwtTokenProvider.extractTokenType(refreshToken, false);
 
             if (accessTokenType != TokenType.ACCESS_TOKEN || refreshTokenType != TokenType.REFRESH_TOKEN) {
-                clearAuthCookies(response);
                 throw new RefreshTokenException("Invalid token type", "invalid_token_type", HttpStatus.UNAUTHORIZED);
             }
 
@@ -116,7 +93,6 @@ public class AuthServiceImpl implements IAuthService {
             UserDetails userDetails = userDetailsService.loadUserByUsername(userEmail);
 
             if (!jwtTokenProvider.isTokenValid(refreshToken, userDetails, false)) {
-                clearAuthCookies(response);
                 throw new RefreshTokenException("Invalid refresh token", "invalid_refresh_token", HttpStatus.UNAUTHORIZED);
             }
 
@@ -128,22 +104,21 @@ public class AuthServiceImpl implements IAuthService {
                 case NEEDS_REFRESH:
                 case EXPIRED_REFRESHABLE:
                     String newAccessToken = jwtTokenProvider.generateToken(userDetails, true);
-                    ResponseCookie newAccessTokenCookie = cookieService.createAccessTokenCookie(newAccessToken);
-                    response.addHeader(HttpHeaders.SET_COOKIE, newAccessTokenCookie.toString());
-                    break;
+                    return TokenResponse.builder()
+                            .accessToken(newAccessToken)
+                            .refreshToken(refreshToken)
+                            .build();
                 case EXPIRED_NON_REFRESHABLE:
-                    clearAuthCookies(response);
                     throw new RefreshTokenException("Access token expired and non-refreshable", "expired_non_refreshable_access_token", HttpStatus.UNAUTHORIZED);
                 case INVALID:
-                    clearAuthCookies(response);
                     throw new RefreshTokenException("Invalid access token", "invalid_access_token", HttpStatus.UNAUTHORIZED);
+                default:
+                    throw new RefreshTokenException("Invalid token", "invalid_token", HttpStatus.UNAUTHORIZED);
             }
 
         } catch (ExpiredJwtException e) {
-            clearAuthCookies(response);
             throw new RefreshTokenException("Refresh token has expired", "expired_refresh_token", HttpStatus.UNAUTHORIZED);
         } catch (JwtException e) {
-            clearAuthCookies(response);
             throw new RefreshTokenException("Invalid refresh token", "invalid_refresh_token", HttpStatus.UNAUTHORIZED);
         }
     }
@@ -290,13 +265,6 @@ public class AuthServiceImpl implements IAuthService {
             default:
                 throw new EmailTokenException("Unknown email type", "unknown_email_type", HttpStatus.BAD_REQUEST);
         }
-    }
-    
-    private void clearAuthCookies(HttpServletResponse response) {
-        ResponseCookie accessTokenCookie = cookieService.deleteAccessTokenCookie();
-        ResponseCookie refreshTokenCookie = cookieService.deleteRefreshTokenCookie();
-        response.addHeader(HttpHeaders.SET_COOKIE, accessTokenCookie.toString());
-        response.addHeader(HttpHeaders.SET_COOKIE, refreshTokenCookie.toString());
     }
 
 }

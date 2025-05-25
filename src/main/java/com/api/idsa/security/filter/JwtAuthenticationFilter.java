@@ -2,7 +2,6 @@ package com.api.idsa.security.filter;
 
 import com.api.idsa.security.enums.TokenType;
 import com.api.idsa.security.provider.JwtTokenProvider;
-import com.api.idsa.security.service.ICookieService;
 
 import jakarta.servlet.FilterChain;
 import jakarta.servlet.ServletException;
@@ -10,6 +9,7 @@ import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
 
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.http.HttpHeaders;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.security.core.userdetails.UserDetails;
@@ -45,9 +45,6 @@ public class JwtAuthenticationFilter extends OncePerRequestFilter {
     @Autowired
     private UserDetailsService userDetailsService;
 
-    @Autowired
-    private ICookieService cookieService;
-
     @Override
     protected boolean shouldNotFilter(HttpServletRequest request) {
         String path = request.getServletPath();
@@ -57,7 +54,7 @@ public class JwtAuthenticationFilter extends OncePerRequestFilter {
     @Override
     protected void doFilterInternal(HttpServletRequest request, HttpServletResponse response, FilterChain filterChain)
             throws ServletException, IOException {
-        final String jwt = cookieService.getAccessTokenFromCookie(request);
+        final String jwt = getAccessTokenFromRequest(request);
 
         if (jwt == null || jwt.isEmpty()) {
             filterChain.doFilter(request, response);
@@ -91,6 +88,14 @@ public class JwtAuthenticationFilter extends OncePerRequestFilter {
         } catch (Exception ex) {
             handlerExceptionResolver.resolveException(request, response, null, ex);
         }
+    }
+
+    private String getAccessTokenFromRequest(HttpServletRequest request) {
+        String authHeader = request.getHeader(HttpHeaders.AUTHORIZATION);
+        if (authHeader != null && authHeader.startsWith("Bearer ")) {
+            return authHeader.substring(7);
+        }
+        return null;
     }
 
 }
