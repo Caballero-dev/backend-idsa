@@ -13,7 +13,7 @@ import com.api.idsa.domain.biometric.service.IReportService;
 import java.util.List;
 
 @RestController
-@RequestMapping("/common/reports")
+@RequestMapping("/api/common/reports")
 public class ReportController {
 
     @Autowired

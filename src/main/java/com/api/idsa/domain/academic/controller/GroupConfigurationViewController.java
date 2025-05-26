@@ -19,7 +19,7 @@ import com.api.idsa.domain.academic.service.IGroupConfigurationViewService;
 import java.util.List;
 
 @RestController
-@RequestMapping("/common/group-configurations-view")
+@RequestMapping("/api/common/group-configurations-view")
 public class GroupConfigurationViewController {
 
     @Autowired
