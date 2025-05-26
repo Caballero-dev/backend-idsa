@@ -17,7 +17,7 @@ import org.springframework.web.bind.annotation.*;
 import java.util.List;
 
 @RestController
-@RequestMapping("/admin/groups")
+@RequestMapping("/api/admin/groups")
 public class GroupController {
 
     @Autowired
