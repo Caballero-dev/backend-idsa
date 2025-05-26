@@ -35,12 +35,12 @@ public class SecurityConfig {
                 .authenticationProvider(authenticationProvider())
                 .authorizeHttpRequests(auth -> auth
                         .requestMatchers(
-                                "/auth/login", "/auth/refresh-token", "/auth/verify-email",
-                                "/auth/forgot-password", "/auth/reset-password", "/auth/confirm-email-change",
-                                "/auth/resend-email")
+                                "/api/auth/login", "/api/auth/refresh-token", "/api/auth/verify-email",
+                                "/api/auth/forgot-password", "/api/auth/reset-password", "/api/auth/confirm-email-change",
+                                "/api/auth/resend-email")
                         .permitAll()
-                        .requestMatchers("/admin/**").hasAuthority("ROLE_ADMIN")
-                        .requestMatchers("/common/**", "/image/**").hasAnyAuthority("ROLE_ADMIN", "ROLE_TUTOR")
+                        .requestMatchers("/api/admin/**").hasAuthority("ROLE_ADMIN")
+                        .requestMatchers("/api/common/**", "/api/image/**").hasAnyAuthority("ROLE_ADMIN", "ROLE_TUTOR")
                         .anyRequest().authenticated())
                 .addFilterBefore(jwtAuthenticationFilter, UsernamePasswordAuthenticationFilter.class)
                 .build();

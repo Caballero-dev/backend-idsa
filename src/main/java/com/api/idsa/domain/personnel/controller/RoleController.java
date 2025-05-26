@@ -12,7 +12,7 @@ import com.api.idsa.domain.personnel.service.IRoleService;
 import java.util.List;
 
 @RestController
-@RequestMapping("/admin/roles")
+@RequestMapping("/api/admin/roles")
 public class RoleController {
 
     @Autowired

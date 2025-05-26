@@ -17,7 +17,7 @@ import org.springframework.web.bind.annotation.*;
 import java.util.List;
 
 @RestController
-@RequestMapping("/admin/generations")
+@RequestMapping("/api/admin/generations")
 public class GenerationController {
 
     @Autowired
