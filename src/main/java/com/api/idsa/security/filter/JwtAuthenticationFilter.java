@@ -27,13 +27,13 @@ import java.util.List;
 public class JwtAuthenticationFilter extends OncePerRequestFilter {
 
     private static final List<String> PUBLIC_PATHS = Arrays.asList(
-        "/auth/login",
-        "/auth/verify-email",
-        "/auth/forgot-password",
-        "/auth/reset-password",
-        "/auth/confirm-email-change",
-        "/auth/refresh-token",
-        "/auth/resend-email"
+        "/api/auth/login",
+        "/api/auth/verify-email",
+        "/api/auth/forgot-password",
+        "/api/auth/reset-password",
+        "/api/auth/confirm-email-change",
+        "/api/auth/refresh-token",
+        "/api/auth/resend-email"
     );
 
     @Autowired

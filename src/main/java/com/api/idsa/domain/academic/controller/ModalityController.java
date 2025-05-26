@@ -17,7 +17,7 @@ import org.springframework.web.bind.annotation.*;
 import java.util.List;
 
 @RestController
-@RequestMapping("/admin/modalities")
+@RequestMapping("/api/admin/modalities")
 public class ModalityController {
 
     @Autowired
