@@ -8,6 +8,7 @@ import org.springframework.security.authentication.DisabledException;
 import org.springframework.security.authentication.LockedException;
 import org.springframework.security.authentication.BadCredentialsException;
 import org.springframework.security.core.AuthenticationException;
+import org.springframework.web.HttpRequestMethodNotSupportedException;
 import org.springframework.web.bind.MethodArgumentNotValidException;
 import org.springframework.web.bind.MissingServletRequestParameterException;
 import org.springframework.web.bind.UnsatisfiedServletRequestParameterException;
@@ -206,6 +207,17 @@ public class GlobalExceptionHandler {
             request.getDescription(false).replace("uri=", "")
         );
         return ResponseEntity.status(ex.getHttpStatus()).body(apiError);
+    }
+
+    @ExceptionHandler(HttpRequestMethodNotSupportedException.class)
+    public ResponseEntity<ApiError> handleHttpRequestMethodNotSupportedException(HttpRequestMethodNotSupportedException ex, WebRequest request) {
+        System.out.println();
+        ApiError apiError = new ApiError(
+            HttpStatus.METHOD_NOT_ALLOWED,
+            ex.getMessage() + " <<method_not_allowed>>",
+            request.getDescription(false).replace("uri=", "")
+        );
+        return ResponseEntity.status(HttpStatus.METHOD_NOT_ALLOWED).body(apiError);
     }
 
     @ExceptionHandler(HttpMessageNotReadableException.class)
