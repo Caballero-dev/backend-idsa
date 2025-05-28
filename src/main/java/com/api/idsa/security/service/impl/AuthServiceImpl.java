@@ -82,8 +82,8 @@ public class AuthServiceImpl implements IAuthService {
 
         try {
 
-            TokenType accessTokenType = jwtTokenProvider.extractTokenType(accessToken, true);
-            TokenType refreshTokenType = jwtTokenProvider.extractTokenType(refreshToken, false);
+            TokenType accessTokenType = jwtTokenProvider.extractTokenTypeSafely(accessToken, true);
+            TokenType refreshTokenType = jwtTokenProvider.extractTokenTypeSafely(refreshToken, false);
 
             if (accessTokenType != TokenType.ACCESS_TOKEN || refreshTokenType != TokenType.REFRESH_TOKEN) {
                 throw new RefreshTokenException("Invalid token type", "invalid_token_type", HttpStatus.UNAUTHORIZED);
