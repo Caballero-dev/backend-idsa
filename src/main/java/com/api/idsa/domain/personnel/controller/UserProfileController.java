@@ -18,13 +18,13 @@ public class UserProfileController {
     @Autowired
     IUserProfileService userProfileService;
 
-    @GetMapping("/{email}")
-    public ResponseEntity<ApiResponse<UserProfileResponse>> getUserProfileByEmail(@PathVariable String email) {
+    @GetMapping
+    public ResponseEntity<ApiResponse<UserProfileResponse>> getUserProfile() {
         return ResponseEntity.status(HttpStatus.OK).body(
             new ApiResponse<UserProfileResponse>(
                 HttpStatus.OK,
                 "User profile retrieved successfully",
-                userProfileService.getUserProfileByEmail(email)
+                userProfileService.getUserProfile()
             )
         );
     }
