@@ -29,7 +29,7 @@ public class UserProfileServiceImpl implements IUserProfileService {
     @Override
     public UserProfileResponse getUserProfileByEmail(String email) {
         UserEntity user = userRepository.findByEmail(email)
-                .orElseThrow(() -> new ResourceNotFoundException("Get", "User", "email", email));
+                .orElseThrow(() -> new ResourceNotFoundException("User", "email", email));
 
         return userProfileMapper.toUserProfileResponse(user);
     }
@@ -38,14 +38,14 @@ public class UserProfileServiceImpl implements IUserProfileService {
     @Transactional
     public void updatePassword(UpdatePasswordRequest request) {
         UserEntity user = userRepository.findByEmail(request.getEmail())
-                .orElseThrow(() -> new ResourceNotFoundException("Update", "User", "email", request.getEmail()));
+                .orElseThrow(() -> new ResourceNotFoundException("User", "email", request.getEmail()));
 
         if (!passwordEncoder.matches(request.getCurrentPassword(), user.getPassword())) {
-            throw new IncorrectPasswordException("The current password is incorrect");
+            throw new IncorrectPasswordException("The current password is incorrect <<current_password_incorrect>>");
         }
 
-        if (request.getCurrentPassword().equals(request.getNewPassword())) {
-            throw new IncorrectPasswordException("The new password cannot be equal to the current password");
+        if (passwordEncoder.matches(request.getNewPassword(), user.getPassword())) {
+            throw new IncorrectPasswordException("The new password cannot be equal to the current password <<new_password_equal_to_current>>");
         }
 
         user.setPassword(passwordEncoder.encode(request.getNewPassword()));
