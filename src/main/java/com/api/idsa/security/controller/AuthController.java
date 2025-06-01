@@ -7,7 +7,7 @@ import com.api.idsa.security.dto.request.PasswordSetRequest;
 import com.api.idsa.security.dto.request.RefreshTokenRequest;
 import com.api.idsa.security.dto.request.ResetPasswordRequest;
 import com.api.idsa.security.dto.response.TokenResponse;
-import com.api.idsa.security.dto.request.ResendEmailByTokenRequest;
+import com.api.idsa.security.dto.request.ResendEmailRequest;
 import com.api.idsa.security.service.IAuthService;
 
 import jakarta.validation.Valid;
@@ -67,8 +67,8 @@ public class AuthController {
     }
 
     @PostMapping("/resend-email")
-    public void resendEmailByToken(@Valid @RequestBody ResendEmailByTokenRequest request) {
-        authService.resendEmailByToken(request.getToken());
+    public void resendEmail(@Valid @RequestBody ResendEmailRequest request) {
+        authService.resendEmail(request);
     }
 
 }

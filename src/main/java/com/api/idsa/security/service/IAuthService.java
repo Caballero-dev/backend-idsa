@@ -4,6 +4,7 @@ import com.api.idsa.security.dto.request.ForgotPasswordRequest;
 import com.api.idsa.security.dto.request.LoginRequest;
 import com.api.idsa.security.dto.request.PasswordSetRequest;
 import com.api.idsa.security.dto.request.RefreshTokenRequest;
+import com.api.idsa.security.dto.request.ResendEmailRequest;
 import com.api.idsa.security.dto.request.ResetPasswordRequest;
 import com.api.idsa.security.dto.response.TokenResponse;
 
@@ -52,11 +53,23 @@ public interface IAuthService {
     void confirmEmailChange(String token);
 
     /**
-     * Reenvía un correo electrónico según el token proporcionado.
-     * El tipo de email a enviar se determina automáticamente según el tipo del token.
+     * Reenvía un correo electrónico basado en el estado actual del usuario y el estado de verificación del correo.
      * 
-     * @param token Token para determinar el tipo de correo y el destinatario
+     * Este método determina el correo electrónico apropiado para enviar según el estado de la cuenta del usuario:
+     * 
+     * 1. **Registro Inicial**: Si el usuario no está verificado, está inactivo y no tiene contraseña,
+     *    se envía un correo de verificación para confirmar su dirección de correo electrónico.
+     * 
+     * 2. **Cambio de Correo Electrónico**: Si el usuario no está verificado, está inactivo, pero tiene una contraseña,
+     *    se envía un correo de confirmación de cambio de correo electrónico.
+     * 
+     * // 3. **Restablecimiento de Contraseña**: Si el usuario está verificado, activo y tiene una contraseña,
+     * //   se envía un correo de restablecimiento de contraseña.
+     * 
+     * Si el usuario no existe en el repositorio, no se realiza ninguna acción.
+     * 
+     * @param resendEmailRequest La solicitud que contiene la dirección de correo electrónico del usuario.
      */
-    void resendEmailByToken(String token);
+    void resendEmail(ResendEmailRequest resendEmailRequest);
 
 }
