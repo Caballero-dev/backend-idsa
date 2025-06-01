@@ -21,6 +21,8 @@ import com.api.idsa.security.service.IAuthService;
 import io.jsonwebtoken.ExpiredJwtException;
 import io.jsonwebtoken.JwtException;
 
+import java.util.Optional;
+
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.security.authentication.AuthenticationManager;
@@ -150,15 +152,11 @@ public class AuthServiceImpl implements IAuthService {
     @Override
     @Transactional
     public void requestPasswordReset(ForgotPasswordRequest forgotPasswordRequest) {
-        UserEntity userEntity = userRepository.findByEmail(forgotPasswordRequest.getEmail())
-                .orElseThrow(() -> new ResourceNotFoundException("process password reset", "User", "email", forgotPasswordRequest.getEmail()));
-
-        if (!userEntity.getIsActive()) {
-            throw new EmailTokenException("User account is not active", "account_inactive", HttpStatus.FORBIDDEN);
+        Optional<UserEntity> userOptional = userRepository.findByEmail(forgotPasswordRequest.getEmail()); 
+        if (userOptional.isPresent() && userOptional.get().getIsActive()) {            
+            String token = emailTokenProvider.generateVerificationToken(forgotPasswordRequest.getEmail(), TokenType.PASSWORD_RESET);
+            mailService.sendPasswordResetEmail(forgotPasswordRequest.getEmail(), token);
         }
-
-        String token = emailTokenProvider.generateVerificationToken(forgotPasswordRequest.getEmail(), TokenType.PASSWORD_RESET);
-        mailService.sendPasswordResetEmail(forgotPasswordRequest.getEmail(), token);
     }
 
     @Override
