@@ -31,7 +31,7 @@ public class MailServiceImpl implements MailService {
     @Override
     public void sendVerificationEmail(String to, String token) {
         Context context = new Context();
-        context.setVariable("verificationUrl", frontendUrl + "/verify-email?token=" + token);
+        context.setVariable("verificationUrl", frontendUrl + "/auth/verify-email?token=" + token);
         context.setVariable("verificationExpiration", verificationExpirationInMinutes);
 
         String emailContent = templateEngine.process("mail/verification-email", context);
@@ -41,7 +41,7 @@ public class MailServiceImpl implements MailService {
     @Override
     public void sendPasswordResetEmail(String to, String token) {
         Context context = new Context();
-        context.setVariable("resetUrl", frontendUrl + "/reset-password?token=" + token);
+        context.setVariable("resetUrl", frontendUrl + "/auth/reset-password?token=" + token);
         context.setVariable("resetExpiration", verificationExpirationInMinutes);
 
         String emailContent = templateEngine.process("mail/password-reset-email", context);
@@ -51,7 +51,7 @@ public class MailServiceImpl implements MailService {
     @Override
     public void sendEmailChangeConfirmation(String to, String token) {
         Context context = new Context();
-        context.setVariable("confirmationUrl", frontendUrl + "/confirm-email-change?token=" + token);
+        context.setVariable("confirmationUrl", frontendUrl + "/auth/confirm-email-change?token=" + token);
         context.setVariable("confirmationExpiration", verificationExpirationInMinutes);
 
         String emailContent = templateEngine.process("mail/email-change-confirmation", context);

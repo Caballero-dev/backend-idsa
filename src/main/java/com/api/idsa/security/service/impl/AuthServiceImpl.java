@@ -134,7 +134,7 @@ public class AuthServiceImpl implements IAuthService {
             TokenType type = emailTokenProvider.extractType(passwordSetRequest.getToken());
             
             if (type == null || type != TokenType.EMAIL_VERIFICATION) {
-                throw new EmailTokenException("Invalid token type", "invalid_token_verification", HttpStatus.BAD_REQUEST);
+                throw new EmailTokenException("Invalid token type", "invalid_verification_token", HttpStatus.BAD_REQUEST);
             }
             
             UserEntity userEntity = userRepository.findByEmail(email)
@@ -150,9 +150,9 @@ public class AuthServiceImpl implements IAuthService {
             userRepository.save(userEntity);
             
         } catch (ExpiredJwtException e) {
-            throw new EmailTokenException("Email verification token has expired", "expired_token_verification", HttpStatus.UNAUTHORIZED);
+            throw new EmailTokenException("Email verification token has expired", "expired_verification_token", HttpStatus.UNAUTHORIZED);
         } catch (JwtException e) {
-            throw new EmailTokenException("Invalid email verification token", "invalid_token_verification", HttpStatus.UNAUTHORIZED);
+            throw new EmailTokenException("Invalid email verification token", "invalid_verification_token", HttpStatus.UNAUTHORIZED);
         }
     }
 
