@@ -205,24 +205,33 @@ public class AuthServiceImpl implements IAuthService {
     @Override
     @Transactional
     public void confirmEmailChange(String token) {
-        // FIXME: Verificar funcionamiento
-        String newEmail = emailTokenProvider.extractUsername(token);
-        TokenType type = emailTokenProvider.extractType(token);
+        try {
+            String newEmail = emailTokenProvider.extractUsername(token);
+            TokenType type = emailTokenProvider.extractType(token);
 
-        if (type == null || type != TokenType.EMAIL_CHANGE) {
-            throw new EmailTokenException("Invalid token type", "invalid_token_type", HttpStatus.BAD_REQUEST);
+            if (type == null || type != TokenType.EMAIL_CHANGE) {
+                throw new EmailTokenException("Invalid token type", "invalid_email_change_token", HttpStatus.BAD_REQUEST);
+            }
+
+            UserEntity userEntity = userRepository.findByEmail(emailTokenProvider.extractUsername(token))
+                    .orElseThrow(() -> new ResourceNotFoundException( "User", "email", newEmail));
+
+            if (userEntity.getIsActive() && userEntity.getIsVerifiedEmail()) {
+                throw new EmailTokenException("Email has already been verified", "verified_email", HttpStatus.BAD_REQUEST);
+            }
+
+            if (!userEntity.getIsActive() && userEntity.getIsVerifiedEmail()) {
+                throw new EmailTokenException("User account is disabled", "account_inactive", HttpStatus.FORBIDDEN);
+            }
+
+            userEntity.setIsVerifiedEmail(true);
+            userEntity.setIsActive(true);
+            userRepository.save(userEntity);
+        } catch (ExpiredJwtException e) {
+            throw new EmailTokenException("Password reset token has expired", "expired_email_change_token", HttpStatus.UNAUTHORIZED);
+        } catch (JwtException e) {
+            throw new EmailTokenException("Invalid password reset token", "invalid_email_change_token", HttpStatus.UNAUTHORIZED);
         }
-
-        UserEntity userEntity = userRepository.findByEmail(emailTokenProvider.extractUsername(token))
-                .orElseThrow(() -> new ResourceNotFoundException("confirm email change", "User", "email", newEmail));
-        
-        if (userEntity.getIsVerifiedEmail()) {
-            throw new EmailTokenException("Email has already been verified", "verified_email", HttpStatus.BAD_REQUEST);
-        }
-
-        userEntity.setIsVerifiedEmail(true);
-        userEntity.setIsActive(true);
-        userRepository.save(userEntity);
     }
 
     @Override
