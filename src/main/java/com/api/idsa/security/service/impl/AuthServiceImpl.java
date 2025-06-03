@@ -169,27 +169,37 @@ public class AuthServiceImpl implements IAuthService {
     @Override
     @Transactional
     public void resetPassword(ResetPasswordRequest resetPasswordRequest) {
-        // FIXME: Verificar funcionamiento
-        String email = emailTokenProvider.extractUsername(resetPasswordRequest.getToken());
-        TokenType type = emailTokenProvider.extractType(resetPasswordRequest.getToken());
+        try {         
+            String email = emailTokenProvider.extractUsername(resetPasswordRequest.getToken());
+            TokenType type = emailTokenProvider.extractType(resetPasswordRequest.getToken());
 
-        if (type == null || type != TokenType.PASSWORD_RESET) {
-            throw new EmailTokenException("Invalid token type", "invalid_token_type", HttpStatus.BAD_REQUEST);
+            if (type == null || type != TokenType.PASSWORD_RESET) {
+                throw new EmailTokenException("Invalid token type", "invalid_reset_token", HttpStatus.BAD_REQUEST);
+            }
+
+            UserEntity userEntity = userRepository.findByEmail(email)
+                    .orElseThrow(() -> new ResourceNotFoundException("User", "email", email));
+
+            if (!userEntity.getIsActive() && !userEntity.getIsVerifiedEmail() && userEntity.getPassword() == null) {
+                throw new EmailTokenException("User account requires verification", "new_account_unverified", HttpStatus.FORBIDDEN);
+            }
+
+            if (!userEntity.getIsActive() && !userEntity.getIsVerifiedEmail()) {
+                throw new EmailTokenException("Email change requires verification", "email_change_unverified", HttpStatus.FORBIDDEN);
+            }
+
+            if (!userEntity.getIsActive()) {
+                throw new EmailTokenException("User account is disabled", "account_inactive", HttpStatus.FORBIDDEN);
+            }
+            
+            userEntity.setPassword(passwordEncoder.encode(resetPasswordRequest.getNewPassword()));
+            userRepository.save(userEntity);
+                
+        } catch (ExpiredJwtException e) {
+            throw new EmailTokenException("Password reset token has expired", "expired_reset_token", HttpStatus.UNAUTHORIZED);
+        } catch (JwtException e) {
+            throw new EmailTokenException("Invalid password reset token", "invalid_reset_token", HttpStatus.UNAUTHORIZED);
         }
-
-        UserEntity userEntity = userRepository.findByEmail(email)
-                .orElseThrow(() -> new ResourceNotFoundException("reset password", "User", "email", email));
-
-        if (!userEntity.getIsActive()) {
-            throw new EmailTokenException("User account is not active", "account_inactive", HttpStatus.FORBIDDEN);
-        }
-
-        if (!userEntity.getIsVerifiedEmail()) {
-            throw new EmailTokenException("Email has not been verified", "unverified_email", HttpStatus.BAD_REQUEST);
-        }
-
-        userEntity.setPassword(passwordEncoder.encode(resetPasswordRequest.getNewPassword()));
-        userRepository.save(userEntity);
     }
 
     @Override
