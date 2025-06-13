@@ -95,6 +95,16 @@ public class JwtTokenProvider {
         return TokenType.safeValueOf(typeStr);
     }
 
+    public TokenType extractTokenTypeSafely(String token, boolean isAccessToken) {
+        try {
+            String typeStr = extractAllHeader(token, JwsHeader::getType, isAccessToken);
+            return TokenType.safeValueOf(typeStr);
+        } catch (ExpiredJwtException e) {
+            String typeStr = e.getHeader().getType();
+            return TokenType.safeValueOf(typeStr);
+        }
+    }
+
     public TokenRefreshStatus checkAccessTokenRefreshStatus(String token) {
         try {
             Date expirationDate = extractExpirationSafely(token, true);

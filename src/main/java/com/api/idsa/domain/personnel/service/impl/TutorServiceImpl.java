@@ -61,20 +61,20 @@ public class TutorServiceImpl implements ITutorService {
     public TutorResponse createTutor(TutorRequest tutorRequest) {
 
         if (tutorRepository.existsByEmployeeCode(tutorRequest.getEmployeeCode())) {
-            throw new DuplicateResourceException("create", "Tutor", "employeeCode", tutorRequest.getEmployeeCode());
+            throw new DuplicateResourceException("Tutor", "employee_code", tutorRequest.getEmployeeCode());
         }
         if (personRepository.existsByStudent_StudentCode(tutorRequest.getEmployeeCode())) {
-            throw new DuplicateResourceException("create", "Tutor", "employeeCode", tutorRequest.getEmployeeCode());
-        } 
+            throw new DuplicateResourceException("Tutor", "employee_code", tutorRequest.getEmployeeCode());
+        }
         if (personRepository.existsByPhoneNumber(tutorRequest.getPhoneNumber())) {
-            throw new DuplicateResourceException("create", "Tutor", "phoneNumber", tutorRequest.getPhoneNumber());
+            throw new DuplicateResourceException("Tutor", "phone_number", tutorRequest.getPhoneNumber());
         }
         if (userRepository.existsByEmail(tutorRequest.getEmail())) {
-            throw new DuplicateResourceException("create", "Tutor", "email", tutorRequest.getEmail());
+            throw new DuplicateResourceException("Tutor", "email", tutorRequest.getEmail());
         }
 
         RoleEntity roleEntity = roleRepository.findByRoleName("ROLE_TUTOR")
-                .orElseThrow(() -> new ResourceNotFoundException("create", "Tutor", "RoleName", "ROLE_TUTOR"));
+                .orElseThrow(() -> new ResourceNotFoundException("Tutor", "role_name", "ROLE_TUTOR"));
 
         PersonEntity personEntity = tutorMapper.toPersonEntity(tutorRequest);
         personRepository.save(personEntity);
@@ -106,19 +106,19 @@ public class TutorServiceImpl implements ITutorService {
     public TutorResponse updateTutor(Long tutorId, TutorRequest tutorRequest) {
 
         TutorEntity tutorEntity = tutorRepository.findById(tutorId)
-                .orElseThrow(() -> new ResourceNotFoundException("update", "Tutor", tutorId));
+                .orElseThrow(() -> new ResourceNotFoundException("Tutor", "tutor_id", tutorId));
 
         if (!tutorEntity.getEmployeeCode().equals(tutorRequest.getEmployeeCode()) && tutorRepository.existsByEmployeeCode(tutorRequest.getEmployeeCode())) {
-            throw new DuplicateResourceException("update", "Tutor", "employeeCode", tutorRequest.getEmployeeCode());
+            throw new DuplicateResourceException("Tutor", "employee_code", tutorRequest.getEmployeeCode());
         }
         if (personRepository.existsByStudent_StudentCode(tutorRequest.getEmployeeCode())) {
-            throw new DuplicateResourceException("update", "Tutor", "employeeCode", tutorRequest.getEmployeeCode());
+            throw new DuplicateResourceException("Tutor", "employee_code", tutorRequest.getEmployeeCode());
         }
         if (!tutorEntity.getPerson().getPhoneNumber().equals(tutorRequest.getPhoneNumber()) && personRepository.existsByPhoneNumber(tutorRequest.getPhoneNumber())) {
-            throw new DuplicateResourceException("update", "Tutor", "phoneNumber", tutorRequest.getPhoneNumber());
+            throw new DuplicateResourceException("Tutor", "phone_number", tutorRequest.getPhoneNumber());
         }
         if (!tutorEntity.getPerson().getUser().getEmail().equals(tutorRequest.getEmail()) && userRepository.existsByEmail(tutorRequest.getEmail())) {
-            throw new DuplicateResourceException("update", "Tutor", "email", tutorRequest.getEmail());
+            throw new DuplicateResourceException("Tutor", "email", tutorRequest.getEmail());
         }
 
         PersonEntity person = tutorEntity.getPerson();

@@ -9,11 +9,10 @@ public interface IUserProfileService {
     /**
      * Obtiene el perfil de usuario por correo electrónico.
      *
-     * @param email del usuario
      * @return  {@link UserProfileResponse} con la información del perfil de usuario.
      * @throws ResourceNotFoundException si no se encuentra el usuario.
      */
-    UserProfileResponse getUserProfileByEmail(String email);
+    UserProfileResponse getUserProfile();
 
     /**
      * Actualiza la contraseña del usuario.

@@ -9,23 +9,23 @@ import com.api.idsa.infrastructure.mail.service.MailService;
 import com.api.idsa.security.dto.request.ForgotPasswordRequest;
 import com.api.idsa.security.dto.request.LoginRequest;
 import com.api.idsa.security.dto.request.PasswordSetRequest;
+import com.api.idsa.security.dto.request.RefreshTokenRequest;
+import com.api.idsa.security.dto.request.ResendEmailRequest;
 import com.api.idsa.security.dto.request.ResetPasswordRequest;
+import com.api.idsa.security.dto.response.TokenResponse;
 import com.api.idsa.security.enums.TokenType;
 import com.api.idsa.security.enums.TokenRefreshStatus;
 import com.api.idsa.security.provider.EmailTokenProvider;
 import com.api.idsa.security.provider.JwtTokenProvider;
 import com.api.idsa.security.service.IAuthService;
-import com.api.idsa.security.service.ICookieService;
 
 import io.jsonwebtoken.ExpiredJwtException;
 import io.jsonwebtoken.JwtException;
-import jakarta.servlet.http.HttpServletRequest;
-import jakarta.servlet.http.HttpServletResponse;
+
+import java.util.Optional;
 
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpStatus;
-import org.springframework.http.ResponseCookie;
 import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.core.Authentication;
@@ -48,9 +48,6 @@ public class AuthServiceImpl implements IAuthService {
     private EmailTokenProvider emailTokenProvider;
 
     @Autowired
-    private ICookieService cookieService;
-
-    @Autowired
     private PasswordEncoder passwordEncoder;
 
     @Autowired
@@ -63,7 +60,7 @@ public class AuthServiceImpl implements IAuthService {
     private UserDetailsService userDetailsService;
 
     @Override
-    public void login(LoginRequest loginRequest, HttpServletResponse response) {
+    public TokenResponse login(LoginRequest loginRequest) {
         Authentication authentication = authenticationManager.authenticate(
             new UsernamePasswordAuthenticationToken(
                 loginRequest.getEmail(),
@@ -75,40 +72,23 @@ public class AuthServiceImpl implements IAuthService {
         String accessToken = jwtTokenProvider.generateToken(userDetails, true);
         String refreshToken = jwtTokenProvider.generateToken(userDetails, false);
 
-        ResponseCookie accessTokenCookie = cookieService.createAccessTokenCookie(accessToken);
-        ResponseCookie refreshTokenCookie = cookieService.createRefreshTokenCookie(refreshToken);
-
-        response.addHeader(HttpHeaders.SET_COOKIE, accessTokenCookie.toString());
-        response.addHeader(HttpHeaders.SET_COOKIE, refreshTokenCookie.toString());
+        return TokenResponse.builder()
+                .accessToken(accessToken)
+                .refreshToken(refreshToken)
+                .build();
     }
 
     @Override
-    public void logout(HttpServletResponse response) {
-        ResponseCookie accessTokenCookie = cookieService.deleteAccessTokenCookie();
-        ResponseCookie refreshTokenCookie = cookieService.deleteRefreshTokenCookie();
-        response.addHeader(HttpHeaders.SET_COOKIE, accessTokenCookie.toString());
-        response.addHeader(HttpHeaders.SET_COOKIE, refreshTokenCookie.toString());
-    }
-
-    @Override
-    public void refreshToken(HttpServletRequest request, HttpServletResponse response) {
-        String refreshToken = cookieService.getRefreshTokenFromCookie(request);
-        String accessToken = cookieService.getAccessTokenFromCookie(request);
-
-        if (refreshToken == null || refreshToken.isEmpty()) {
-            throw new RefreshTokenException("Refresh token not found", "refresh_token_not_found", HttpStatus.UNAUTHORIZED);
-        }
-        if (accessToken == null || accessToken.isEmpty()) {
-            throw new RefreshTokenException("Access token not found", "access_token_not_found", HttpStatus.UNAUTHORIZED);
-        }
+    public TokenResponse refreshToken(RefreshTokenRequest refreshTokenRequest) {
+        String refreshToken = refreshTokenRequest.getRefreshToken();
+        String accessToken = refreshTokenRequest.getAccessToken();
 
         try {
 
-            TokenType accessTokenType = jwtTokenProvider.extractTokenType(accessToken, true);
-            TokenType refreshTokenType = jwtTokenProvider.extractTokenType(refreshToken, false);
+            TokenType accessTokenType = jwtTokenProvider.extractTokenTypeSafely(accessToken, true);
+            TokenType refreshTokenType = jwtTokenProvider.extractTokenTypeSafely(refreshToken, false);
 
             if (accessTokenType != TokenType.ACCESS_TOKEN || refreshTokenType != TokenType.REFRESH_TOKEN) {
-                clearAuthCookies(response);
                 throw new RefreshTokenException("Invalid token type", "invalid_token_type", HttpStatus.UNAUTHORIZED);
             }
 
@@ -116,7 +96,6 @@ public class AuthServiceImpl implements IAuthService {
             UserDetails userDetails = userDetailsService.loadUserByUsername(userEmail);
 
             if (!jwtTokenProvider.isTokenValid(refreshToken, userDetails, false)) {
-                clearAuthCookies(response);
                 throw new RefreshTokenException("Invalid refresh token", "invalid_refresh_token", HttpStatus.UNAUTHORIZED);
             }
 
@@ -128,22 +107,21 @@ public class AuthServiceImpl implements IAuthService {
                 case NEEDS_REFRESH:
                 case EXPIRED_REFRESHABLE:
                     String newAccessToken = jwtTokenProvider.generateToken(userDetails, true);
-                    ResponseCookie newAccessTokenCookie = cookieService.createAccessTokenCookie(newAccessToken);
-                    response.addHeader(HttpHeaders.SET_COOKIE, newAccessTokenCookie.toString());
-                    break;
+                    return TokenResponse.builder()
+                            .accessToken(newAccessToken)
+                            .refreshToken(refreshToken)
+                            .build();
                 case EXPIRED_NON_REFRESHABLE:
-                    clearAuthCookies(response);
                     throw new RefreshTokenException("Access token expired and non-refreshable", "expired_non_refreshable_access_token", HttpStatus.UNAUTHORIZED);
                 case INVALID:
-                    clearAuthCookies(response);
                     throw new RefreshTokenException("Invalid access token", "invalid_access_token", HttpStatus.UNAUTHORIZED);
+                default:
+                    throw new RefreshTokenException("Invalid token", "invalid_token", HttpStatus.UNAUTHORIZED);
             }
 
         } catch (ExpiredJwtException e) {
-            clearAuthCookies(response);
             throw new RefreshTokenException("Refresh token has expired", "expired_refresh_token", HttpStatus.UNAUTHORIZED);
         } catch (JwtException e) {
-            clearAuthCookies(response);
             throw new RefreshTokenException("Invalid refresh token", "invalid_refresh_token", HttpStatus.UNAUTHORIZED);
         }
     }
@@ -151,152 +129,142 @@ public class AuthServiceImpl implements IAuthService {
     @Override
     @Transactional
     public void verifyEmailAndSetPassword(PasswordSetRequest passwordSetRequest) {
+        try {
+            String email = emailTokenProvider.extractUsername(passwordSetRequest.getToken());
+            TokenType type = emailTokenProvider.extractType(passwordSetRequest.getToken());
+            
+            if (type == null || type != TokenType.EMAIL_VERIFICATION) {
+                throw new EmailTokenException("Invalid token type", "invalid_verification_token", HttpStatus.BAD_REQUEST);
+            }
+            
+            UserEntity userEntity = userRepository.findByEmail(email)
+                    .orElseThrow(() -> new ResourceNotFoundException("User", "email", email));
 
-        String email = emailTokenProvider.extractUsername(passwordSetRequest.getToken());
-        TokenType type = emailTokenProvider.extractType(passwordSetRequest.getToken());
+            if (userEntity.getIsVerifiedEmail() || userEntity.getIsActive() || userEntity.getPassword() != null) {
+                throw new EmailTokenException("Email has already been verified", "verified_email", HttpStatus.BAD_REQUEST);
+            }
 
-        if (type == null || type != TokenType.EMAIL_VERIFICATION) {
-            throw new EmailTokenException("Invalid token type", "invalid_token_type", HttpStatus.BAD_REQUEST);
+            userEntity.setPassword(passwordEncoder.encode(passwordSetRequest.getPassword()));
+            userEntity.setIsActive(true);
+            userEntity.setIsVerifiedEmail(true);
+            userRepository.save(userEntity);
+            
+        } catch (ExpiredJwtException e) {
+            throw new EmailTokenException("Email verification token has expired", "expired_verification_token", HttpStatus.UNAUTHORIZED);
+        } catch (JwtException e) {
+            throw new EmailTokenException("Invalid email verification token", "invalid_verification_token", HttpStatus.UNAUTHORIZED);
         }
-
-        UserEntity userEntity = userRepository.findByEmail(email)
-                .orElseThrow(() -> new ResourceNotFoundException("verify email", "User", "email", email));
-
-        if (userEntity.getIsVerifiedEmail()) {
-            throw new EmailTokenException("Email has already been verified", "verified_email", HttpStatus.BAD_REQUEST);
-        }
-
-        userEntity.setPassword(passwordEncoder.encode(passwordSetRequest.getPassword()));
-        userEntity.setIsActive(true);
-        userEntity.setIsVerifiedEmail(true);
-        userRepository.save(userEntity);
     }
 
     @Override
     @Transactional
     public void requestPasswordReset(ForgotPasswordRequest forgotPasswordRequest) {
-        UserEntity userEntity = userRepository.findByEmail(forgotPasswordRequest.getEmail())
-                .orElseThrow(() -> new ResourceNotFoundException("process password reset", "User", "email", forgotPasswordRequest.getEmail()));
-
-        if (!userEntity.getIsActive()) {
-            throw new EmailTokenException("User account is not active", "account_inactive", HttpStatus.FORBIDDEN);
+        Optional<UserEntity> userOptional = userRepository.findByEmail(forgotPasswordRequest.getEmail()); 
+        if (userOptional.isPresent() && userOptional.get().getIsActive() && userOptional.get().getIsVerifiedEmail()) {            
+            String token = emailTokenProvider.generateVerificationToken(forgotPasswordRequest.getEmail(), TokenType.PASSWORD_RESET);
+            mailService.sendPasswordResetEmail(forgotPasswordRequest.getEmail(), token);
         }
-
-        String token = emailTokenProvider.generateVerificationToken(forgotPasswordRequest.getEmail(), TokenType.PASSWORD_RESET);
-        mailService.sendPasswordResetEmail(forgotPasswordRequest.getEmail(), token);
     }
 
     @Override
     @Transactional
     public void resetPassword(ResetPasswordRequest resetPasswordRequest) {
+        try {         
+            String email = emailTokenProvider.extractUsername(resetPasswordRequest.getToken());
+            TokenType type = emailTokenProvider.extractType(resetPasswordRequest.getToken());
 
-        String email = emailTokenProvider.extractUsername(resetPasswordRequest.getToken());
-        TokenType type = emailTokenProvider.extractType(resetPasswordRequest.getToken());
+            if (type == null || type != TokenType.PASSWORD_RESET) {
+                throw new EmailTokenException("Invalid token type", "invalid_reset_token", HttpStatus.BAD_REQUEST);
+            }
 
-        if (type == null || type != TokenType.PASSWORD_RESET) {
-            throw new EmailTokenException("Invalid token type", "invalid_token_type", HttpStatus.BAD_REQUEST);
+            UserEntity userEntity = userRepository.findByEmail(email)
+                    .orElseThrow(() -> new ResourceNotFoundException("User", "email", email));
+
+            if (!userEntity.getIsActive() && !userEntity.getIsVerifiedEmail() && userEntity.getPassword() == null) {
+                throw new EmailTokenException("User account requires verification", "new_account_unverified", HttpStatus.FORBIDDEN);
+            }
+
+            if (!userEntity.getIsActive() && !userEntity.getIsVerifiedEmail()) {
+                throw new EmailTokenException("Email change requires verification", "email_change_unverified", HttpStatus.FORBIDDEN);
+            }
+
+            if (!userEntity.getIsActive()) {
+                throw new EmailTokenException("User account is disabled", "account_inactive", HttpStatus.FORBIDDEN);
+            }
+            
+            userEntity.setPassword(passwordEncoder.encode(resetPasswordRequest.getNewPassword()));
+            userRepository.save(userEntity);
+                
+        } catch (ExpiredJwtException e) {
+            throw new EmailTokenException("Password reset token has expired", "expired_reset_token", HttpStatus.UNAUTHORIZED);
+        } catch (JwtException e) {
+            throw new EmailTokenException("Invalid password reset token", "invalid_reset_token", HttpStatus.UNAUTHORIZED);
         }
-
-        UserEntity userEntity = userRepository.findByEmail(email)
-                .orElseThrow(() -> new ResourceNotFoundException("reset password", "User", "email", email));
-
-        if (!userEntity.getIsActive()) {
-            throw new EmailTokenException("User account is not active", "account_inactive", HttpStatus.FORBIDDEN);
-        }
-
-        if (!userEntity.getIsVerifiedEmail()) {
-            throw new EmailTokenException("Email has not been verified", "unverified_email", HttpStatus.BAD_REQUEST);
-        }
-
-        userEntity.setPassword(passwordEncoder.encode(resetPasswordRequest.getNewPassword()));
-        userRepository.save(userEntity);
     }
 
     @Override
     @Transactional
     public void confirmEmailChange(String token) {
+        try {
+            String newEmail = emailTokenProvider.extractUsername(token);
+            TokenType type = emailTokenProvider.extractType(token);
 
-        String newEmail = emailTokenProvider.extractUsername(token);
-        TokenType type = emailTokenProvider.extractType(token);
+            if (type == null || type != TokenType.EMAIL_CHANGE) {
+                throw new EmailTokenException("Invalid token type", "invalid_email_change_token", HttpStatus.BAD_REQUEST);
+            }
 
-        if (type == null || type != TokenType.EMAIL_CHANGE) {
-            throw new EmailTokenException("Invalid token type", "invalid_token_type", HttpStatus.BAD_REQUEST);
+            UserEntity userEntity = userRepository.findByEmail(emailTokenProvider.extractUsername(token))
+                    .orElseThrow(() -> new ResourceNotFoundException( "User", "email", newEmail));
+
+            if (userEntity.getIsActive() && userEntity.getIsVerifiedEmail()) {
+                throw new EmailTokenException("Email has already been verified", "verified_email", HttpStatus.BAD_REQUEST);
+            }
+
+            if (!userEntity.getIsActive() && userEntity.getIsVerifiedEmail()) {
+                throw new EmailTokenException("User account is disabled", "account_inactive", HttpStatus.FORBIDDEN);
+            }
+
+            userEntity.setIsVerifiedEmail(true);
+            userEntity.setIsActive(true);
+            userRepository.save(userEntity);
+        } catch (ExpiredJwtException e) {
+            throw new EmailTokenException("Password reset token has expired", "expired_email_change_token", HttpStatus.UNAUTHORIZED);
+        } catch (JwtException e) {
+            throw new EmailTokenException("Invalid password reset token", "invalid_email_change_token", HttpStatus.UNAUTHORIZED);
         }
-
-        UserEntity userEntity = userRepository.findByEmail(emailTokenProvider.extractUsername(token))
-                .orElseThrow(() -> new ResourceNotFoundException("confirm email change", "User", "email", newEmail));
-        
-        if (userEntity.getIsVerifiedEmail()) {
-            throw new EmailTokenException("Email has already been verified", "verified_email", HttpStatus.BAD_REQUEST);
-        }
-
-        userEntity.setIsVerifiedEmail(true);
-        userEntity.setIsActive(true);
-        userRepository.save(userEntity);
     }
 
     @Override
-    public void resendEmailByToken(String token) {
-        try {
-            String email = emailTokenProvider.extractUsername(token);
-            TokenType tokenType = emailTokenProvider.extractType(token);
+    @Transactional
+    public void resendEmail(ResendEmailRequest resendEmailRequest) {
+        String email = resendEmailRequest.getEmail();
+        Optional<UserEntity> userOptional = userRepository.findByEmail(email);
 
-            processEmailResend(email, tokenType);
+        if (userOptional.isPresent()) {
+            
+            UserEntity userEntity = userOptional.get();
 
-        } catch (ExpiredJwtException e) {
-            String email = e.getClaims().getSubject();
-            TokenType tokenType = TokenType.safeValueOf(e.getHeader().getType());
-
-            processEmailResend(email, tokenType);
-        } catch (JwtException e) {
-            throw new EmailTokenException("Invalid token", "invalid_token", HttpStatus.UNAUTHORIZED);
-        }
-    }
-
-    private void processEmailResend(String email, TokenType tokenType) {
-
-        if (tokenType == null) {
-            throw new EmailTokenException("Invalid token type", "invalid_token_type", HttpStatus.BAD_REQUEST);
-        }
-
-        UserEntity userEntity = userRepository.findByEmail(email)
-                .orElseThrow(() -> new ResourceNotFoundException("resend email", "User", "email", email));
-        
-        switch (tokenType) {
-            case EMAIL_VERIFICATION:
-                if (userEntity.getIsVerifiedEmail()) {
-                    throw new EmailTokenException("Email has already been verified", "verified_email", HttpStatus.BAD_REQUEST);
-                }
-                String verificationToken = emailTokenProvider.generateVerificationToken(email, tokenType);
+            // Caso 1: Usuario no verificado, inactivo y sin contraseña (registro inicial)
+            if (!userEntity.getIsVerifiedEmail() && !userEntity.getIsActive() && userEntity.getPassword() == null) {
+                String verificationToken = emailTokenProvider.generateVerificationToken(email, TokenType.EMAIL_VERIFICATION);
                 mailService.sendVerificationEmail(email, verificationToken);
-                break;
-                
-            case PASSWORD_RESET:
-                if (!userEntity.getIsActive()) {
-                    throw new EmailTokenException("User account is not active", "account_inactive", HttpStatus.FORBIDDEN);
-                }
-                String resetToken = emailTokenProvider.generateVerificationToken(email, tokenType);
-                mailService.sendPasswordResetEmail(email, resetToken);
-                break;
-                
-            case EMAIL_CHANGE:
-                if (userEntity.getIsVerifiedEmail()) {
-                    throw new EmailTokenException("Email has already been verified", "verified_email", HttpStatus.BAD_REQUEST);
-                }
-                String emailChangeToken = emailTokenProvider.generateVerificationToken(email, tokenType);
-                mailService.sendEmailChangeConfirmation(email, emailChangeToken);
-                break;
-                
-            default:
-                throw new EmailTokenException("Unknown email type", "unknown_email_type", HttpStatus.BAD_REQUEST);
+                return;
+            }
+
+            // Caso 2: Usuario no verificado, inactivo y con contraseña (cambio de email)
+            if (!userEntity.getIsVerifiedEmail() && !userEntity.getIsActive() && userEntity.getPassword() != null) {
+                String verificationToken = emailTokenProvider.generateVerificationToken(email, TokenType.EMAIL_CHANGE);
+                mailService.sendEmailChangeConfirmation(email, verificationToken);
+                return;
+            }
+
+            // Caso 3: Usuario verificado, activo y con contraseña (reseteo de contraseña)
+            // if (userEntity.getIsVerifiedEmail() && userEntity.getIsActive() && userEntity.getPassword() != null) {
+            //     String resetToken = emailTokenProvider.generateVerificationToken(email, TokenType.PASSWORD_RESET);
+            //     mailService.sendPasswordResetEmail(email, resetToken);
+            //     return;
+            // }
         }
-    }
-    
-    private void clearAuthCookies(HttpServletResponse response) {
-        ResponseCookie accessTokenCookie = cookieService.deleteAccessTokenCookie();
-        ResponseCookie refreshTokenCookie = cookieService.deleteRefreshTokenCookie();
-        response.addHeader(HttpHeaders.SET_COOKIE, accessTokenCookie.toString());
-        response.addHeader(HttpHeaders.SET_COOKIE, refreshTokenCookie.toString());
     }
 
 }

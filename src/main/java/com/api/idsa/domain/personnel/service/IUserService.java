@@ -12,25 +12,11 @@ import org.springframework.data.domain.Pageable;
 public interface IUserService {
 
     /**
-     * Obtiene todos los usuarios.
+     * Obtiene todos los usuarios excepto aquellos con el rol "ROLE_ADMIN".
      *
      * @return Lista de {@link UserResponse} con la información de los usuarios.
      */
-    Page<UserResponse> getAllUser(Pageable pageable);
-
-    /**
-     * Obtiene los usuarios activos diferentes de "ROLE_ADMIN".
-     *
-     * @return Lista de {@link UserResponse} con la información de los usuarios activos.
-     */
-    Page<UserResponse> getAllActiveExceptAdmin(Pageable pageable);
-
-    /**
-     * Obtiene ls usuarios inactivos diferentes de "ROLE_ADMIN".
-     *
-     * @return Lista de {@link UserResponse} con la información de los usuarios inactivos.
-     */
-    Page<UserResponse> getAllInactiveExceptAdmin(Pageable pageable);
+    Page<UserResponse> getAllUserExceptAdmin(Pageable pageable);
 
     /**
      * Crea un nuevo usuario.
