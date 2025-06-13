@@ -56,20 +56,8 @@ public class UserServiceImpl implements IUserService {
     private PasswordEncoder passwordEncoder;
 
     @Override
-    public Page<UserResponse> getAllUser(Pageable pageable) {
-        Page<UserEntity> userPage = userRepository.findAll(pageable);
-        return userPage.map(userMapper::toResponse);
-    }
-
-    @Override
-    public Page<UserResponse> getAllActiveExceptAdmin(Pageable pageable) {
-        Page<UserEntity> userPage = userRepository.findAllByIsActiveTrueAndRole_RoleNameIsNot("ROLE_ADMIN", pageable);
-        return userPage.map(userMapper::toResponse);
-    }
-
-    @Override
-    public Page<UserResponse> getAllInactiveExceptAdmin(Pageable pageable) {
-        Page<UserEntity> userPage = userRepository.findAllByIsActiveFalseAndRole_RoleNameIsNot("ROLE_ADMIN", pageable);
+    public Page<UserResponse> getAllUserExceptAdmin(Pageable pageable) {
+        Page<UserEntity> userPage = userRepository.findAllByRole_RoleNameIsNot("ROLE_ADMIN", pageable);
         return userPage.map(userMapper::toResponse);
     }
 
@@ -78,22 +66,22 @@ public class UserServiceImpl implements IUserService {
     public UserResponse createUser(UserRequest userRequest) {
 
         if (userRepository.existsByEmail(userRequest.getEmail())) {
-            throw new DuplicateResourceException("create", "User", "email", userRequest.getEmail());
+            throw new DuplicateResourceException("User", "email", userRequest.getEmail());
         }
         if (personRepository.existsByPhoneNumber(userRequest.getPhoneNumber())) {
-            throw new DuplicateResourceException("create", "User", "phoneNumber", userRequest.getPhoneNumber());
+            throw new DuplicateResourceException("User", "phone_number", userRequest.getPhoneNumber());
         }
         if (personRepository.existsByTutor_EmployeeCode(userRequest.getKey())) {
-            throw new DuplicateResourceException("create", "User", "key_employeeCode", userRequest.getKey());
+            throw new DuplicateResourceException("User", "key_employee_code", userRequest.getKey());
         }
         if (personRepository.existsByStudent_StudentCode(userRequest.getKey())) {
-            throw new DuplicateResourceException("create", "User", "key_studentCode", userRequest.getKey());
+            throw new DuplicateResourceException("User", "key_student_code", userRequest.getKey());
         }
 
         RoleEntity roleEntity = roleRepository.findByRoleName(userRequest.getRole().getRoleId())
-                .orElseThrow(() -> new ResourceNotFoundException("create", "User", "RoleName", userRequest.getRole().getRoleId()));
+                .orElseThrow(() -> new ResourceNotFoundException("Role", "role_name", userRequest.getRole().getRoleId()));
 
-        if ("ROLE_ADMIN".equals(roleEntity.getRoleName())) throw new UserRoleCreationDeniedException();
+        if ("ROLE_ADMIN".equals(roleEntity.getRoleName())) throw new UserRoleCreationDeniedException("Creation of user with the specified role is denied");
 
         PersonEntity personEntity = userMapper.toPersonEntity(userRequest);
         personRepository.save(personEntity);
@@ -126,26 +114,26 @@ public class UserServiceImpl implements IUserService {
     public UserResponse updateUser(Long userId, boolean isUpdatePassword, UserRequest updateUserRequest) {
 
         UserEntity userEntity = userRepository.findById(userId)
-                .orElseThrow(() -> new ResourceNotFoundException("update", "User", userId));
+                .orElseThrow(() -> new ResourceNotFoundException("User", "user_id", userId));
 
         if (!userEntity.getEmail().equals(updateUserRequest.getEmail()) && userRepository.existsByEmail(updateUserRequest.getEmail())) {
-            throw new DuplicateResourceException("update", "User", "email", updateUserRequest.getEmail());
+            throw new DuplicateResourceException("User", "email", updateUserRequest.getEmail());
         }
         if (!userEntity.getPerson().getPhoneNumber().equals(updateUserRequest.getPhoneNumber()) && personRepository.existsByPhoneNumber(updateUserRequest.getPhoneNumber())) {
-            throw new DuplicateResourceException("update", "User", "phoneNumber", updateUserRequest.getPhoneNumber());
+            throw new DuplicateResourceException("User", "phone_number", updateUserRequest.getPhoneNumber());
         }
         if (
             userEntity.getPerson().getTutor() != null &&
             !userEntity.getPerson().getTutor().getEmployeeCode().equals(updateUserRequest.getKey()) &&
             personRepository.existsByTutor_EmployeeCode(updateUserRequest.getKey())
         ) {
-            throw new DuplicateResourceException("update", "User", "key_employeeCode", updateUserRequest.getKey());
+            throw new DuplicateResourceException("User", "key_employee_code", updateUserRequest.getKey());
         }
         if (personRepository.existsByStudent_StudentCode(updateUserRequest.getKey())) {
-            throw new DuplicateResourceException("update", "User", "key_studentCode", updateUserRequest.getKey());
+            throw new DuplicateResourceException("User", "key_student_code", updateUserRequest.getKey());
         }
 
-        if ("ROLE_ADMIN".equals(updateUserRequest.getRole().getRoleId())) throw new UserRoleCreationDeniedException("Update of user with the role 'ADMIN' is denied");
+        if ("ROLE_ADMIN".equals(updateUserRequest.getRole().getRoleId())) throw new UserRoleCreationDeniedException("Update of user with the specified role is denied");
 
         PersonEntity person = userEntity.getPerson();
         person.setName(updateUserRequest.getName());

@@ -6,8 +6,4 @@ public class UserRoleCreationDeniedException extends RuntimeException {
         super(message);
     }
 
-    public UserRoleCreationDeniedException() {
-        super("Creation of user with the role 'ADMIN' is denied");
-    }
-
 }

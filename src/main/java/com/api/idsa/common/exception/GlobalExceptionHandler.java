@@ -50,7 +50,7 @@ public class GlobalExceptionHandler {
     public ResponseEntity<ApiError> handleUserRoleCreationDeniedException(UserRoleCreationDeniedException ex, WebRequest request) {
         ApiError apiError = new ApiError(
             HttpStatus.FORBIDDEN,
-            ex.getMessage(),
+            ex.getMessage() + " <<role_denied>>",
             request.getDescription(false).replace("uri=", "")
         );
         return ResponseEntity.status(HttpStatus.FORBIDDEN).body(apiError);

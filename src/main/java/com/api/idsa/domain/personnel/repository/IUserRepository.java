@@ -12,9 +12,7 @@ import java.util.Optional;
 @Repository
 public interface IUserRepository extends JpaRepository<UserEntity, Long> {
 
-    Page<UserEntity> findAllByIsActiveTrueAndRole_RoleNameIsNot(String roleName, Pageable pageable);
-
-    Page<UserEntity> findAllByIsActiveFalseAndRole_RoleNameIsNot(String roleName, Pageable pageable);
+    Page<UserEntity> findAllByRole_RoleNameIsNot(String roleName, Pageable pageable);
 
     boolean existsByEmail(String email);
 
