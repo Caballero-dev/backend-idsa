@@ -73,7 +73,7 @@ public class GlobalExceptionHandler {
         ApiError apiError;
         String path = request.getDescription(false).replace("uri=", "");
 
-        if (ex.getCause() instanceof ConstraintViolationException constrainEx) {
+        if (ex.getCause() instanceof ConstraintViolationException constraintEx) {
             if (constrainEx.getErrorMessage().contains("foreign key constraint")) {
                 apiError = new ApiError(
                     HttpStatus.CONFLICT,
