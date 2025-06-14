@@ -74,13 +74,13 @@ public class GlobalExceptionHandler {
         String path = request.getDescription(false).replace("uri=", "");
 
         if (ex.getCause() instanceof ConstraintViolationException constraintEx) {
-            if (constrainEx.getErrorMessage().contains("foreign key constraint")) {
+            if (constraintEx.getErrorMessage().contains("foreign key constraint")) {
                 apiError = new ApiError(
                     HttpStatus.CONFLICT,
                     "Failed: Operation cannot be completed due to data dependency <<foreign_key_violation>>",
                     path
                 );
-            } else if (constrainEx.getErrorMessage().contains("unique constraint")) {
+            } else if (constraintEx.getErrorMessage().contains("unique constraint")) {
                 apiError = new ApiError(
                     HttpStatus.CONFLICT,
                     "Failed: Resource already exists <<resource_exists>>",
