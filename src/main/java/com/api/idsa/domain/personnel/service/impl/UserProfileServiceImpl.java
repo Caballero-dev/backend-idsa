@@ -10,6 +10,8 @@ import com.api.idsa.domain.personnel.repository.IUserRepository;
 import com.api.idsa.domain.personnel.service.IUserProfileService;
 
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.security.core.Authentication;
+import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -27,9 +29,10 @@ public class UserProfileServiceImpl implements IUserProfileService {
     private PasswordEncoder passwordEncoder;
 
     @Override
-    public UserProfileResponse getUserProfileByEmail(String email) {
+    public UserProfileResponse getUserProfile() {
+        String email = getCurrentEmail();
         UserEntity user = userRepository.findByEmail(email)
-                .orElseThrow(() -> new ResourceNotFoundException("Get", "User", "email", email));
+                .orElseThrow(() -> new ResourceNotFoundException("User", "email", email));
 
         return userProfileMapper.toUserProfileResponse(user);
     }
@@ -37,19 +40,27 @@ public class UserProfileServiceImpl implements IUserProfileService {
     @Override
     @Transactional
     public void updatePassword(UpdatePasswordRequest request) {
-        UserEntity user = userRepository.findByEmail(request.getEmail())
-                .orElseThrow(() -> new ResourceNotFoundException("Update", "User", "email", request.getEmail()));
+
+        String email = getCurrentEmail();
+
+        UserEntity user = userRepository.findByEmail(email)
+                .orElseThrow(() -> new ResourceNotFoundException("User", "email", email));
 
         if (!passwordEncoder.matches(request.getCurrentPassword(), user.getPassword())) {
-            throw new IncorrectPasswordException("The current password is incorrect");
+            throw new IncorrectPasswordException("The current password is incorrect <<current_password_incorrect>>");
         }
 
-        if (request.getCurrentPassword().equals(request.getNewPassword())) {
-            throw new IncorrectPasswordException("The new password cannot be equal to the current password");
+        if (passwordEncoder.matches(request.getNewPassword(), user.getPassword())) {
+            throw new IncorrectPasswordException("The new password cannot be equal to the current password <<new_password_equal_to_current>>");
         }
 
         user.setPassword(passwordEncoder.encode(request.getNewPassword()));
         userRepository.save(user);
+    }
+
+    private String getCurrentEmail() {
+        Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
+        return authentication.getName();
     }
 
 }

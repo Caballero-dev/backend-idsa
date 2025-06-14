@@ -3,10 +3,12 @@ package com.api.idsa.common.exception;
 import org.springframework.dao.DataIntegrityViolationException;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.http.converter.HttpMessageNotReadableException;
 import org.springframework.security.authentication.DisabledException;
 import org.springframework.security.authentication.LockedException;
 import org.springframework.security.authentication.BadCredentialsException;
 import org.springframework.security.core.AuthenticationException;
+import org.springframework.web.HttpRequestMethodNotSupportedException;
 import org.springframework.web.bind.MethodArgumentNotValidException;
 import org.springframework.web.bind.MissingServletRequestParameterException;
 import org.springframework.web.bind.UnsatisfiedServletRequestParameterException;
@@ -48,7 +50,7 @@ public class GlobalExceptionHandler {
     public ResponseEntity<ApiError> handleUserRoleCreationDeniedException(UserRoleCreationDeniedException ex, WebRequest request) {
         ApiError apiError = new ApiError(
             HttpStatus.FORBIDDEN,
-            ex.getMessage(),
+            ex.getMessage() + " <<role_denied>>",
             request.getDescription(false).replace("uri=", "")
         );
         return ResponseEntity.status(HttpStatus.FORBIDDEN).body(apiError);
@@ -205,6 +207,27 @@ public class GlobalExceptionHandler {
             request.getDescription(false).replace("uri=", "")
         );
         return ResponseEntity.status(ex.getHttpStatus()).body(apiError);
+    }
+
+    @ExceptionHandler(HttpRequestMethodNotSupportedException.class)
+    public ResponseEntity<ApiError> handleHttpRequestMethodNotSupportedException(HttpRequestMethodNotSupportedException ex, WebRequest request) {
+        System.out.println();
+        ApiError apiError = new ApiError(
+            HttpStatus.METHOD_NOT_ALLOWED,
+            ex.getMessage() + " <<method_not_allowed>>",
+            request.getDescription(false).replace("uri=", "")
+        );
+        return ResponseEntity.status(HttpStatus.METHOD_NOT_ALLOWED).body(apiError);
+    }
+
+    @ExceptionHandler(HttpMessageNotReadableException.class)
+    public ResponseEntity<ApiError> handleHttpMessageNotReadableException(HttpMessageNotReadableException ex, WebRequest request) {
+        ApiError apiError = new ApiError(
+            HttpStatus.BAD_REQUEST,
+            "Malformed JSON request <<malformed_json>>",
+            request.getDescription(false).replace("uri=", "")
+        );
+        return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(apiError);
     }
 
     @ExceptionHandler(Exception.class)

@@ -25,34 +25,17 @@ public class UserController {
     @Autowired
     IUserService userService;
 
-    @GetMapping("/active")
-    public ResponseEntity<ApiResponse<List<UserResponse>>> getActiveUsers(
+    @GetMapping
+    public ResponseEntity<ApiResponse<List<UserResponse>>> getAllUsers(
         @RequestParam(defaultValue = "0") int page,
         @RequestParam(defaultValue = "100") int size
     ) {
         Pageable pageable = Pageable.ofSize(size).withPage(page);
-        Page<UserResponse> userPage = userService.getAllActiveExceptAdmin(pageable);
+        Page<UserResponse> userPage = userService.getAllUserExceptAdmin(pageable);
         return ResponseEntity.status(HttpStatus.OK).body(
             new ApiResponse<List<UserResponse>>(
                 HttpStatus.OK,
-                "Active users retrieved successfully",
-                userPage.getContent(),
-                PageInfo.fromPage(userPage)
-            )
-        );
-    }
-
-    @GetMapping("/inactive")
-    public ResponseEntity<ApiResponse<List<UserResponse>>> getInactiveUsers(
-        @RequestParam(defaultValue = "0") int page,
-        @RequestParam(defaultValue = "100") int size
-    ) {
-        Pageable pageable = Pageable.ofSize(size).withPage(page);
-        Page<UserResponse> userPage = userService.getAllInactiveExceptAdmin(pageable);
-        return ResponseEntity.status(HttpStatus.OK).body(
-            new ApiResponse<List<UserResponse>>(
-                HttpStatus.OK,
-                "Inactive users retrieved successfully",
+                "Users retrieved successfully",
                 userPage.getContent(),
                 PageInfo.fromPage(userPage)
             )
