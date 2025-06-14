@@ -1,5 +1,6 @@
 package com.api.idsa.common.exception;
 
+import org.hibernate.exception.ConstraintViolationException;
 import org.springframework.dao.DataIntegrityViolationException;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -68,11 +69,38 @@ public class GlobalExceptionHandler {
 
     @ExceptionHandler(DataIntegrityViolationException.class)
     public ResponseEntity<ApiError> handleDataIntegrityViolationException(DataIntegrityViolationException ex, WebRequest request) {
-        ApiError apiError = new ApiError(
-            HttpStatus.CONFLICT,
-            ex.getMessage(),
-            request.getDescription(false).replace("uri=", "")
-        );
+
+        ApiError apiError;
+        String path = request.getDescription(false).replace("uri=", "");
+
+        if (ex.getCause() instanceof ConstraintViolationException constraintEx) {
+            if (constrainEx.getErrorMessage().contains("foreign key constraint")) {
+                apiError = new ApiError(
+                    HttpStatus.CONFLICT,
+                    "Failed: Operation cannot be completed due to data dependency <<foreign_key_violation>>",
+                    path
+                );
+            } else if (constrainEx.getErrorMessage().contains("unique constraint")) {
+                apiError = new ApiError(
+                    HttpStatus.CONFLICT,
+                    "Failed: Resource already exists <<resource_exists>>",
+                    path
+                );
+            } else {
+                apiError = new ApiError(
+                    HttpStatus.CONFLICT,
+                    "Failed: Data constraint violation <<constraint_violation>>",
+                    path
+                );
+            }
+        } else {
+            apiError = new ApiError(
+                HttpStatus.CONFLICT,
+                "Failed: Data integrity violation <<data_integrity>>",
+                path
+            );
+        }
+
         return ResponseEntity.status(HttpStatus.CONFLICT).body(apiError);
     }
 
@@ -86,7 +114,7 @@ public class GlobalExceptionHandler {
 
         ex.getBindingResult().getFieldErrors().forEach((error) -> {
             apiError.addValidationError(
-                error.getField(), 
+                error.getField(),
                 error.getCode(),
                 error.getDefaultMessage()
             );
@@ -119,7 +147,7 @@ public class GlobalExceptionHandler {
     public ResponseEntity<ApiError> handleMethodArgumentTypeMismatchException(MethodArgumentTypeMismatchException ex, WebRequest request) {
         ApiError apiError = new ApiError(
             HttpStatus.BAD_REQUEST,
-            ex.getMessage(),
+            "The parameter '" + ex.getName() + "' should be of type " + ex.getRequiredType().getSimpleName() + " <<type_mismatch>>",
             request.getDescription(false).replace("uri=", "")
         );
         return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(apiError);
