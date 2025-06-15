@@ -1,6 +1,7 @@
 package com.api.idsa.domain.personnel.service.impl;
 
 import com.api.idsa.common.exception.DuplicateResourceException;
+import com.api.idsa.common.exception.ResourceDependencyException;
 import com.api.idsa.common.exception.ResourceNotFoundException;
 import com.api.idsa.common.exception.UserRoleCreationDeniedException;
 import com.api.idsa.domain.personnel.dto.request.UserRequest;
@@ -20,6 +21,7 @@ import com.api.idsa.security.enums.TokenType;
 import com.api.idsa.security.provider.EmailTokenProvider;
 
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.dao.DataIntegrityViolationException;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.security.crypto.password.PasswordEncoder;
@@ -177,11 +179,18 @@ public class UserServiceImpl implements IUserService {
 
     @Override
     public void deleteUser(Long userId) {
-        // FIXME: Si tiene grupos asignados se decir que no se puede elimininar por que tiene grupos asignados, que en confiuguración grupo cambie el tutor por otro
-        UserEntity userEntity = userRepository.findById(userId)
-                .orElseThrow(() -> new ResourceNotFoundException("delete", "User", userId));
+        try {
+            UserEntity userEntity = userRepository.findById(userId)
+                    .orElseThrow(() -> new ResourceNotFoundException("delete", "User", userId));
 
-        userRepository.delete(userEntity);
+            userRepository.delete(userEntity);            
+        } catch (DataIntegrityViolationException e) {
+            if (e.getMessage().contains("group_configurations_tutor_id_fkey")) {
+                throw new ResourceDependencyException("User", userId, "groups assigned as tutor");
+            }
+            throw new ResourceDependencyException("User", userId, " associated records");
+        }
+
     }
     
 }
