@@ -186,9 +186,9 @@ public class UserServiceImpl implements IUserService {
             userRepository.delete(userEntity);            
         } catch (DataIntegrityViolationException e) {
             if (e.getMessage().contains("group_configurations_tutor_id_fkey")) {
-                throw new ResourceDependencyException("User", userId, "groups assigned as tutor");
+                throw new ResourceDependencyException("User", userId, "groups assigned as tutor", "group_configurations");
             }
-            throw new ResourceDependencyException("User", userId, " associated records");
+            throw new ResourceDependencyException("User", userId, "associated records", "unknown");
         }
 
     }
