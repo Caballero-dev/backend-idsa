@@ -6,8 +6,8 @@ public class ResourceNotFoundException extends RuntimeException {
         super(message);
     }
 
-    public ResourceNotFoundException(String entity, String field, Long id) {
-        super(String.format("Failed: %s with %s: %s <<%s_not_found>>", entity, field, id, entity.toLowerCase()));
+    public ResourceNotFoundException(String entity, String field, Long value) {
+        super(String.format("Failed: %s with %s: %s not found <<%s_not_found>>", entity, field, value, entity.toLowerCase().replace(" ", "_")));
     }
 
     public ResourceNotFoundException(String action, String entity, String field, String value) {
@@ -15,7 +15,7 @@ public class ResourceNotFoundException extends RuntimeException {
     }
 
     public ResourceNotFoundException(String entity, String field, String value) {
-        super(String.format("Failed: %s with %s: %s <<%s_not_found>>", entity, field, value, entity.toLowerCase()));
+        super(String.format("Failed: %s with %s: %s not found <<%s_not_found>>", entity, field, value, entity.toLowerCase().replace(" ", "_")));
     }
 
 }
