@@ -1,6 +1,7 @@
 package com.api.idsa.domain.personnel.service.impl;
 
 import com.api.idsa.common.exception.DuplicateResourceException;
+import com.api.idsa.common.exception.ResourceDependencyException;
 import com.api.idsa.common.exception.ResourceNotFoundException;
 import com.api.idsa.domain.personnel.dto.request.TutorRequest;
 import com.api.idsa.domain.personnel.dto.response.TutorResponse;
@@ -19,6 +20,7 @@ import com.api.idsa.security.enums.TokenType;
 import com.api.idsa.security.provider.EmailTokenProvider;
 
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.dao.DataIntegrityViolationException;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
@@ -74,7 +76,7 @@ public class TutorServiceImpl implements ITutorService {
         }
 
         RoleEntity roleEntity = roleRepository.findByRoleName("ROLE_TUTOR")
-                .orElseThrow(() -> new ResourceNotFoundException("Tutor", "role_name", "ROLE_TUTOR"));
+                .orElseThrow(() -> new ResourceNotFoundException("Role", "role_name", "ROLE_TUTOR"));
 
         PersonEntity personEntity = tutorMapper.toPersonEntity(tutorRequest);
         personRepository.save(personEntity);
@@ -106,7 +108,7 @@ public class TutorServiceImpl implements ITutorService {
     public TutorResponse updateTutor(Long tutorId, TutorRequest tutorRequest) {
 
         TutorEntity tutorEntity = tutorRepository.findById(tutorId)
-                .orElseThrow(() -> new ResourceNotFoundException("Tutor", "tutor_id", tutorId));
+                .orElseThrow(() -> new ResourceNotFoundException("Tutor", "id", tutorId));
 
         if (!tutorEntity.getEmployeeCode().equals(tutorRequest.getEmployeeCode()) && tutorRepository.existsByEmployeeCode(tutorRequest.getEmployeeCode())) {
             throw new DuplicateResourceException("Tutor", "employee_code", tutorRequest.getEmployeeCode());
@@ -151,11 +153,19 @@ public class TutorServiceImpl implements ITutorService {
 
     @Override
     public void deleteTutor(Long tutorId) throws ResourceNotFoundException {
-        // FIXME: Si tiene grupos asignados se decir que no se puede elimininar por que tiene grupos asignados, que en confiuguración grupo cambie el tutor por otro
-        TutorEntity tutorEntity = tutorRepository.findById(tutorId)
-                .orElseThrow(() -> new ResourceNotFoundException("delete", "Tutor", tutorId));
-        
-        tutorRepository.delete(tutorEntity);
+        try {
+            TutorEntity tutorEntity = tutorRepository.findById(tutorId)
+                    .orElseThrow(() -> new ResourceNotFoundException("Tutor", "id", tutorId));
+
+            tutorRepository.delete(tutorEntity);
+        } catch (DataIntegrityViolationException e) {
+            if (e.getMessage().contains("group_configurations_tutor_id_fkey")) {
+                throw new ResourceDependencyException("Tutor", tutorId, "groups assigned", "group_configurations");
+            } else {
+                throw new ResourceDependencyException("Tutor", tutorId, "associated records", "unknown");
+            }
+        }
+
     }
 
 }

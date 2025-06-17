@@ -62,13 +62,11 @@ public class FileStorageServiceImpl implements IFileStorageService {
             if (Files.exists(filePath)) {
                 Files.delete(filePath);
                 return;
-            } else {
-
             }
         } catch (NoSuchFileException e) {
-            throw new RuntimeException("File not found", e);
+            throw new RuntimeException("File not found: " + e.getMessage());
         } catch (IOException e) {
-            throw new RuntimeException("Error deleting file", e);
+            throw new RuntimeException("Error deleting file: " + e.getMessage());
         }
     }
 
