@@ -5,12 +5,14 @@ import jakarta.mail.internet.MimeMessage;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
+import org.springframework.mail.MailException;
 import org.springframework.mail.javamail.JavaMailSender;
 import org.springframework.mail.javamail.MimeMessageHelper;
 import org.springframework.stereotype.Service;
 import org.thymeleaf.TemplateEngine;
 import org.thymeleaf.context.Context;
 
+import com.api.idsa.common.exception.EmailSendingException;
 import com.api.idsa.infrastructure.mail.service.MailService;
 
 @Service
@@ -69,7 +71,11 @@ public class MailServiceImpl implements MailService {
 
             mailSender.send(message);
         } catch (MessagingException e) {
-            throw new RuntimeException("Failed to send email", e);
+            throw new EmailSendingException("Error configuring email message");
+        } catch (MailException e) {
+            throw new EmailSendingException("Failed to send email");
+        } catch (Exception e) {
+            throw new EmailSendingException("An unexpected error occurred while sending email");
         }
     }
 
