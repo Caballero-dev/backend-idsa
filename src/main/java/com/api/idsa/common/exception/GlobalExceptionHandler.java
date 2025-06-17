@@ -36,6 +36,16 @@ public class GlobalExceptionHandler {
         return ResponseEntity.status(HttpStatus.NOT_FOUND).body(apiError);
     }
 
+    @ExceptionHandler(ResourceDependencyException.class)
+    public ResponseEntity<ApiError> handleResourceDependencyException(ResourceDependencyException ex, WebRequest request) {
+        ApiError apiError = new ApiError(
+            HttpStatus.CONFLICT,
+            ex.getMessage(),
+            request.getDescription(false).replace("uri=", "")
+        );
+        return ResponseEntity.status(HttpStatus.CONFLICT).body(apiError);
+    }
+
     @ExceptionHandler(DuplicateResourceException.class)
     public ResponseEntity<ApiError> handleDuplicateResourceException(DuplicateResourceException ex, WebRequest request) {
         ApiError apiError = new ApiError(

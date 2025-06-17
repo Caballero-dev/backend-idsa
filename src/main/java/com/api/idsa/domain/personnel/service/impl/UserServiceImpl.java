@@ -1,6 +1,7 @@
 package com.api.idsa.domain.personnel.service.impl;
 
 import com.api.idsa.common.exception.DuplicateResourceException;
+import com.api.idsa.common.exception.ResourceDependencyException;
 import com.api.idsa.common.exception.ResourceNotFoundException;
 import com.api.idsa.common.exception.UserRoleCreationDeniedException;
 import com.api.idsa.domain.personnel.dto.request.UserRequest;
@@ -20,6 +21,7 @@ import com.api.idsa.security.enums.TokenType;
 import com.api.idsa.security.provider.EmailTokenProvider;
 
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.dao.DataIntegrityViolationException;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.security.crypto.password.PasswordEncoder;
@@ -75,7 +77,7 @@ public class UserServiceImpl implements IUserService {
             throw new DuplicateResourceException("User", "key_employee_code", userRequest.getKey());
         }
         if (personRepository.existsByStudent_StudentCode(userRequest.getKey())) {
-            throw new DuplicateResourceException("User", "key_student_code", userRequest.getKey());
+            throw new DuplicateResourceException("User", "key_employee_code", userRequest.getKey());
         }
 
         RoleEntity roleEntity = roleRepository.findByRoleName(userRequest.getRole().getRoleId())
@@ -114,7 +116,7 @@ public class UserServiceImpl implements IUserService {
     public UserResponse updateUser(Long userId, boolean isUpdatePassword, UserRequest updateUserRequest) {
 
         UserEntity userEntity = userRepository.findById(userId)
-                .orElseThrow(() -> new ResourceNotFoundException("User", "user_id", userId));
+                .orElseThrow(() -> new ResourceNotFoundException("User", "id", userId));
 
         if (!userEntity.getEmail().equals(updateUserRequest.getEmail()) && userRepository.existsByEmail(updateUserRequest.getEmail())) {
             throw new DuplicateResourceException("User", "email", updateUserRequest.getEmail());
@@ -130,7 +132,7 @@ public class UserServiceImpl implements IUserService {
             throw new DuplicateResourceException("User", "key_employee_code", updateUserRequest.getKey());
         }
         if (personRepository.existsByStudent_StudentCode(updateUserRequest.getKey())) {
-            throw new DuplicateResourceException("User", "key_student_code", updateUserRequest.getKey());
+            throw new DuplicateResourceException("User", "key_employee_code", updateUserRequest.getKey());
         }
 
         if ("ROLE_ADMIN".equals(updateUserRequest.getRole().getRoleId())) throw new UserRoleCreationDeniedException("Update of user with the specified role is denied");
@@ -169,7 +171,7 @@ public class UserServiceImpl implements IUserService {
 	public void updateUserStatus(Long userId, boolean isActive) {
 
         UserEntity userEntity = userRepository.findById(userId)
-                .orElseThrow(() -> new ResourceNotFoundException("update", "User", userId));
+                .orElseThrow(() -> new ResourceNotFoundException("User", "id", userId));
 
         userEntity.setIsActive(isActive);
         userRepository.save(userEntity);
@@ -177,11 +179,17 @@ public class UserServiceImpl implements IUserService {
 
     @Override
     public void deleteUser(Long userId) {
-        // FIXME: Si tiene grupos asignados se decir que no se puede elimininar por que tiene grupos asignados, que en confiuguración grupo cambie el tutor por otro
-        UserEntity userEntity = userRepository.findById(userId)
-                .orElseThrow(() -> new ResourceNotFoundException("delete", "User", userId));
+        try {
+            UserEntity userEntity = userRepository.findById(userId)
+                    .orElseThrow(() -> new ResourceNotFoundException("User", "id", userId));
 
-        userRepository.delete(userEntity);
+            userRepository.delete(userEntity);            
+        } catch (DataIntegrityViolationException e) {
+            if (e.getMessage().contains("group_configurations_tutor_id_fkey")) {
+                throw new ResourceDependencyException("User", userId, "groups assigned as tutor", "group_configurations");
+            }
+            throw new ResourceDependencyException("User", userId, "associated records", "unknown");
+        }
     }
     
 }
