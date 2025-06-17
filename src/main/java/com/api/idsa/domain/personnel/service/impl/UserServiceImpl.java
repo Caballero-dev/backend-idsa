@@ -77,7 +77,7 @@ public class UserServiceImpl implements IUserService {
             throw new DuplicateResourceException("User", "key_employee_code", userRequest.getKey());
         }
         if (personRepository.existsByStudent_StudentCode(userRequest.getKey())) {
-            throw new DuplicateResourceException("User", "key_student_code", userRequest.getKey());
+            throw new DuplicateResourceException("User", "key_employee_code", userRequest.getKey());
         }
 
         RoleEntity roleEntity = roleRepository.findByRoleName(userRequest.getRole().getRoleId())
@@ -116,7 +116,7 @@ public class UserServiceImpl implements IUserService {
     public UserResponse updateUser(Long userId, boolean isUpdatePassword, UserRequest updateUserRequest) {
 
         UserEntity userEntity = userRepository.findById(userId)
-                .orElseThrow(() -> new ResourceNotFoundException("User", "user_id", userId));
+                .orElseThrow(() -> new ResourceNotFoundException("User", "id", userId));
 
         if (!userEntity.getEmail().equals(updateUserRequest.getEmail()) && userRepository.existsByEmail(updateUserRequest.getEmail())) {
             throw new DuplicateResourceException("User", "email", updateUserRequest.getEmail());
@@ -132,7 +132,7 @@ public class UserServiceImpl implements IUserService {
             throw new DuplicateResourceException("User", "key_employee_code", updateUserRequest.getKey());
         }
         if (personRepository.existsByStudent_StudentCode(updateUserRequest.getKey())) {
-            throw new DuplicateResourceException("User", "key_student_code", updateUserRequest.getKey());
+            throw new DuplicateResourceException("User", "key_employee_code", updateUserRequest.getKey());
         }
 
         if ("ROLE_ADMIN".equals(updateUserRequest.getRole().getRoleId())) throw new UserRoleCreationDeniedException("Update of user with the specified role is denied");
@@ -171,7 +171,7 @@ public class UserServiceImpl implements IUserService {
 	public void updateUserStatus(Long userId, boolean isActive) {
 
         UserEntity userEntity = userRepository.findById(userId)
-                .orElseThrow(() -> new ResourceNotFoundException("update", "User", userId));
+                .orElseThrow(() -> new ResourceNotFoundException("User", "id", userId));
 
         userEntity.setIsActive(isActive);
         userRepository.save(userEntity);
@@ -181,7 +181,7 @@ public class UserServiceImpl implements IUserService {
     public void deleteUser(Long userId) {
         try {
             UserEntity userEntity = userRepository.findById(userId)
-                    .orElseThrow(() -> new ResourceNotFoundException("delete", "User", userId));
+                    .orElseThrow(() -> new ResourceNotFoundException("User", "id", userId));
 
             userRepository.delete(userEntity);            
         } catch (DataIntegrityViolationException e) {
@@ -190,7 +190,6 @@ public class UserServiceImpl implements IUserService {
             }
             throw new ResourceDependencyException("User", userId, "associated records", "unknown");
         }
-
     }
     
 }
