@@ -77,6 +77,16 @@ public class GlobalExceptionHandler {
         return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body(apiError);
     }
 
+    @ExceptionHandler(EmailSendingException.class)
+    public ResponseEntity<ApiError> handleEmailSendingException(EmailSendingException ex, WebRequest request) {
+        ApiError apiError = new ApiError(
+            HttpStatus.INTERNAL_SERVER_ERROR,
+            ex.getMessage() + " <<email_sending_failed>>",
+            request.getDescription(false).replace("uri=", "")
+        );
+        return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(apiError);
+    }
+
     @ExceptionHandler(DataIntegrityViolationException.class)
     public ResponseEntity<ApiError> handleDataIntegrityViolationException(DataIntegrityViolationException ex, WebRequest request) {
 
