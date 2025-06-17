@@ -76,7 +76,7 @@ public class TutorServiceImpl implements ITutorService {
         }
 
         RoleEntity roleEntity = roleRepository.findByRoleName("ROLE_TUTOR")
-                .orElseThrow(() -> new ResourceNotFoundException("Tutor", "role_name", "ROLE_TUTOR"));
+                .orElseThrow(() -> new ResourceNotFoundException("Role", "role_name", "ROLE_TUTOR"));
 
         PersonEntity personEntity = tutorMapper.toPersonEntity(tutorRequest);
         personRepository.save(personEntity);
@@ -108,7 +108,7 @@ public class TutorServiceImpl implements ITutorService {
     public TutorResponse updateTutor(Long tutorId, TutorRequest tutorRequest) {
 
         TutorEntity tutorEntity = tutorRepository.findById(tutorId)
-                .orElseThrow(() -> new ResourceNotFoundException("Tutor", "tutor_id", tutorId));
+                .orElseThrow(() -> new ResourceNotFoundException("Tutor", "id", tutorId));
 
         if (!tutorEntity.getEmployeeCode().equals(tutorRequest.getEmployeeCode()) && tutorRepository.existsByEmployeeCode(tutorRequest.getEmployeeCode())) {
             throw new DuplicateResourceException("Tutor", "employee_code", tutorRequest.getEmployeeCode());
@@ -155,11 +155,10 @@ public class TutorServiceImpl implements ITutorService {
     public void deleteTutor(Long tutorId) throws ResourceNotFoundException {
         try {
             TutorEntity tutorEntity = tutorRepository.findById(tutorId)
-                    .orElseThrow(() -> new ResourceNotFoundException("delete", "Tutor", tutorId));
-            
-            tutorRepository.delete(tutorEntity);            
+                    .orElseThrow(() -> new ResourceNotFoundException("Tutor", "id", tutorId));
+
+            tutorRepository.delete(tutorEntity);
         } catch (DataIntegrityViolationException e) {
-            System.out.println("Error deleting user: " + e.getMessage());
             if (e.getMessage().contains("group_configurations_tutor_id_fkey")) {
                 throw new ResourceDependencyException("Tutor", tutorId, "groups assigned", "group_configurations");
             } else {
