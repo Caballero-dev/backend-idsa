@@ -13,6 +13,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
+import org.springframework.dao.DataIntegrityViolationException;
 
 @Service
 public class GradeServiceImpl implements IGradeService {
@@ -33,7 +34,7 @@ public class GradeServiceImpl implements IGradeService {
     public GradeResponse createGrade(GradeRequest gradeRequest) {
 
         if (gradeRepository.existsByGradeName(gradeRequest.getName())) {
-            throw new DuplicateResourceException("create", "Grade", gradeRequest.getName());
+            throw new DuplicateResourceException("Grade", "name", gradeRequest.getName());
         }
 
         GradeEntity gradeEntity = gradeMapper.toEntity(gradeRequest);
@@ -44,10 +45,10 @@ public class GradeServiceImpl implements IGradeService {
     public GradeResponse updateGrade(Long gradeId, GradeRequest gradeRequest) {
 
         GradeEntity gradeEntity = gradeRepository.findById(gradeId)
-                .orElseThrow(() -> new ResourceNotFoundException("update", "Grade", gradeId));
+                .orElseThrow(() -> new ResourceNotFoundException("Grade", "id", gradeId));
 
         if (!gradeEntity.getGradeName().equals(gradeRequest.getName()) && gradeRepository.existsByGradeName(gradeRequest.getName())) {
-            throw new DuplicateResourceException("update", "Grade", gradeRequest.getName());
+            throw new DuplicateResourceException("Grade", "name", gradeRequest.getName());
         }
 
         gradeEntity.setGradeName(gradeRequest.getName());
@@ -56,11 +57,17 @@ public class GradeServiceImpl implements IGradeService {
 
     @Override
     public void deleteGrade(Long gradeId) {
-        
-        GradeEntity gradeEntity = gradeRepository.findById(gradeId)
-                .orElseThrow(() -> new ResourceNotFoundException("delete", "Grade", gradeId));
-        
-        gradeRepository.delete(gradeEntity);
+        try {
+            GradeEntity gradeEntity = gradeRepository.findById(gradeId)
+                    .orElseThrow(() -> new ResourceNotFoundException("Grade", "id", gradeId));
+            gradeRepository.delete(gradeEntity);
+        } catch (DataIntegrityViolationException e) {
+            if (e.getMessage().contains("group_configurations_grade_id_fkey")) {
+                throw new com.api.idsa.common.exception.ResourceDependencyException("Grade", gradeId, "assigned groups", "group_configurations");
+            } else {
+                throw new com.api.idsa.common.exception.ResourceDependencyException("Grade", gradeId, "associated records", "unknown");
+            }
+        }
     }
 
 }
