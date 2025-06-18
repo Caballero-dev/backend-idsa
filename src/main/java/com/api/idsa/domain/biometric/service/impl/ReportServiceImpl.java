@@ -4,6 +4,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+import com.api.idsa.common.exception.ResourceNotFoundException;
 import com.api.idsa.domain.biometric.dto.response.ReportResponse;
 import com.api.idsa.domain.biometric.mapper.IReportMapper;
 import com.api.idsa.domain.biometric.model.BiometricDataEntity;
@@ -48,6 +49,10 @@ public class ReportServiceImpl implements IReportService {
 
     @Override
     public List<ReportResponse> getReportsByStudentId(Long studentId) {
+        if (!reportRepository.existsByStudent_StudentId(studentId)) {
+            throw new ResourceNotFoundException("Student", "id", studentId);
+        }
+
         List<ReportResponse> reports = reportMapper.toResponseList(reportRepository.findByStudentStudentId(studentId)).stream()
                 .map(r -> {
                     r.setImages(generateImageUrl(r.getImages()));
