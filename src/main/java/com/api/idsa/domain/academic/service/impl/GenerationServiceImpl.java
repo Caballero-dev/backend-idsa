@@ -35,7 +35,7 @@ public class GenerationServiceImpl implements IGenerationService {
     public GenerationResponse createGeneration(GenerationRequest generationRequest) {
 
         if (generationRepository.existsByStartYearAndEndYear(generationRequest.getYearStart(), generationRequest.getYearEnd())) {
-            throw new DuplicateResourceException("Generation", "start_end_year ", generationRequest.getYearStart() + " / " + generationRequest.getYearEnd());
+            throw new DuplicateResourceException("Generation", "start_end_year", generationRequest.getYearStart() + " / " + generationRequest.getYearEnd());
         }
 
         GenerationEntity generationEntity = generationMapper.toEntity(generationRequest);

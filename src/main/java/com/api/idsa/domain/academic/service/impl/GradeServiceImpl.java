@@ -1,6 +1,7 @@
 package com.api.idsa.domain.academic.service.impl;
 
 import com.api.idsa.common.exception.DuplicateResourceException;
+import com.api.idsa.common.exception.ResourceDependencyException;
 import com.api.idsa.common.exception.ResourceNotFoundException;
 import com.api.idsa.domain.academic.dto.request.GradeRequest;
 import com.api.idsa.domain.academic.dto.response.GradeResponse;
@@ -63,9 +64,9 @@ public class GradeServiceImpl implements IGradeService {
             gradeRepository.delete(gradeEntity);
         } catch (DataIntegrityViolationException e) {
             if (e.getMessage().contains("group_configurations_grade_id_fkey")) {
-                throw new com.api.idsa.common.exception.ResourceDependencyException("Grade", gradeId, "assigned groups", "group_configurations");
+                throw new ResourceDependencyException("Grade", gradeId, "assigned groups", "group_configurations");
             } else {
-                throw new com.api.idsa.common.exception.ResourceDependencyException("Grade", gradeId, "associated records", "unknown");
+                throw new ResourceDependencyException("Grade", gradeId, "associated records", "unknown");
             }
         }
     }
