@@ -1,6 +1,7 @@
 package com.api.idsa.domain.academic.service.impl;
 
 import com.api.idsa.common.exception.DuplicateResourceException;
+import com.api.idsa.common.exception.ResourceDependencyException;
 import com.api.idsa.common.exception.ResourceNotFoundException;
 import com.api.idsa.domain.academic.dto.request.GroupRequest;
 import com.api.idsa.domain.academic.dto.response.GroupResponse;
@@ -13,6 +14,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
+import org.springframework.dao.DataIntegrityViolationException;
 
 @Service
 public class GroupServiceImpl implements IGroupService {
@@ -33,7 +35,7 @@ public class GroupServiceImpl implements IGroupService {
     public GroupResponse createGroup(GroupRequest groupRequest) {
 
         if (groupRepository.existsByGroupName(groupRequest.getName())) {
-            throw new DuplicateResourceException("create", "Group", groupRequest.getName());
+            throw new DuplicateResourceException("Group", "name", groupRequest.getName());
         }
 
         GroupEntity groupEntity = groupMapper.toEntity(groupRequest);
@@ -44,10 +46,10 @@ public class GroupServiceImpl implements IGroupService {
     public GroupResponse updateGroup(Long groupId, GroupRequest groupRequest) {
 
         GroupEntity groupEntity = groupRepository.findById(groupId)
-                .orElseThrow(() -> new ResourceNotFoundException("update", "Group", groupId));
+                .orElseThrow(() -> new ResourceNotFoundException("Group", "id", groupId));
 
         if (!groupEntity.getGroupName().equals(groupRequest.getName()) && groupRepository.existsByGroupName(groupRequest.getName())) {
-            throw new DuplicateResourceException("update", "Group", groupRequest.getName());
+            throw new DuplicateResourceException("Group", "name", groupRequest.getName());
         }
 
         groupEntity.setGroupName(groupRequest.getName());
@@ -55,13 +57,18 @@ public class GroupServiceImpl implements IGroupService {
     }
 
     @Override
-    public void deleteGroup(Long groupId) throws ResourceNotFoundException {
-
-        GroupEntity groupEntity = groupRepository.findById(groupId)
-                .orElseThrow(() -> new ResourceNotFoundException("delete", "Group", groupId));
-        
-        groupRepository.delete(groupEntity);
+    public void deleteGroup(Long groupId) {
+        try {
+            GroupEntity groupEntity = groupRepository.findById(groupId)
+                    .orElseThrow(() -> new ResourceNotFoundException("Group", "id", groupId));
+            groupRepository.delete(groupEntity);
+        } catch (DataIntegrityViolationException e) {
+            if (e.getMessage().contains("group_configurations_group_id_fkey")) {
+                throw new ResourceDependencyException("Group", groupId, "assigned group configurations", "group_configurations");
+            } else {
+                throw new ResourceDependencyException("Group", groupId, "associated records", "unknown");
+            }
+        }
     }
-
 
 }

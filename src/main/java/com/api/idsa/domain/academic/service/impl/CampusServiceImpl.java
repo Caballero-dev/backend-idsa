@@ -1,6 +1,7 @@
 package com.api.idsa.domain.academic.service.impl;
 
 import com.api.idsa.common.exception.DuplicateResourceException;
+import com.api.idsa.common.exception.ResourceDependencyException;
 import com.api.idsa.common.exception.ResourceNotFoundException;
 import com.api.idsa.domain.academic.dto.request.CampusRequest;
 import com.api.idsa.domain.academic.dto.response.CampusResponse;
@@ -10,6 +11,7 @@ import com.api.idsa.domain.academic.repository.ICampusRepository;
 import com.api.idsa.domain.academic.service.ICampusService;
 
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.dao.DataIntegrityViolationException;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
@@ -33,7 +35,7 @@ public class CampusServiceImpl implements ICampusService {
     public CampusResponse createCampus(CampusRequest campusRequest) {
 
         if (campusRepository.existsByCampusName(campusRequest.getName())) {
-            throw new DuplicateResourceException("create", "Campus", campusRequest.getName());
+            throw new DuplicateResourceException("Campus", "name", campusRequest.getName());
         }
 
         CampusEntity campusEntity = campusMapper.toEntity(campusRequest);
@@ -44,10 +46,10 @@ public class CampusServiceImpl implements ICampusService {
     public CampusResponse updateCampus(Long campusId, CampusRequest campusRequest) {
         
         CampusEntity campusEntity = campusRepository.findById(campusId)
-                .orElseThrow(() -> new ResourceNotFoundException("update", "Campus", campusId));
+                .orElseThrow(() -> new ResourceNotFoundException("Campus", "id", campusId));
 
         if (!campusEntity.getCampusName().equals(campusRequest.getName()) && campusRepository.existsByCampusName(campusRequest.getName())) {
-            throw new DuplicateResourceException("update", "Campus", campusRequest.getName());
+            throw new DuplicateResourceException("Campus", "name", campusRequest.getName());
         }
 
         campusEntity.setCampusName(campusRequest.getName());
@@ -56,11 +58,18 @@ public class CampusServiceImpl implements ICampusService {
 
     @Override
     public void deleteCampus(Long campusId) {
-
-        CampusEntity campusEntity = campusRepository.findById(campusId)
-                .orElseThrow(() -> new ResourceNotFoundException("delete", "Campus", campusId));
-        
-        campusRepository.delete(campusEntity);
+        try {
+            CampusEntity campusEntity = campusRepository.findById(campusId)
+                    .orElseThrow(() -> new ResourceNotFoundException("Campus", "id", campusId));
+            
+            campusRepository.delete(campusEntity);
+        } catch (DataIntegrityViolationException e) {
+            if (e.getMessage().contains("group_configurations_campus_id_fkey")) {
+                throw new ResourceDependencyException("Campus", campusId, "groups assigned", "group_configurations");
+            } else {
+                throw new ResourceDependencyException("Campus", campusId, "associated records", "unknown");
+            }
+        }
     }
 
 }
