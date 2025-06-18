@@ -37,7 +37,7 @@ public class BiometricDataServiceImpl implements IBiometricDataService {
     public BiometricDataEntity createBiometricData(BiometricDataRequest biometricDataRequest) {
 
         StudentEntity student = studentRepository.findByStudentCode(biometricDataRequest.getStudentId())
-                .orElseThrow(() -> new ResourceNotFoundException("Create", "BiometricData", "StudentCode", biometricDataRequest.getStudentId()));
+                .orElseThrow(() -> new ResourceNotFoundException("Student", "student_code", biometricDataRequest.getStudentId()));
 
         String fileName = fileStorageService.storeBase64Image(biometricDataRequest.getImage());
 

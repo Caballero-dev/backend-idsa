@@ -13,6 +13,8 @@ public interface IReportRepository extends JpaRepository<ReportEntity, Long> {
     
     ReportEntity findByStudent_StudentId(Long studentId);
     
+    boolean existsByStudent_StudentId(Long studentId);
+
     List<ReportEntity> findByStudentStudentId(Long studentId);
 
     Optional<ReportEntity> findFirstByStudent_StudentIdOrderByCreatedAtDesc(Long studentStudentId);

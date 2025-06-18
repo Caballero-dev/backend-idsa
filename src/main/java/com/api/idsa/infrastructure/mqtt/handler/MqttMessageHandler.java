@@ -39,40 +39,33 @@ public class MqttMessageHandler implements MessageHandler {
 
     @Override
     public void handleMessage(Message<?> message) throws MessagingException {
-        try {
-            String payload = message.getPayload().toString();
+        String payload = message.getPayload().toString();
 
-            if (payload == null || payload.isEmpty() || !payload.startsWith("{")) {
-                log.warn("Invalid payload received");
-                return;
-            }
-
-            BiometricDataRequest biometricData = deserializePayload(payload);
-            if (biometricData == null) return;
-
-            processBiometricData(biometricData);
-
-        } catch (Exception e) {
-            log.error("Error procesing message: {}", e.getMessage());
+        if (payload == null || payload.isEmpty() || !payload.startsWith("{")) {
+            log.warn("Failed: Invalid payload format <<invalid_payload>>");
+            return;
         }
+
+        BiometricDataRequest biometricData = deserializePayload(payload);
+        if (biometricData == null) return;
+
+        processBiometricData(biometricData);
     }
 
     private BiometricDataRequest deserializePayload(String payload) {
-        BiometricDataRequest biometricData;
-
         try {
-            biometricData = objectMapper.readValue(payload, BiometricDataRequest.class);
+            BiometricDataRequest biometricData = objectMapper.readValue(payload, BiometricDataRequest.class);
+
+            if (!validateBiometricData(biometricData)) return null;
+            
+            return biometricData;
         } catch (JsonMappingException e) {
-            log.warn("JSON structure error: {}", e.getMessage());
+            log.warn("Failed: JSON structure error [ {} ] <<json_structure_error>>", e.getMessage());
             return null;
         } catch (JsonProcessingException e) {
-            log.warn("Error deserializing JSON: {}", e.getMessage());
+            log.warn("Failed: Error deserializing JSON [ {} ] <<json_deserialization_error>>", e.getMessage());
             return null;
         }
-
-        if (!validateBiometricData(biometricData)) return null;
-
-        return biometricData;
     }
 
     private boolean validateBiometricData(BiometricDataRequest data) {
@@ -83,7 +76,7 @@ public class MqttMessageHandler implements MessageHandler {
                     .map(violation -> violation.getPropertyPath() + ": " + violation.getMessage())
                     .collect(Collectors.joining(", "));
 
-            log.warn("Invalid biometric data: {}", errorMessages);
+            log.warn("Failed: Invalid biometric data format [ {} ] <<validation_error>>", errorMessages);
             return false;
         }
 
@@ -91,8 +84,12 @@ public class MqttMessageHandler implements MessageHandler {
     }
 
     private void processBiometricData(BiometricDataRequest biometricData) {
-        BiometricDataEntity biometricDataEntity = biometricDataService.createBiometricData(biometricData);
-        reportService.createReport(biometricDataEntity.getStudent(), biometricDataEntity.getCreatedAt());
+        try {
+            BiometricDataEntity biometricDataEntity = biometricDataService.createBiometricData(biometricData);
+            reportService.createReport(biometricDataEntity.getStudent(), biometricDataEntity.getCreatedAt());
+        } catch (Exception e) {
+            log.warn("Error processing biometric data [ {} ]", e.getMessage());
+        }
     }
 
 }

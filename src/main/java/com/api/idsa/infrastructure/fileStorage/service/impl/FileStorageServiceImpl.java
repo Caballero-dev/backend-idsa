@@ -32,9 +32,9 @@ public class FileStorageServiceImpl implements IFileStorageService {
             Files.write(filePath, imageBytes);
             return fileName;
         } catch (IllegalArgumentException e) {
-            throw new IllegalArgumentException("Invalid base64 string", e);
+            throw new IllegalArgumentException("Invalid base64 string: " + e.getMessage());
         } catch (IOException e) {
-            throw new RuntimeException("Error writing file", e);
+            throw new RuntimeException("Error writing file: " + e.getMessage());
         }
     }
 

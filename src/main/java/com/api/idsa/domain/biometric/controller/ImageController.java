@@ -33,20 +33,20 @@ public class ImageController {
             if (!resource.exists()) {
                 return ResponseEntity.notFound().build();
             }
-                String contentType = Files.probeContentType(filePath);
-                if (contentType == null) {
-                    contentType = MediaType.IMAGE_JPEG_VALUE;
-                }
+            String contentType = Files.probeContentType(filePath);
+            if (contentType == null) {
+                contentType = MediaType.IMAGE_JPEG_VALUE;
+            }
 
-                if (!contentType.startsWith("image/")) {
-                    return ResponseEntity.badRequest().body(null);
-                }
+            if (!contentType.startsWith("image/")) {
+                return ResponseEntity.badRequest().body(null);
+            }
 
-                return ResponseEntity.ok()
-                        .contentType(MediaType.parseMediaType(contentType))
-                        .header(HttpHeaders.CONTENT_DISPOSITION, "inline; filename=\"" + resource.getFilename() + "\"")
-                        .body(resource);
-            
+            return ResponseEntity.ok()
+                    .contentType(MediaType.parseMediaType(contentType))
+                    .header(HttpHeaders.CONTENT_DISPOSITION, "inline; filename=\"" + resource.getFilename() + "\"")
+                    .body(resource);
+        
         } catch (IOException e) {
             return ResponseEntity.internalServerError().build();
         }
