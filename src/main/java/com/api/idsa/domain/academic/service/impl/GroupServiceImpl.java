@@ -1,6 +1,7 @@
 package com.api.idsa.domain.academic.service.impl;
 
 import com.api.idsa.common.exception.DuplicateResourceException;
+import com.api.idsa.common.exception.ResourceDependencyException;
 import com.api.idsa.common.exception.ResourceNotFoundException;
 import com.api.idsa.domain.academic.dto.request.GroupRequest;
 import com.api.idsa.domain.academic.dto.response.GroupResponse;
@@ -62,10 +63,10 @@ public class GroupServiceImpl implements IGroupService {
                     .orElseThrow(() -> new ResourceNotFoundException("Group", "id", groupId));
             groupRepository.delete(groupEntity);
         } catch (DataIntegrityViolationException e) {
-            if (e.getMessage() != null && e.getMessage().contains("group_configurations_group_id_fkey")) {
-                throw new com.api.idsa.common.exception.ResourceDependencyException("Group", groupId, "assigned group configurations", "group_configurations");
+            if (e.getMessage().contains("group_configurations_group_id_fkey")) {
+                throw new ResourceDependencyException("Group", groupId, "assigned group configurations", "group_configurations");
             } else {
-                throw new com.api.idsa.common.exception.ResourceDependencyException("Group", groupId, "associated records", "unknown");
+                throw new ResourceDependencyException("Group", groupId, "associated records", "unknown");
             }
         }
     }

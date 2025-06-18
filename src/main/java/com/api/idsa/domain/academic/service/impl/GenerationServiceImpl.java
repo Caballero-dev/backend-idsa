@@ -1,6 +1,7 @@
 package com.api.idsa.domain.academic.service.impl;
 
 import com.api.idsa.common.exception.DuplicateResourceException;
+import com.api.idsa.common.exception.ResourceDependencyException;
 import com.api.idsa.common.exception.ResourceNotFoundException;
 import com.api.idsa.domain.academic.dto.request.GenerationRequest;
 import com.api.idsa.domain.academic.dto.response.GenerationResponse;
@@ -8,6 +9,7 @@ import com.api.idsa.domain.academic.mapper.IGenerationMapper;
 import com.api.idsa.domain.academic.model.GenerationEntity;
 import com.api.idsa.domain.academic.repository.IGenerationRepository;
 import com.api.idsa.domain.academic.service.IGenerationService;
+
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
@@ -67,9 +69,9 @@ public class GenerationServiceImpl implements IGenerationService {
             generationRepository.delete(generationEntity);
         } catch (DataIntegrityViolationException e) {
             if (e.getMessage().contains("group_configurations_generation_id_fkey")) {
-                throw new com.api.idsa.common.exception.ResourceDependencyException("Generation", generationId, "assigned groups", "group_configurations");
+                throw new ResourceDependencyException("Generation", generationId, "assigned groups", "group_configurations");
             } else {
-                throw new com.api.idsa.common.exception.ResourceDependencyException("Generation", generationId, "associated records", "unknown");
+                throw new ResourceDependencyException("Generation", generationId, "associated records", "unknown");
             }
         }
     }
