@@ -1,6 +1,7 @@
 package com.api.idsa.domain.academic.service.impl;
 
 import com.api.idsa.common.exception.DuplicateResourceException;
+import com.api.idsa.common.exception.ResourceDependencyException;
 import com.api.idsa.common.exception.ResourceNotFoundException;
 import com.api.idsa.domain.academic.dto.request.GenerationRequest;
 import com.api.idsa.domain.academic.dto.response.GenerationResponse;
@@ -8,9 +9,11 @@ import com.api.idsa.domain.academic.mapper.IGenerationMapper;
 import com.api.idsa.domain.academic.model.GenerationEntity;
 import com.api.idsa.domain.academic.repository.IGenerationRepository;
 import com.api.idsa.domain.academic.service.IGenerationService;
+
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
+import org.springframework.dao.DataIntegrityViolationException;
 import org.springframework.stereotype.Service;
 
 @Service
@@ -32,7 +35,7 @@ public class GenerationServiceImpl implements IGenerationService {
     public GenerationResponse createGeneration(GenerationRequest generationRequest) {
 
         if (generationRepository.existsByStartYearAndEndYear(generationRequest.getYearStart(), generationRequest.getYearEnd())) {
-            throw new DuplicateResourceException("create", "Generation", "uniqueGeneration", generationRequest.getYearStart() + " - " + generationRequest.getYearEnd());
+            throw new DuplicateResourceException("Generation", "start_end_year ", generationRequest.getYearStart() + " / " + generationRequest.getYearEnd());
         }
 
         GenerationEntity generationEntity = generationMapper.toEntity(generationRequest);
@@ -43,10 +46,14 @@ public class GenerationServiceImpl implements IGenerationService {
     public GenerationResponse updateGeneration(Long generationId, GenerationRequest request) {
 
         GenerationEntity generationEntity = generationRepository.findById(generationId)
-                .orElseThrow(() -> new ResourceNotFoundException("update", "Generation", generationId));
+                .orElseThrow(() -> new ResourceNotFoundException("Generation", "id", generationId));
 
-        if (generationRepository.existsByStartYearAndEndYear(request.getYearStart(), request.getYearEnd())) {
-            throw new DuplicateResourceException("update", "Generation", "uniqueGeneration", request.getYearStart() + " - " + request.getYearEnd());
+        if (
+            ( 
+                !generationEntity.getStartYear().equals(request.getYearStart()) || !generationEntity.getEndYear().equals(request.getYearEnd()) 
+            ) && generationRepository.existsByStartYearAndEndYear(request.getYearStart(), request.getYearEnd())
+        ) {
+            throw new DuplicateResourceException("Generation", "start_end_year", request.getYearStart() + " / " + request.getYearEnd());
         }
 
         generationEntity.setStartYear(request.getYearStart());
@@ -56,11 +63,17 @@ public class GenerationServiceImpl implements IGenerationService {
 
     @Override
     public void deleteGeneration(Long generationId) {
-
-        GenerationEntity generationEntity = generationRepository.findById(generationId)
-                .orElseThrow(() -> new ResourceNotFoundException("delete", "Generation", generationId));
-        
-        generationRepository.delete(generationEntity);
+        try {
+            GenerationEntity generationEntity = generationRepository.findById(generationId)
+                    .orElseThrow(() -> new ResourceNotFoundException("Generation", "id", generationId));
+            generationRepository.delete(generationEntity);
+        } catch (DataIntegrityViolationException e) {
+            if (e.getMessage().contains("group_configurations_generation_id_fkey")) {
+                throw new ResourceDependencyException("Generation", generationId, "assigned groups", "group_configurations");
+            } else {
+                throw new ResourceDependencyException("Generation", generationId, "associated records", "unknown");
+            }
+        }
     }
     
 }

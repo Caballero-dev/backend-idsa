@@ -1,6 +1,7 @@
 package com.api.idsa.domain.academic.service.impl;
 
 import com.api.idsa.common.exception.DuplicateResourceException;
+import com.api.idsa.common.exception.ResourceDependencyException;
 import com.api.idsa.common.exception.ResourceNotFoundException;
 import com.api.idsa.domain.academic.dto.request.GroupConfigurationRequest;
 import com.api.idsa.domain.academic.dto.response.GroupConfigurationResponse;
@@ -10,6 +11,7 @@ import com.api.idsa.domain.academic.repository.IGroupConfigurationRepository;
 import com.api.idsa.domain.academic.service.IGroupConfigurationService;
 
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.dao.DataIntegrityViolationException;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
@@ -42,9 +44,8 @@ public class GroupConfigurationServiceImpl implements IGroupConfigurationService
                 groupConfigurationEntity.getGeneration())
         ) {
             throw new DuplicateResourceException(
-                    "create",
-                    "GroupConfiguration",
-                    "UniqueGroupConfiguration",
+                    "Group Configuration",
+                    "configuration",
                     groupConfigurationRequest.getCampus().getName() + ", " +
                             groupConfigurationRequest.getSpecialty().getName() + ", " +
                             groupConfigurationRequest.getModality().getName() + ", " +
@@ -61,7 +62,7 @@ public class GroupConfigurationServiceImpl implements IGroupConfigurationService
     public GroupConfigurationResponse updateGroupConfiguration(Long groupConfigurationId, GroupConfigurationRequest groupConfigurationRequest) {
 
         GroupConfigurationEntity groupConfigurationEntity = groupConfigurationRepository.findById(groupConfigurationId)
-                .orElseThrow(() -> new ResourceNotFoundException("update", "GroupConfiguration", groupConfigurationId));
+                .orElseThrow(() -> new ResourceNotFoundException("Group Configuration", "id", groupConfigurationId));
 
         GroupConfigurationEntity gc = groupConfigurationMapper.toEntity(groupConfigurationRequest);
 
@@ -81,9 +82,8 @@ public class GroupConfigurationServiceImpl implements IGroupConfigurationService
                 gc.getGeneration())
         ) {
             throw new DuplicateResourceException(
-                    "update",
-                    "GroupConfiguration",
-                    "UniqueGroupConfiguration",
+                    "Group Configuration",
+                    "configuration",
                     groupConfigurationRequest.getCampus().getName() + ", " +
                             groupConfigurationRequest.getSpecialty().getName() + ", " +
                             groupConfigurationRequest.getModality().getName() + ", " +
@@ -104,12 +104,18 @@ public class GroupConfigurationServiceImpl implements IGroupConfigurationService
     }
 
     @Override
-    public void deleteGroupConfiguration(Long groupConfigurationId) throws ResourceNotFoundException {
-
-        GroupConfigurationEntity groupConfigurationEntity = groupConfigurationRepository.findById(groupConfigurationId)
-                .orElseThrow(() -> new ResourceNotFoundException("delete", "GroupConfiguration", groupConfigurationId));
-        
-        groupConfigurationRepository.delete(groupConfigurationEntity);
+    public void deleteGroupConfiguration(Long groupConfigurationId) {
+        try {
+            GroupConfigurationEntity groupConfigurationEntity = groupConfigurationRepository.findById(groupConfigurationId)
+                    .orElseThrow(() -> new ResourceNotFoundException("Group Configuration", "id", groupConfigurationId));
+            groupConfigurationRepository.delete(groupConfigurationEntity);
+        } catch (DataIntegrityViolationException e) {
+            if (e.getMessage().contains("students_group_configuration_id_fkey")) {
+                throw new ResourceDependencyException("Group Configuration", groupConfigurationId, "enrolled students", "students");
+            } else {
+                throw new ResourceDependencyException("Group Configuration", groupConfigurationId, "associated records", "unknown");
+            }
+        }
     }
 
 }
