@@ -5,7 +5,7 @@ import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 
-import java.time.LocalDate;
+import java.time.ZonedDateTime;
 
 import com.api.idsa.common.validation.annotation.YearRange;
 
@@ -16,8 +16,8 @@ import com.api.idsa.common.validation.annotation.YearRange;
 public class GenerationRequest {
 
     @NotNull(message = "Start year is required")
-    private LocalDate yearStart;
+    private ZonedDateTime yearStart;
 
     @NotNull(message = "End year is required")
-    private LocalDate yearEnd;
+    private ZonedDateTime yearEnd;
 }
