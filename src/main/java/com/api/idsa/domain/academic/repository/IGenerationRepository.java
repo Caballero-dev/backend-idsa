@@ -5,11 +5,11 @@ import org.springframework.stereotype.Repository;
 
 import com.api.idsa.domain.academic.model.GenerationEntity;
 
-import java.time.LocalDate;
+import java.time.ZonedDateTime;
 
 @Repository
 public interface IGenerationRepository extends JpaRepository<GenerationEntity, Long> {
 
-    boolean existsByStartYearAndEndYear(LocalDate startYear, LocalDate endYear);
+    boolean existsByStartYearAndEndYear(ZonedDateTime startYear, ZonedDateTime endYear);
 
 }

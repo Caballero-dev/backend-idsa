@@ -39,8 +39,8 @@ CREATE TABLE groups
 CREATE TABLE generations
 (
     generation_id SERIAL,
-    start_year    DATE NOT NULL,
-    end_year      DATE NOT NULL,
+    start_year    TIMESTAMP WITH TIME ZONE NOT NULL,
+    end_year      TIMESTAMP WITH TIME ZONE NOT NULL,
     PRIMARY KEY (generation_id),
     CONSTRAINT unique_generation UNIQUE (start_year, end_year)
 );

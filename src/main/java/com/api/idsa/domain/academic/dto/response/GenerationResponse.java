@@ -5,7 +5,7 @@ import lombok.Builder;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 
-import java.time.LocalDate;
+import java.time.ZonedDateTime;
 
 @Data
 @Builder
@@ -15,8 +15,8 @@ public class GenerationResponse {
 
     private Long generationId;
 
-    private LocalDate yearStart;
+    private ZonedDateTime yearStart;
 
-    private LocalDate yearEnd;
+    private ZonedDateTime yearEnd;
 
 }
