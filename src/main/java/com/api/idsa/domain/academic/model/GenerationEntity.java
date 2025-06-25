@@ -5,7 +5,7 @@ import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 
-import java.time.LocalDate;
+import java.time.ZonedDateTime;
 
 @Entity
 @Table(
@@ -31,10 +31,10 @@ public class GenerationEntity {
     private Long generationId;
 
     @Column(name = "start_year", nullable = false)
-    private LocalDate startYear;
+    private ZonedDateTime startYear;
 
     @Column(name = "end_year", nullable = false)
-    private LocalDate endYear;
+    private ZonedDateTime endYear;
 
 //    @OneToMany(mappedBy = "generation")
 //    private List<GroupConfigurationEntity> groupConfigurations;
