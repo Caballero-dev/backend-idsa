@@ -1,11 +1,12 @@
 package com.api.idsa.domain.biometric.repository;
 
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.stereotype.Repository;
 
 import com.api.idsa.domain.biometric.model.ReportEntity;
 
-import java.util.List;
 import java.util.Optional;
 
 @Repository
@@ -15,7 +16,7 @@ public interface IReportRepository extends JpaRepository<ReportEntity, Long> {
     
     boolean existsByStudent_StudentId(Long studentId);
 
-    List<ReportEntity> findByStudentStudentId(Long studentId);
+    Page<ReportEntity> findByStudentStudentIdOrderByCreatedAtDesc(Long studentId, Pageable pageable);
 
     Optional<ReportEntity> findFirstByStudent_StudentIdOrderByCreatedAtDesc(Long studentStudentId);
 

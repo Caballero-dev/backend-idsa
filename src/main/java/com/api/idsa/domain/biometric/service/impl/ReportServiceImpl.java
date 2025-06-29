@@ -1,6 +1,8 @@
 package com.api.idsa.domain.biometric.service.impl;
 
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -13,6 +15,7 @@ import com.api.idsa.domain.biometric.repository.IBiometricDataRepository;
 import com.api.idsa.domain.biometric.repository.IReportRepository;
 import com.api.idsa.domain.biometric.service.IReportService;
 import com.api.idsa.domain.personnel.model.StudentEntity;
+import com.api.idsa.domain.personnel.repository.IStudentRepository;
 import com.api.idsa.infrastructure.fileStorage.service.IFileStorageService;
 
 import java.math.BigDecimal;
@@ -31,14 +34,19 @@ public class ReportServiceImpl implements IReportService {
     private IBiometricDataRepository biometricDataRepository;
 
     @Autowired
+    private IStudentRepository studentRepository;
+
+    @Autowired
     private IReportMapper reportMapper;
 
     @Autowired
     IFileStorageService fileStorageService;
 
     @Override
-    public List<ReportResponse> findAll() {
-        List<ReportResponse> reports = reportMapper.toResponseList(reportRepository.findAll()).stream()
+    public Page<ReportResponse> findAll(Pageable pageable) {
+        Page<ReportEntity> reportPage = reportRepository.findAll(pageable);
+        Page<ReportResponse> reports = reportPage.map(reportMapper::toResponse);
+        reports.stream()
                 .map(r -> {
                     r.setImages(generateImageUrl(r.getImages()));
                     return r;
@@ -48,12 +56,14 @@ public class ReportServiceImpl implements IReportService {
     }
 
     @Override
-    public List<ReportResponse> getReportsByStudentId(Long studentId) {
-        if (!reportRepository.existsByStudent_StudentId(studentId)) {
+    public Page<ReportResponse> getReportsByStudentId(Long studentId, Pageable pageable) {
+        if (!studentRepository.existsById(studentId)) {
             throw new ResourceNotFoundException("Student", "id", studentId);
         }
 
-        List<ReportResponse> reports = reportMapper.toResponseList(reportRepository.findByStudentStudentId(studentId)).stream()
+        Page<ReportEntity> reportPage = reportRepository.findByStudentStudentIdOrderByCreatedAtDesc(studentId, pageable);
+        Page<ReportResponse> reports = reportPage.map(reportMapper::toResponse);
+        reports.stream()
                 .map(r -> {
                     r.setImages(generateImageUrl(r.getImages()));
                     return r;
