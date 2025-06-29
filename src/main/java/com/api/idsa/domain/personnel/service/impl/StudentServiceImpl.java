@@ -49,6 +49,9 @@ public class StudentServiceImpl implements IStudentService {
 
     @Override
     public Page<StudentResponse> getStudentsByGroupConfigurationId(Long groupConfigurationId, Pageable pageable) {
+        if (!groupConfigurationRepository.existsByGroupConfigurationId(groupConfigurationId)) {
+            throw new ResourceNotFoundException("Group Configuration", "id", groupConfigurationId);
+        }
         Page<StudentEntity> studentPage = studentRepository.findByGroupConfiguration_GroupConfigurationId(groupConfigurationId, pageable);
         return studentPage.map(studentMapper::toResponse);
     }
