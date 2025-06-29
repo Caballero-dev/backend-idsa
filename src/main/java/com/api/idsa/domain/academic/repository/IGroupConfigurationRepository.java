@@ -25,6 +25,8 @@ public interface IGroupConfigurationRepository extends JpaRepository<GroupConfig
             GenerationEntity generation
     );
 
+    boolean existsByGroupConfigurationId(Long groupConfigurationId);
+
     Page<GroupConfigurationEntity> findByTutor_EmployeeCode(String employeeCode, Pageable pageable);
 
     Page<GroupConfigurationEntity> findByTutor_Person_User_Email(String personUserEmail, Pageable pageable);
