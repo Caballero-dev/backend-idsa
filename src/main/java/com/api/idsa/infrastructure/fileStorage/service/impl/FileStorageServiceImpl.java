@@ -41,7 +41,7 @@ public class FileStorageServiceImpl implements IFileStorageService {
     @Override
     public String generateImageUrl(String fileName) {
         return ServletUriComponentsBuilder.fromCurrentContextPath()
-                .path("/image/")
+                .path("/api/image/")
                 .path(fileName)
                 .toUriString();
     }
