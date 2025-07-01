@@ -8,6 +8,7 @@ import org.springframework.transaction.annotation.Transactional;
 
 import com.api.idsa.common.exception.ResourceNotFoundException;
 import com.api.idsa.domain.biometric.dto.response.ReportResponse;
+import com.api.idsa.domain.biometric.dto.response.ReportSummaryResponse;
 import com.api.idsa.domain.biometric.mapper.IReportMapper;
 import com.api.idsa.domain.biometric.model.BiometricDataEntity;
 import com.api.idsa.domain.biometric.model.ReportEntity;
@@ -70,6 +71,24 @@ public class ReportServiceImpl implements IReportService {
                 })
                 .toList();
         return reports;
+    }
+
+    @Override
+    public ReportSummaryResponse getReportSummary() {
+        Integer totalStudents = studentRepository.countStudents();
+        Integer studentsWithReports = reportRepository.countStudentsWithReports();
+        Integer studentsWithoutReports = totalStudents - studentsWithReports;
+        Integer studentsWithLowProbability = reportRepository.countStudentsByPredictionRange(BigDecimal.ZERO, new BigDecimal(40));
+        Integer studentsWithMediumProbability = reportRepository.countStudentsByPredictionRange(new BigDecimal(40), new BigDecimal(70));
+        Integer studentsWithHighProbability = reportRepository.countStudentsByPredictionRange(new BigDecimal(70), new BigDecimal(100));
+        return ReportSummaryResponse.builder()
+                .totalStudents(totalStudents)
+                .studentsWithReports(studentsWithReports)
+                .studentsWithoutReports(studentsWithoutReports)
+                .studentsWithLowProbability(studentsWithLowProbability)
+                .studentsWithMediumProbability(studentsWithMediumProbability)
+                .studentsWithHighProbability(studentsWithHighProbability)
+                .build();
     }
     
     @Override
