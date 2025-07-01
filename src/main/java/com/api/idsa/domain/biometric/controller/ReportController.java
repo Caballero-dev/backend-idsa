@@ -14,6 +14,7 @@ import org.springframework.web.bind.annotation.RestController;
 import com.api.idsa.common.response.ApiResponse;
 import com.api.idsa.common.response.PageInfo;
 import com.api.idsa.domain.biometric.dto.response.ReportResponse;
+import com.api.idsa.domain.biometric.dto.response.ReportSummaryResponse;
 import com.api.idsa.domain.biometric.service.IReportService;
 
 import java.util.List;
@@ -56,6 +57,17 @@ public class ReportController {
                 "Reports retrieved successfully",
                 reportPage.getContent(),
                 PageInfo.fromPage(reportPage)
+            )
+        );
+    }
+
+    @GetMapping("/summary")
+    public ResponseEntity<ApiResponse<ReportSummaryResponse>> getReportSummary() {
+        return ResponseEntity.status(HttpStatus.OK).body(
+            new ApiResponse<ReportSummaryResponse>(
+                HttpStatus.OK,
+                "Report summary retrieved successfully",
+                reportService.getReportSummary()
             )
         );
     }

@@ -157,3 +157,22 @@ CREATE TABLE report_biometric_data
     FOREIGN KEY (report_id) REFERENCES reports (report_id),
     FOREIGN KEY (biometric_data_id) REFERENCES biometric_data (biometric_data_id)
 );
+
+-- Funcion para contar estudiantes por rango de probabilidad
+CREATE OR REPLACE FUNCTION count_students_by_prediction_range(
+    min_prediction NUMERIC,
+    max_prediction NUMERIC
+)
+RETURNS INTEGER AS $$
+BEGIN
+    RETURN (
+        SELECT COUNT(*)
+        FROM (
+            SELECT DISTINCT ON (student_id) student_id, prediction_result
+            FROM reports
+            ORDER BY student_id, created_at DESC
+        ) latest_reports
+        WHERE prediction_result >= min_prediction AND prediction_result < max_prediction
+    );
+END;
+$$ LANGUAGE plpgsql;

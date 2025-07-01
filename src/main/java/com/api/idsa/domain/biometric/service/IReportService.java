@@ -6,6 +6,7 @@ import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 
 import com.api.idsa.domain.biometric.dto.response.ReportResponse;
+import com.api.idsa.domain.biometric.dto.response.ReportSummaryResponse;
 import com.api.idsa.domain.personnel.model.StudentEntity;
 
 public interface IReportService {
@@ -23,6 +24,13 @@ public interface IReportService {
      * @return Lista de {@link ReportResponse} con la información de los reportes del estudiante.
      */
     Page<ReportResponse> getReportsByStudentId(Long studentId, Pageable pageable);
+
+    /**
+     * Obtiene un resumen de los reportes registrados.
+     *
+     * @return {@link ReportSummaryResponse} con la información de los reportes registrados.
+     */
+    ReportSummaryResponse getReportSummary();
 
     /**
      * Crea un reporte.
