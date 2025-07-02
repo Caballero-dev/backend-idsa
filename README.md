@@ -22,7 +22,7 @@ La API es responsable de:
    - Dispositivos IoT (Raspberry Pi) capturan imágenes y datos fisiológicos al ingreso del estudiante.
    - Los datos se envían vía MQTT en formato JSON a la API.
 2. **Recepción y Procesamiento:**
-   - La API almacena los datos y, al acumular 10 registros, los envía al modelo de Deep Learning (PyTorch) para análisis.
+   - La API almacena los datos y, al acumular 10 registros, los envía al modelo de predicción para análisis.
 3. **Predicción y Almacenamiento:**
    - El modelo retorna la probabilidad de consumo, métricas fisiológicas y dilatación pupilar.
    - La API almacena los resultados y referencias a las imágenes.
