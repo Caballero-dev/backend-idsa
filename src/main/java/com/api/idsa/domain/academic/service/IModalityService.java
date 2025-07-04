@@ -11,11 +11,13 @@ import org.springframework.data.domain.Pageable;
 public interface IModalityService {
 
     /**
-     * Obtiene todas las modalidades
+     * Obtiene todas las modalidades registradas con opción de búsqueda.
      *
-     * @return Lista de {@link ModalityResponse} con la información de las modalidades.
+     * @param pageable Configuración de paginación.
+     * @param search Término de búsqueda opcional para filtrar por nombre de la modalidad.
+     * @return Página de {@link ModalityResponse} con la información de las modalidades.
      */
-    Page<ModalityResponse> getAllModality(Pageable pageable);
+    Page<ModalityResponse> getAllModality(Pageable pageable, String search);
 
     /**
      * Crea una modalidad
