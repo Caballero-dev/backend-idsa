@@ -12,6 +12,7 @@ import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.util.StringUtils;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
@@ -26,10 +27,11 @@ public class CampusController {
     @GetMapping
     public ResponseEntity<ApiResponse<List<CampusResponse>>> getAllCampus(
         @RequestParam(defaultValue = "0") int page,
-        @RequestParam(defaultValue = "100") int size
+        @RequestParam(defaultValue = "100") int size,
+        @RequestParam(required = false) String search
     ) {
         Pageable pageable = Pageable.ofSize(size).withPage(page); 
-        Page<CampusResponse> campusPage = campusService.getAllCampus(pageable);
+        Page<CampusResponse> campusPage = campusService.getAllCampus(pageable, search);
         return ResponseEntity.status(HttpStatus.OK).body(
             new ApiResponse<List<CampusResponse>>(
                 HttpStatus.OK,
