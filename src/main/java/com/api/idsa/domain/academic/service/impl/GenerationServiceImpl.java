@@ -15,6 +15,7 @@ import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.dao.DataIntegrityViolationException;
 import org.springframework.stereotype.Service;
+import org.springframework.util.StringUtils;
 
 @Service
 public class GenerationServiceImpl implements IGenerationService {
@@ -26,8 +27,13 @@ public class GenerationServiceImpl implements IGenerationService {
     IGenerationMapper generationMapper;
 
     @Override
-    public Page<GenerationResponse> getAllGeneration(Pageable pageable) {
-        Page<GenerationEntity> generationPage = generationRepository.findAll(pageable);
+    public Page<GenerationResponse> getAllGeneration(Pageable pageable, String search) {
+        Page<GenerationEntity> generationPage;
+        if (StringUtils.hasText(search)) {
+            generationPage = generationRepository.findByStartYearOrEndYearContaining(search.trim(), pageable);
+        } else {
+            generationPage = generationRepository.findAll(pageable);
+        }
         return generationPage.map(generationMapper::toResponse);
     }
 
