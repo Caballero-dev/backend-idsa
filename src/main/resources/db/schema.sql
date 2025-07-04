@@ -158,21 +158,33 @@ CREATE TABLE report_biometric_data
     FOREIGN KEY (biometric_data_id) REFERENCES biometric_data (biometric_data_id)
 );
 
--- Funcion para contar estudiantes por rango de probabilidad
+-- Función para contar estudiantes por rango de probabilidad
 CREATE OR REPLACE FUNCTION count_students_by_prediction_range(
     min_prediction NUMERIC,
     max_prediction NUMERIC
 )
-RETURNS INTEGER AS $$
+    RETURNS INTEGER AS
+$$
 BEGIN
-    RETURN (
-        SELECT COUNT(*)
-        FROM (
-            SELECT DISTINCT ON (student_id) student_id, prediction_result
-            FROM reports
-            ORDER BY student_id, created_at DESC
-        ) latest_reports
-        WHERE prediction_result >= min_prediction AND prediction_result < max_prediction
-    );
+    RETURN (SELECT COUNT(*)
+            FROM (SELECT DISTINCT ON (student_id) student_id, prediction_result
+                  FROM reports
+                  ORDER BY student_id, created_at DESC) latest_reports
+            WHERE prediction_result >= min_prediction
+              AND prediction_result < max_prediction);
 END;
 $$ LANGUAGE plpgsql;
+
+-- Función para buscar generaciones por un valor de búsqueda
+CREATE OR REPLACE FUNCTION search_generations(searchValue varchar)
+    RETURNS SETOF generations
+AS
+$BODY$
+BEGIN
+    RETURN QUERY
+        SELECT g.*
+        FROM generations g
+        WHERE To_CHAR(g.start_year, 'YYYY-MM-DD') ILIKE '%' || searchValue || '%'
+           OR To_CHAR(g.end_year, 'YYYY-MM-DD') ILIKE '%' || searchValue || '%';
+END;
+$BODY$ LANGUAGE plpgsql;

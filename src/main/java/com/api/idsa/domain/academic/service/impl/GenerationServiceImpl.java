@@ -30,7 +30,7 @@ public class GenerationServiceImpl implements IGenerationService {
     public Page<GenerationResponse> getAllGeneration(Pageable pageable, String search) {
         Page<GenerationEntity> generationPage;
         if (StringUtils.hasText(search)) {
-            generationPage = generationRepository.findByStartYearOrEndYearContaining(search.trim(), pageable);
+            generationPage = generationRepository.findGenerationsBySearchTerm(search.trim(), pageable);
         } else {
             generationPage = generationRepository.findAll(pageable);
         }
