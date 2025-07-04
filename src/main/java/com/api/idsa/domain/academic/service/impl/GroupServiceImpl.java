@@ -15,6 +15,7 @@ import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 import org.springframework.dao.DataIntegrityViolationException;
+import org.springframework.util.StringUtils;
 
 @Service
 public class GroupServiceImpl implements IGroupService {
@@ -26,8 +27,13 @@ public class GroupServiceImpl implements IGroupService {
     IGroupMapper groupMapper;
 
     @Override
-    public Page<GroupResponse> getAllGroup(Pageable pageable) {
-        Page<GroupEntity> groupPage = groupRepository.findAll(pageable);
+    public Page<GroupResponse> getAllGroup(Pageable pageable, String search) {
+        Page<GroupEntity> groupPage;
+        if (StringUtils.hasText(search)) {
+            groupPage = groupRepository.findByGroupNameContainingIgnoreCase(search.trim(), pageable);
+        } else {
+            groupPage = groupRepository.findAll(pageable);
+        }
         return groupPage.map(groupMapper::toResponse);
     }
 
