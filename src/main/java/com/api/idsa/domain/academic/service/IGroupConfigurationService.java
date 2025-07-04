@@ -11,11 +11,14 @@ import org.springframework.data.domain.Pageable;
 public interface IGroupConfigurationService {
 
     /**
-     * Obtiene la lista de configuraciones de grupos.
+     * Obtiene la lista de configuraciones de grupos con opción de búsqueda.
      *
-     * @return Lista de {@link GroupConfigurationResponse} con la información de las configuraciones de grupos.
+     * @param pageable Configuración de paginación.
+     * @param search Término de búsqueda opcional para filtrar por diversos criterios como:
+     *              nombre del tutor, correo electrónico, campus, especialidad, etc.
+     * @return Página de {@link GroupConfigurationResponse} con la información filtrada.
      */
-    Page<GroupConfigurationResponse> getAllGroupConfiguration(Pageable pageable);
+    Page<GroupConfigurationResponse> getAllGroupConfiguration(Pageable pageable, String search);
 
     /**
      * Crea una nueva configuración de grupo.

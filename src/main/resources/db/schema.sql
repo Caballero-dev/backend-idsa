@@ -188,3 +188,35 @@ BEGIN
            OR To_CHAR(g.end_year, 'YYYY-MM-DD') ILIKE '%' || searchValue || '%';
 END;
 $BODY$ LANGUAGE plpgsql;
+
+-- Función para buscar configuraciones de grupos por un valor de búsqueda
+CREATE OR REPLACE FUNCTION search_group_configurations(searchValue varchar)
+    RETURNS SETOF group_configurations
+AS
+$BODY$
+BEGIN
+    RETURN QUERY
+        SELECT gc.*
+        FROM group_configurations gc
+                 JOIN tutors t on t.tutor_id = gc.tutor_id
+                 JOIN people p on p.person_id = t.person_id
+                 JOIN users u on u.person_id = p.person_id
+                 JOIN campuses c on c.campus_id = gc.campus_id
+                 JOIN specialties s on s.specialty_id = gc.specialty_id
+                 JOIN modalities m on m.modality_id = gc.modality_id
+                 JOIN grades gr on gr.grade_id = gc.grade_id
+                 JOIN groups gp on gp.group_id = gc.group_id
+                 JOIN generations g on g.generation_id = gc.generation_id
+        WHERE p.name ILIKE '%' || searchValue || '%'
+           OR p.first_surname ILIKE '%' || searchValue || '%'
+           OR p.second_surname ILIKE '%' || searchValue || '%'
+           OR u.email ILIKE '%' || searchValue || '%'
+           OR c.campus_name ILIKE '%' || searchValue || '%'
+           OR s.specialty_name ILIKE '%' || searchValue || '%'
+           OR m.modality_name ILIKE '%' || searchValue || '%'
+           OR gr.grade_name ILIKE '%' || searchValue || '%'
+           OR gp.group_name ILIKE '%' || searchValue || '%'
+           OR To_CHAR(g.start_year, 'YYYY-MM-DD') ILIKE '%' || searchValue || '%'
+           OR To_CHAR(g.end_year, 'YYYY-MM-DD') ILIKE '%' || searchValue || '%';
+END;
+$BODY$ LANGUAGE plpgsql;

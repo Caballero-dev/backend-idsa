@@ -15,6 +15,7 @@ import org.springframework.dao.DataIntegrityViolationException;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
+import org.springframework.util.StringUtils;
 
 @Service
 public class GroupConfigurationServiceImpl implements IGroupConfigurationService {
@@ -26,8 +27,15 @@ public class GroupConfigurationServiceImpl implements IGroupConfigurationService
     IGroupConfigurationMapper groupConfigurationMapper;
 
     @Override
-    public Page<GroupConfigurationResponse> getAllGroupConfiguration(Pageable pageable) {
-        Page<GroupConfigurationEntity> groupConfigurationPage = groupConfigurationRepository.findAll(pageable);
+    public Page<GroupConfigurationResponse> getAllGroupConfiguration(Pageable pageable, String search) {
+        Page<GroupConfigurationEntity> groupConfigurationPage;
+
+        if (StringUtils.hasText(search)) {
+            groupConfigurationPage = groupConfigurationRepository.findGroupConfigurationsBySearchTerm(search.trim(), pageable);
+        } else {
+            groupConfigurationPage = groupConfigurationRepository.findAll(pageable);
+        }
+
         return groupConfigurationPage.map(groupConfigurationMapper::toResponse);
     }
 
