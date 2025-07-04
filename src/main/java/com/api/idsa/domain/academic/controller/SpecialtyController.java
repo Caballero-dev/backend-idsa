@@ -26,10 +26,11 @@ public class SpecialtyController {
     @GetMapping
     public ResponseEntity<ApiResponse<List<SpecialtyResponse>>> getAllSpecialty(
         @RequestParam(defaultValue = "0") int page,
-        @RequestParam(defaultValue = "100") int size
+        @RequestParam(defaultValue = "100") int size,
+        @RequestParam(required = false) String search
     ) {
         Pageable pageable = Pageable.ofSize(size).withPage(page);
-        Page<SpecialtyResponse> specialtyPage = specialtyService.getAllSpecialty(pageable);
+        Page<SpecialtyResponse> specialtyPage = specialtyService.getAllSpecialty(pageable, search);
         return ResponseEntity.status(HttpStatus.OK).body(
             new ApiResponse<List<SpecialtyResponse>>(
                 HttpStatus.OK,

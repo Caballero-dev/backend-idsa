@@ -15,6 +15,7 @@ import org.springframework.dao.DataIntegrityViolationException;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
+import org.springframework.util.StringUtils;
 
 @Service
 public class SpecialtyServiceImpl implements ISpecialtyService {
@@ -26,8 +27,16 @@ public class SpecialtyServiceImpl implements ISpecialtyService {
     ISpecialtyMapper specialtyMapper;
 
     @Override
-    public Page<SpecialtyResponse> getAllSpecialty(Pageable pageable) {
-        Page<SpecialtyEntity> specialtyPage = specialtyRepository.findAll(pageable);
+    public Page<SpecialtyResponse> getAllSpecialty(Pageable pageable, String search) {
+        Page<SpecialtyEntity> specialtyPage;
+
+        if (StringUtils.hasText(search)) {
+            specialtyPage = specialtyRepository.findByShortNameContainingIgnoreCaseOrSpecialtyNameContainingIgnoreCase(
+                    search.trim(), search.trim(), pageable);
+        } else {
+            specialtyPage = specialtyRepository.findAll(pageable);
+        }
+
         return specialtyPage.map(specialtyMapper::toResponse);
     }
 
@@ -48,13 +57,13 @@ public class SpecialtyServiceImpl implements ISpecialtyService {
 
     @Override
     public SpecialtyResponse updateSpecialty(Long specialtyId, SpecialtyRequest specialtyRequest) {
-        
+
         SpecialtyEntity specialtyEntity = specialtyRepository.findById(specialtyId)
                 .orElseThrow(() -> new ResourceNotFoundException("Specialty", "id", specialtyId));
 
         if (!specialtyEntity.getSpecialtyName().equals(specialtyRequest.getName()) && specialtyRepository.existsBySpecialtyName(specialtyRequest.getName())) {
             throw new DuplicateResourceException("Specialty", "name", specialtyRequest.getName());
-        } 
+        }
         if (!specialtyEntity.getShortName().equals(specialtyRequest.getShortName()) && specialtyRepository.existsByShortName(specialtyRequest.getShortName())) {
             throw new DuplicateResourceException("Specialty", "short_name", specialtyRequest.getShortName());
         }

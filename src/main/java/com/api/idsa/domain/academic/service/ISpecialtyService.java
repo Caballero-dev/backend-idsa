@@ -11,11 +11,13 @@ import org.springframework.data.domain.Pageable;
 public interface ISpecialtyService {
 
     /**
-     * Obtiene todas las especialidades registradas.
+     * Obtiene todas las especialidades registradas con opción de búsqueda.
      *
-     * @return Lista de {@link SpecialtyResponse} con todas las especialidades.
+     * @param pageable Configuración de paginación.
+     * @param search Término de búsqueda opcional para filtrar por nombre o abreviatura de la especialidad.
+     * @return Página de {@link SpecialtyResponse} con la información de las especialidades.
      */
-    Page<SpecialtyResponse> getAllSpecialty(Pageable pageable);
+    Page<SpecialtyResponse> getAllSpecialty(Pageable pageable, String search);
 
     /**
      * Crea una nueva especialidad.
