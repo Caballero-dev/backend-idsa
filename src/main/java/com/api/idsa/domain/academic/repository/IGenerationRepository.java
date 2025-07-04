@@ -16,7 +16,11 @@ public interface IGenerationRepository extends JpaRepository<GenerationEntity, L
 
     boolean existsByStartYearAndEndYear(ZonedDateTime startYear, ZonedDateTime endYear);
 
-    @Query(value = "select * from generations where to_char(start_year, 'YYYY-MM-DD') like %:search% or to_char(end_year, 'YYYY-MM-DD') like %:search%", nativeQuery = true)
+    @Query(
+            value = "select * from generations where to_char(start_year, 'YYYY-MM-DD') like %:search% or to_char(end_year, 'YYYY-MM-DD') like %:search%",
+            countQuery = "select count(*) from generations where to_char(start_year, 'YYYY-MM-DD') like %:search% or to_char(end_year, 'YYYY-MM-DD') like %:search%",
+            nativeQuery = true
+    )
     Page<GenerationEntity> findByStartYearOrEndYearContaining(@Param("search") String search, Pageable pageable);
 
 }
