@@ -236,3 +236,23 @@ BEGIN
         WHERE u.email = emailValue;
 END;
 $BODY$ LANGUAGE plpgsql;
+
+-- Función para buscar tutores por un valor de búsqueda
+CREATE OR REPLACE FUNCTION search_tutors(searchValue varchar)
+    RETURNS SETOF tutors
+AS
+$BODY$
+BEGIN
+    RETURN QUERY
+        SELECT t.*
+        FROM tutors t
+                 JOIN people p ON p.person_id = t.person_id
+                 JOIN users u ON u.person_id = p.person_id
+        WHERE t.employee_code ILIKE '%' || searchValue || '%'
+           OR p.name ILIKE '%' || searchValue || '%'
+           OR p.first_surname ILIKE '%' || searchValue || '%'
+           OR p.second_surname ILIKE '%' || searchValue || '%'
+           OR p.phone_number ILIKE '%' || searchValue || '%'
+           OR u.email ILIKE '%' || searchValue || '%';
+END;
+$BODY$ LANGUAGE plpgsql;

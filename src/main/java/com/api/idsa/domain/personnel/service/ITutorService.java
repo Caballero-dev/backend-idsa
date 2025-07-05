@@ -11,11 +11,14 @@ import org.springframework.data.domain.Pageable;
 public interface ITutorService {
 
     /**
-     * Obtiene todos los tutores registrados.
+     * Obtiene todos los tutores registrados con opción de búsqueda.
      *
-     * @return Lista de {@link TutorResponse} con la información de los tutores.
+     * @param pageable Configuración de paginación.
+     * @param search Término de búsqueda opcional para filtrar tutores por nombre, apellidos,
+     *              correo electrónico, número de teléfono o código de empleado.
+     * @return Página de {@link TutorResponse} con la información filtrada de los tutores.
      */
-    Page<TutorResponse> getAllTutor(Pageable pageable);
+    Page<TutorResponse> getAllTutor(Pageable pageable, String search);
 
     /**
      * Crea un tutor.

@@ -27,10 +27,11 @@ public class TutorController {
     @GetMapping
     public ResponseEntity<ApiResponse<List<TutorResponse>>> getAllTutor(
         @RequestParam(defaultValue = "0") int page,
-        @RequestParam(defaultValue = "100") int size
+        @RequestParam(defaultValue = "100") int size,
+        @RequestParam(required = false) String search
     ) {
         Pageable pageable = Pageable.ofSize(size).withPage(page);
-        Page<TutorResponse> tutorPage = tutorService.getAllTutor(pageable);
+        Page<TutorResponse> tutorPage = tutorService.getAllTutor(pageable, search);
         return ResponseEntity.status(HttpStatus.OK).body(
             new ApiResponse<List<TutorResponse>>(
                 HttpStatus.OK,
