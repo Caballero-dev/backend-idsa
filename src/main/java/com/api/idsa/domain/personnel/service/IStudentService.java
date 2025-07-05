@@ -13,17 +13,23 @@ public interface IStudentService {
     /**
      * Obtiene una lista de estudiantes.
      *
+     * @param pageable Configuración de paginación.
+     * @param search Término de búsqueda opcional para filtrar estudiantes por nombre, apellidos,
+     *              número de teléfono o código de estudiante.
      * @return Lista de  {@link StudentResponse} con la información de los estudiantes.
      */
-    Page<StudentResponse> getAllStudent(Pageable pageable);
+    Page<StudentResponse> getAllStudent(Pageable pageable, String search);
 
     /**
-     * Obtiene una lista de estudiantes por groupConfigurationId.
+     * Obtiene una lista de estudiantes por groupConfigurationId con posibilidad de búsqueda.
      *
      * @param groupConfigurationId ID de la configuración del grupo.
+     * @param pageable Configuración de paginación.
+     * @param search Término de búsqueda opcional para filtrar estudiantes por nombre, apellidos,
+     *              número de teléfono o código de estudiante.
      * @return Lista de {@link StudentResponse} con la información de los estudiantes.
      */
-    Page<StudentResponse> getStudentsByGroupConfigurationId(Long groupConfigurationId, Pageable pageable);
+    Page<StudentResponse> getStudentsByGroupConfigurationId(Long groupConfigurationId, String search ,Pageable pageable);
 
     /**
      * Crea un nuevo estudiante.

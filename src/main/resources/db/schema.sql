@@ -276,3 +276,35 @@ BEGIN
           AND (NOT excludeAdmin OR r.role_name != 'ROLE_ADMIN');
 END;
 $BODY$ LANGUAGE plpgsql;
+
+-- Función para buscar estudiantes por un valor de búsqueda
+CREATE OR REPLACE FUNCTION search_students(searchValue varchar)
+    RETURNS SETOF students
+AS
+$BODY$
+BEGIN
+    RETURN QUERY
+        SELECT s.*
+        FROM students s
+                 JOIN people p ON p.person_id = s.person_id
+                 JOIN group_configurations gc ON gc.group_configuration_id = s.group_configuration_id
+        WHERE p.name ILIKE '%' || searchValue || '%'
+           OR p.first_surname ILIKE '%' || searchValue || '%'
+           OR p.second_surname ILIKE '%' || searchValue || '%'
+           OR p.phone_number ILIKE '%' || searchValue || '%'
+           OR s.student_code ILIKE '%' || searchValue || '%';
+END;
+$BODY$ LANGUAGE plpgsql;
+
+-- Función para buscar estudiantes por un valor de búsqueda y una configuración de grupo específica
+CREATE OR REPLACE FUNCTION search_students_by_group_configuration(searchValue varchar, groupConfigurationId bigint)
+    RETURNS SETOF students
+AS
+$BODY$
+BEGIN
+    RETURN QUERY
+        SELECT s.*
+        FROM search_students(searchValue) s
+        WHERE s.group_configuration_id = groupConfigurationId;
+END;
+$BODY$ LANGUAGE plpgsql;

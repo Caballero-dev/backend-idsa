@@ -20,6 +20,7 @@ import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
+import org.springframework.util.StringUtils;
 
 import java.util.List;
 
@@ -42,17 +43,27 @@ public class StudentServiceImpl implements IStudentService {
     IFileStorageService fileStorageService;
 
     @Override
-    public Page<StudentResponse> getAllStudent(Pageable pageable) {
-        Page<StudentEntity> studentPage = studentRepository.findAll(pageable);
+    public Page<StudentResponse> getAllStudent(Pageable pageable, String search) {
+        Page<StudentEntity> studentPage;
+        if (StringUtils.hasText(search)) {
+            studentPage = studentRepository.findStudentsBySearchTerm(search.trim(), pageable);
+        } else {
+            studentPage = studentRepository.findAll(pageable);
+        }
         return studentPage.map(studentMapper::toResponse);
     }
 
     @Override
-    public Page<StudentResponse> getStudentsByGroupConfigurationId(Long groupConfigurationId, Pageable pageable) {
+    public Page<StudentResponse> getStudentsByGroupConfigurationId(Long groupConfigurationId, String search, Pageable pageable) {
         if (!groupConfigurationRepository.existsByGroupConfigurationId(groupConfigurationId)) {
             throw new ResourceNotFoundException("Group Configuration", "id", groupConfigurationId);
         }
-        Page<StudentEntity> studentPage = studentRepository.findByGroupConfiguration_GroupConfigurationId(groupConfigurationId, pageable);
+        Page<StudentEntity> studentPage;
+        if (StringUtils.hasText(search)) {
+            studentPage = studentRepository.findStudentsBySearchTermAndGroupConfigurationId(search.trim(), groupConfigurationId, pageable);
+        } else {
+            studentPage = studentRepository.findByGroupConfigurationGroupConfigurationId(groupConfigurationId, pageable);
+        }
         return studentPage.map(studentMapper::toResponse);
     }
 
