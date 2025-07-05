@@ -220,3 +220,19 @@ BEGIN
            OR To_CHAR(g.end_year, 'YYYY-MM-DD') ILIKE '%' || searchValue || '%';
 END;
 $BODY$ LANGUAGE plpgsql;
+
+-- Función para buscar configuraciones de grupos por un correo electrónico de tutor y un valor de búsqueda
+CREATE OR REPLACE FUNCTION search_group_configurations_by_tutor_email(emailValue varchar, searchValue varchar)
+    RETURNS SETOF group_configurations
+AS
+$BODY$
+BEGIN
+    RETURN QUERY
+        SELECT gc.*
+        FROM search_group_configurations(searchValue) gc
+                 JOIN tutors t ON t.tutor_id = gc.tutor_id
+                 JOIN people p ON p.person_id = t.person_id
+                 JOIN users u ON u.person_id = p.person_id
+        WHERE u.email = emailValue;
+END;
+$BODY$ LANGUAGE plpgsql;
