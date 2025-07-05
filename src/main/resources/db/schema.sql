@@ -256,3 +256,23 @@ BEGIN
            OR u.email ILIKE '%' || searchValue || '%';
 END;
 $BODY$ LANGUAGE plpgsql;
+
+-- Función para buscar usuarios por un valor de búsqueda y una opción para excluir administradores
+CREATE OR REPLACE FUNCTION search_users(searchValue varchar, excludeAdmin boolean)
+    RETURNS SETOF users
+AS
+$BODY$
+BEGIN
+    RETURN QUERY
+        SELECT u.*
+        FROM users u
+                 JOIN people p ON p.person_id = u.person_id
+                 JOIN roles r ON r.role_id = u.role_id
+        WHERE (p.name ILIKE '%' || searchValue || '%'
+            OR p.first_surname ILIKE '%' || searchValue || '%'
+            OR p.second_surname ILIKE '%' || searchValue || '%'
+            OR u.email ILIKE '%' || searchValue || '%'
+            OR To_CHAR(u.created_at, 'DD-MM-YYYY HH12:MI') ILIKE '%' || searchValue || '%')
+          AND (NOT excludeAdmin OR r.role_name != 'ROLE_ADMIN');
+END;
+$BODY$ LANGUAGE plpgsql;
