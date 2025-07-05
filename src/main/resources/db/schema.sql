@@ -1,5 +1,9 @@
 CREATE DATABASE idsa;
 
+-- ========================
+-- ESQUEMA DE LA BASE DE DATOS
+-- ========================
+
 CREATE TABLE campuses
 (
     campus_id   SERIAL,
@@ -158,6 +162,10 @@ CREATE TABLE report_biometric_data
     FOREIGN KEY (biometric_data_id) REFERENCES biometric_data (biometric_data_id)
 );
 
+-- ========================
+-- FUNCIONES PARA CONSULTAS
+-- ========================
+
 -- Función para contar estudiantes por rango de probabilidad
 CREATE OR REPLACE FUNCTION count_students_by_prediction_range(
     min_prediction NUMERIC,
@@ -308,3 +316,48 @@ BEGIN
         WHERE s.group_configuration_id = groupConfigurationId;
 END;
 $BODY$ LANGUAGE plpgsql;
+
+-- ========================
+-- ÍNDICES PARA OPTIMIZACIÓN
+-- ========================
+
+-- Índices sobre la tabla users
+CREATE INDEX IF NOT EXISTS idx_users_email ON users (email);
+CREATE INDEX IF NOT EXISTS idx_users_person_id ON users (person_id);
+CREATE INDEX IF NOT EXISTS idx_users_role_id ON users (role_id);
+
+-- Índices sobre la tabla tutors
+CREATE INDEX IF NOT EXISTS idx_tutors_person_id ON tutors (person_id);
+CREATE INDEX IF NOT EXISTS idx_tutors_employee_code ON tutors (employee_code);
+
+-- Índices sobre la tabla group_configurations
+CREATE INDEX IF NOT EXISTS idx_group_configurations_unique ON group_configurations
+    (campus_id, specialty_id, modality_id, grade_id, group_id, generation_id);
+CREATE INDEX IF NOT EXISTS idx_group_configurations_campus_id ON group_configurations (campus_id);
+CREATE INDEX IF NOT EXISTS idx_group_configurations_specialty_id ON group_configurations (specialty_id);
+CREATE INDEX IF NOT EXISTS idx_group_configurations_modality_id ON group_configurations (modality_id);
+CREATE INDEX IF NOT EXISTS idx_group_configurations_grade_id ON group_configurations (grade_id);
+CREATE INDEX IF NOT EXISTS idx_group_configurations_group_id ON group_configurations (group_id);
+CREATE INDEX IF NOT EXISTS idx_group_configurations_generation_id ON group_configurations (generation_id);
+CREATE INDEX IF NOT EXISTS idx_group_configurations_tutor_id ON group_configurations (tutor_id);
+
+-- Índices sobre la tabla students
+CREATE INDEX IF NOT EXISTS idx_students_student_code ON students (student_code);
+CREATE INDEX IF NOT EXISTS idx_students_person_id ON students (person_id);
+CREATE INDEX IF NOT EXISTS idx_students_group_configuration_id ON students (group_configuration_id);
+
+-- Índices sobre la tabla biometric_data
+CREATE INDEX IF NOT EXISTS idx_biometric_data_student_id ON biometric_data (student_id);
+CREATE INDEX IF NOT EXISTS idx_biometric_data_created_at ON biometric_data (created_at);
+CREATE INDEX IF NOT EXISTS idx_biometric_data_student_created_at ON biometric_data (student_id, created_at);
+
+-- Índices sobre la tabla reports
+CREATE INDEX IF NOT EXISTS idx_reports_student_id ON reports (student_id);
+CREATE INDEX IF NOT EXISTS idx_reports_created_at ON reports (created_at);
+CREATE INDEX IF NOT EXISTS idx_reports_prediction_result ON reports (prediction_result);
+CREATE INDEX IF NOT EXISTS idx_reports_student_date ON reports (student_id, created_at);
+CREATE INDEX IF NOT EXISTS idx_reports_student_date_desc ON reports (student_id, created_at DESC);
+
+-- Índices sobre la tabla report_biometric_data
+CREATE INDEX IF NOT EXISTS idx_report_biometric_data_report_id ON report_biometric_data (report_id);
+CREATE INDEX IF NOT EXISTS idx_report_biometric_data_biometric_data_id ON report_biometric_data (biometric_data_id);
