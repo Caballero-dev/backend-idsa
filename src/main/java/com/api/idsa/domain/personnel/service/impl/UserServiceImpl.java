@@ -27,6 +27,7 @@ import org.springframework.data.domain.Pageable;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
+import org.springframework.util.StringUtils;
 
 import java.time.ZonedDateTime;
 
@@ -58,8 +59,15 @@ public class UserServiceImpl implements IUserService {
     private PasswordEncoder passwordEncoder;
 
     @Override
-    public Page<UserResponse> getAllUserExceptAdmin(Pageable pageable) {
-        Page<UserEntity> userPage = userRepository.findAllByRole_RoleNameIsNot("ROLE_ADMIN", pageable);
+    public Page<UserResponse> getAllUserExceptAdmin(Pageable pageable, String search) {
+        Page<UserEntity> userPage;
+
+        if (StringUtils.hasText(search)) {
+            userPage = userRepository.findUsersBySearchTerm(search.trim(), true, pageable);
+        } else {
+            userPage = userRepository.findAllByRoleRoleNameIsNot("ROLE_ADMIN", pageable);
+        }
+
         return userPage.map(userMapper::toResponse);
     }
 

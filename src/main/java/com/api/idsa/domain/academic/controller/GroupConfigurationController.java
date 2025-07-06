@@ -26,10 +26,11 @@ public class GroupConfigurationController {
     @GetMapping
     public ResponseEntity<ApiResponse<List<GroupConfigurationResponse>>> getAllGroupConfigurations(
         @RequestParam(defaultValue = "0") int page,
-        @RequestParam(defaultValue = "100") int size
+        @RequestParam(defaultValue = "100") int size,
+        @RequestParam(required = false) String search
     ) {
         Pageable pageable = Pageable.ofSize(size).withPage(page);
-        Page<GroupConfigurationResponse> groupConfigPage = groupConfigurationService.getAllGroupConfiguration(pageable);
+        Page<GroupConfigurationResponse> groupConfigPage = groupConfigurationService.getAllGroupConfiguration(pageable, search);
         return ResponseEntity.status(HttpStatus.OK).body(
             new ApiResponse<List<GroupConfigurationResponse>>(
                 HttpStatus.OK,

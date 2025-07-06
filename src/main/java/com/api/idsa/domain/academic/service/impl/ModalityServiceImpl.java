@@ -15,6 +15,7 @@ import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 import org.springframework.dao.DataIntegrityViolationException;
+import org.springframework.util.StringUtils;
 
 @Service
 public class ModalityServiceImpl implements IModalityService {
@@ -26,8 +27,13 @@ public class ModalityServiceImpl implements IModalityService {
     IModalityMapper modalityMapper;
 
     @Override
-    public Page<ModalityResponse> getAllModality(Pageable pageable) {
-        Page<ModalityEntity> modalityPage = modalityRepository.findAll(pageable);
+    public Page<ModalityResponse> getAllModality(Pageable pageable, String search) {
+        Page<ModalityEntity> modalityPage;
+        if (StringUtils.hasText(search)) {
+            modalityPage = modalityRepository.findByModalityNameContainingIgnoreCase(search.trim(), pageable);
+        } else {
+            modalityPage = modalityRepository.findAll(pageable);
+        }
         return modalityPage.map(modalityMapper::toResponse);
     }
 

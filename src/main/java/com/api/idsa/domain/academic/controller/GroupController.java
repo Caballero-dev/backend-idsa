@@ -26,10 +26,11 @@ public class GroupController {
     @GetMapping
     public ResponseEntity<ApiResponse<List<GroupResponse>>> getAllGroups(
         @RequestParam(defaultValue = "0") int page,
-        @RequestParam(defaultValue = "100") int size
+        @RequestParam(defaultValue = "100") int size,
+        @RequestParam(required = false) String search
     ) {
         Pageable pageable = Pageable.ofSize(size).withPage(page);
-        Page<GroupResponse> groupPage = groupService.getAllGroup(pageable);
+        Page<GroupResponse> groupPage = groupService.getAllGroup(pageable, search);
         return ResponseEntity.status(HttpStatus.OK).body(
             new ApiResponse<List<GroupResponse>>(
                 HttpStatus.OK,

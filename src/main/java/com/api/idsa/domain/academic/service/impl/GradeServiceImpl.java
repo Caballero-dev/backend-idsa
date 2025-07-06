@@ -15,6 +15,7 @@ import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 import org.springframework.dao.DataIntegrityViolationException;
+import org.springframework.util.StringUtils;
 
 @Service
 public class GradeServiceImpl implements IGradeService {
@@ -26,8 +27,13 @@ public class GradeServiceImpl implements IGradeService {
     IGradeMapper gradeMapper;
 
     @Override
-    public Page<GradeResponse> getAllGrade(Pageable pageable) {
-        Page<GradeEntity> gradePage = gradeRepository.findAll(pageable);
+    public Page<GradeResponse> getAllGrade(Pageable pageable, String search) {
+        Page<GradeEntity> gradePage;
+        if (StringUtils.hasText(search)) {
+            gradePage = gradeRepository.findByGradeNameContainingIgnoreCase(search.trim(), pageable);
+        } else {
+            gradePage = gradeRepository.findAll(pageable);
+        }
         return gradePage.map(gradeMapper::toResponse);
     }
 

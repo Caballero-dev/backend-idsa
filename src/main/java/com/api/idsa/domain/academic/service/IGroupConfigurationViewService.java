@@ -8,11 +8,13 @@ import com.api.idsa.domain.academic.dto.response.GroupConfigurationViewResponse;
 public interface IGroupConfigurationViewService {
 
     /**
-     * Obtiene una lista de vista de configuraciones de grupos.
+     * Obtiene la lista de vista de configuraciones de grupos con opción de búsqueda.
      *
-     * @return Lista de {@link GroupConfigurationViewResponse} que representan las configuraciones de grupos.
+     * @param pageable Configuración de paginación.
+     * @param search Término de búsqueda opcional.
+     * @return Página de {@link GroupConfigurationViewResponse} con la información filtrada.
      */
-    Page<GroupConfigurationViewResponse> getAllGroupConfigurationView(Pageable pageable);
+    Page<GroupConfigurationViewResponse> getAllGroupConfigurationView(Pageable pageable, String search);
 
 }
 

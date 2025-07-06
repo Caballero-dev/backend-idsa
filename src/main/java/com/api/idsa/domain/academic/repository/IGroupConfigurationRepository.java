@@ -3,6 +3,8 @@ package com.api.idsa.domain.academic.repository;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.jpa.repository.JpaRepository;
+import org.springframework.data.jpa.repository.Query;
+import org.springframework.data.repository.query.Param;
 import org.springframework.stereotype.Repository;
 
 import com.api.idsa.domain.academic.model.CampusEntity;
@@ -27,8 +29,22 @@ public interface IGroupConfigurationRepository extends JpaRepository<GroupConfig
 
     boolean existsByGroupConfigurationId(Long groupConfigurationId);
 
-    Page<GroupConfigurationEntity> findByTutor_EmployeeCode(String employeeCode, Pageable pageable);
+    Page<GroupConfigurationEntity> findByTutorPersonUserEmail(String personUserEmail, Pageable pageable);
 
-    Page<GroupConfigurationEntity> findByTutor_Person_User_Email(String personUserEmail, Pageable pageable);
+    @Query(
+            value = "select * from search_group_configurations(:search)",
+            nativeQuery = true
+    )
+    Page<GroupConfigurationEntity> findGroupConfigurationsBySearchTerm(@Param("search") String search, Pageable pageable);
+
+    @Query(
+            value = "select * from search_group_configurations_by_tutor_email(:email, :search)",
+            nativeQuery = true
+    )
+    Page<GroupConfigurationEntity> findGroupConfigurationsByTutorEmailAndSearchTerm(
+            @Param("email") String email,
+            @Param("search") String search,
+            Pageable pageable
+    );
 
 }

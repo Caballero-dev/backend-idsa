@@ -11,11 +11,13 @@ import org.springframework.data.domain.Pageable;
 public interface IGenerationService {
 
     /**
-     * Obtiene todas las generaciones registradas.
+     * Obtiene todas las generaciones registradas con opción de búsqueda.
      *
-     * @return Lista de {@link GenerationResponse} con la información de las generaciones.
+     * @param pageable Configuración de paginación.
+     * @param search Término de búsqueda opcional para filtrar por año de inicio o fin.
+     * @return Página de {@link GenerationResponse} con la información de las generaciones.
      */
-    Page<GenerationResponse> getAllGeneration(Pageable pageable);
+    Page<GenerationResponse> getAllGeneration(Pageable pageable, String search);
 
     /**
      * Crea una nueva generación.
