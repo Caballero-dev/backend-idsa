@@ -12,11 +12,13 @@ import org.springframework.data.domain.Pageable;
 public interface ICampusService {
 
     /**
-     * Obtiene todas los campus registrados.
+     * Obtiene todas los campus registrados con opción de búsqueda.
      *
-     * @return Lista de {@link CampusResponse} con la información de los campus.
+     * @param pageable Configuración de paginación.
+     * @param search Término de búsqueda opcional para filtrar por nombre del campus.
+     * @return Página de {@link CampusResponse} con la información de los campus.
      */
-    Page<CampusResponse> getAllCampus(Pageable pageable);
+    Page<CampusResponse> getAllCampus(Pageable pageable, String search);
 
     /**
      * Crea un campus.

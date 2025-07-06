@@ -11,11 +11,13 @@ import org.springframework.data.domain.Pageable;
 public interface IGroupService {
 
     /**
-     * Obtiene todos los grupos registrados.
+     * Obtiene todos los grupos registrados con opción de búsqueda.
      *
-     * @return Lista de {@link GroupResponse} con la información de los grupos.
+     * @param pageable Configuración de paginación.
+     * @param search Término de búsqueda opcional para filtrar por nombre del grupo.
+     * @return Página de {@link GroupResponse} con la información de los grupos.
      */
-    Page<GroupResponse> getAllGroup(Pageable pageable);
+    Page<GroupResponse> getAllGroup(Pageable pageable, String search);
 
     /**
      * Crea un grupo.

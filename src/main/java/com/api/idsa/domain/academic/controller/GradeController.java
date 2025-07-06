@@ -26,10 +26,11 @@ public class GradeController {
     @GetMapping
     public ResponseEntity<ApiResponse<List<GradeResponse>>> getAllGrades(
         @RequestParam(defaultValue = "0") int page,
-        @RequestParam(defaultValue = "100") int size
+        @RequestParam(defaultValue = "100") int size,
+        @RequestParam(required = false) String search
     ) {
         Pageable pageable = Pageable.ofSize(size).withPage(page);
-        Page<GradeResponse> gradePage = gradeService.getAllGrade(pageable);
+        Page<GradeResponse> gradePage = gradeService.getAllGrade(pageable, search);
         return ResponseEntity.status(HttpStatus.OK).body(
             new ApiResponse<List<GradeResponse>>(
                 HttpStatus.OK,

@@ -26,10 +26,11 @@ public class GenerationController {
     @GetMapping
     public ResponseEntity<ApiResponse<List<GenerationResponse>>> getAllGeneration(
         @RequestParam(defaultValue = "0") int page,
-        @RequestParam(defaultValue = "100") int size
+        @RequestParam(defaultValue = "100") int size,
+        @RequestParam(required = false) String search
     ) {
         Pageable pageable = Pageable.ofSize(size).withPage(page);
-        Page<GenerationResponse> generationPage = generationService.getAllGeneration(pageable);
+        Page<GenerationResponse> generationPage = generationService.getAllGeneration(pageable, search);
         return ResponseEntity.status(HttpStatus.OK).body(
             new ApiResponse<List<GenerationResponse>>(
                 HttpStatus.OK,

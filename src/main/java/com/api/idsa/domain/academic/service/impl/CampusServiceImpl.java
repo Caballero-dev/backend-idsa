@@ -15,6 +15,7 @@ import org.springframework.dao.DataIntegrityViolationException;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
+import org.springframework.util.StringUtils;
 
 @Service
 public class CampusServiceImpl implements ICampusService {
@@ -26,8 +27,13 @@ public class CampusServiceImpl implements ICampusService {
     ICampusMapper campusMapper;
 
     @Override
-    public Page<CampusResponse> getAllCampus(Pageable pageable) {
-        Page<CampusEntity> campusPage = campusRepository.findAll(pageable);
+    public Page<CampusResponse> getAllCampus(Pageable pageable, String search) {
+        Page<CampusEntity> campusPage;
+        if (StringUtils.hasText(search)) {
+            campusPage = campusRepository.findByCampusNameContainingIgnoreCase(search.trim(), pageable);
+        } else {
+            campusPage = campusRepository.findAll(pageable);
+        }
         return campusPage.map(campusMapper::toResponse);
     }
 
@@ -44,7 +50,7 @@ public class CampusServiceImpl implements ICampusService {
 
     @Override
     public CampusResponse updateCampus(Long campusId, CampusRequest campusRequest) {
-        
+
         CampusEntity campusEntity = campusRepository.findById(campusId)
                 .orElseThrow(() -> new ResourceNotFoundException("Campus", "id", campusId));
 
@@ -61,7 +67,7 @@ public class CampusServiceImpl implements ICampusService {
         try {
             CampusEntity campusEntity = campusRepository.findById(campusId)
                     .orElseThrow(() -> new ResourceNotFoundException("Campus", "id", campusId));
-            
+
             campusRepository.delete(campusEntity);
         } catch (DataIntegrityViolationException e) {
             if (e.getMessage().contains("group_configurations_campus_id_fkey")) {

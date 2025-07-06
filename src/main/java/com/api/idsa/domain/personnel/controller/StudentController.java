@@ -26,10 +26,11 @@ public class StudentController {
     @GetMapping
     public ResponseEntity<ApiResponse<List<StudentResponse>>> getAllStudents(
         @RequestParam(defaultValue = "0") int page,
-        @RequestParam(defaultValue = "100") int size
+        @RequestParam(defaultValue = "100") int size,
+        @RequestParam(required = false) String search
     ) {
         Pageable pageable = Pageable.ofSize(size).withPage(page);
-        Page<StudentResponse> studentPage = studentService.getAllStudent(pageable);
+        Page<StudentResponse> studentPage = studentService.getAllStudent(pageable, search);
         return ResponseEntity.status(HttpStatus.OK).body(
             new ApiResponse<List<StudentResponse>>(
                 HttpStatus.OK,
@@ -44,10 +45,11 @@ public class StudentController {
     public ResponseEntity<ApiResponse<List<StudentResponse>>> getStudentsByGroupConfigurationId(
         @PathVariable Long groupConfigurationId,
         @RequestParam(defaultValue = "0") int page,
-        @RequestParam(defaultValue = "100") int size
+        @RequestParam(defaultValue = "100") int size,
+        @RequestParam(required = false) String search
     ) {
         Pageable pageable = Pageable.ofSize(size).withPage(page);
-        Page<StudentResponse> studentPage = studentService.getStudentsByGroupConfigurationId(groupConfigurationId, pageable);
+        Page<StudentResponse> studentPage = studentService.getStudentsByGroupConfigurationId(groupConfigurationId, search, pageable);
         return ResponseEntity.status(HttpStatus.OK).body(
             new ApiResponse<List<StudentResponse>>(
                 HttpStatus.OK,

@@ -11,11 +11,13 @@ import org.springframework.data.domain.Pageable;
 public interface IGradeService {
 
     /**
-     * Obtiene todos los grados registrados.
+     * Obtiene todos los grados registrados con opción de búsqueda.
      *
-     * @return Lista de {@link GradeResponse} con la información de los grados.
+     * @param pageable Configuración de paginación.
+     * @param search Término de búsqueda opcional para filtrar por nombre del grado.
+     * @return Página de {@link GradeResponse} con la información de los grados.
      */
-    Page<GradeResponse> getAllGrade(Pageable pageable);
+    Page<GradeResponse> getAllGrade(Pageable pageable, String search);
 
     /**
      * Crea un grado.

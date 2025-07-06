@@ -26,10 +26,11 @@ public class ModalityController {
     @GetMapping
     public ResponseEntity<ApiResponse<List<ModalityResponse>>> getAllModality(
         @RequestParam(defaultValue = "0") int page,
-        @RequestParam(defaultValue = "100") int size
+        @RequestParam(defaultValue = "100") int size,
+        @RequestParam(required = false) String search
     ) {
         Pageable pageable = Pageable.ofSize(size).withPage(page);
-        Page<ModalityResponse> modalityPage = modalityService.getAllModality(pageable);
+        Page<ModalityResponse> modalityPage = modalityService.getAllModality(pageable, search);
         return ResponseEntity.status(HttpStatus.OK).body(
             new ApiResponse<List<ModalityResponse>>(
                 HttpStatus.OK,

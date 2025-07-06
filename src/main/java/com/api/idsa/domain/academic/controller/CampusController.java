@@ -26,10 +26,11 @@ public class CampusController {
     @GetMapping
     public ResponseEntity<ApiResponse<List<CampusResponse>>> getAllCampus(
         @RequestParam(defaultValue = "0") int page,
-        @RequestParam(defaultValue = "100") int size
+        @RequestParam(defaultValue = "100") int size,
+        @RequestParam(required = false) String search
     ) {
         Pageable pageable = Pageable.ofSize(size).withPage(page); 
-        Page<CampusResponse> campusPage = campusService.getAllCampus(pageable);
+        Page<CampusResponse> campusPage = campusService.getAllCampus(pageable, search);
         return ResponseEntity.status(HttpStatus.OK).body(
             new ApiResponse<List<CampusResponse>>(
                 HttpStatus.OK,

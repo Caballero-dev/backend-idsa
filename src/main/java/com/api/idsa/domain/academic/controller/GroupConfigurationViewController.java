@@ -27,10 +27,11 @@ public class GroupConfigurationViewController {
     @GetMapping
     public ResponseEntity<ApiResponse<List<GroupConfigurationViewResponse>>> getAllGroupConfigurationView(
         @RequestParam(defaultValue = "0") int page,
-        @RequestParam(defaultValue = "100") int size
+        @RequestParam(defaultValue = "100") int size,
+        @RequestParam(required = false) String search
     ) {
         Pageable pageable = Pageable.ofSize(size).withPage(page);
-        Page<GroupConfigurationViewResponse> groupConfigViewPage = groupConfigurationViewService.getAllGroupConfigurationView(pageable);
+        Page<GroupConfigurationViewResponse> groupConfigViewPage = groupConfigurationViewService.getAllGroupConfigurationView(pageable, search);
         return ResponseEntity.status(HttpStatus.OK).body(
             new ApiResponse<List<GroupConfigurationViewResponse>>(
                 HttpStatus.OK,

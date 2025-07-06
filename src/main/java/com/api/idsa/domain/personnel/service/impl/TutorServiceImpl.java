@@ -25,6 +25,7 @@ import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
+import org.springframework.util.StringUtils;
 
 import java.time.ZonedDateTime;
 
@@ -53,8 +54,15 @@ public class TutorServiceImpl implements ITutorService {
     private MailService mailService;
 
     @Override
-    public Page<TutorResponse> getAllTutor(Pageable pageable) {
-        Page<TutorEntity> tutorPage = tutorRepository.findAll(pageable);
+    public Page<TutorResponse> getAllTutor(Pageable pageable, String search) {
+        Page<TutorEntity> tutorPage;
+
+        if (StringUtils.hasText(search)) {
+            tutorPage = tutorRepository.findTutorsBySearchTerm(search.trim(), pageable);
+        } else {
+            tutorPage = tutorRepository.findAll(pageable);
+        }
+
         return tutorPage.map(tutorMapper::toResponse);
     }
 
