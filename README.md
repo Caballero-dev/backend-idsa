@@ -165,7 +165,7 @@ El proyecto utiliza una arquitectura de configuración modular con perfiles espe
   - Ejecución: `mvn spring-boot:run`
 
 ## 🌐 Relación con el Front-End
-La API está diseñada para ser consumida por el panel web [Identifi-Adicc](https://github.com/Caballero-dev/frontend-identifi-adicc), que permite a los usuarios finales consultar los resultados y reportes generados por el sistema.
+La API está diseñada para ser consumida por el panel web [(frontend-idsa)](https://github.com/Caballero-dev/frontend-idsa), que permite a los usuarios finales consultar los resultados y reportes generados por el sistema.
 
 ---
 
