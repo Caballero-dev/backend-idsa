@@ -9,6 +9,7 @@ import org.springframework.transaction.annotation.Transactional;
 import com.api.idsa.common.exception.ResourceNotFoundException;
 import com.api.idsa.domain.biometric.dto.response.ReportResponse;
 import com.api.idsa.domain.biometric.dto.response.ReportSummaryResponse;
+import com.api.idsa.domain.biometric.enums.PredictionLevel;
 import com.api.idsa.domain.biometric.mapper.IReportMapper;
 import com.api.idsa.domain.biometric.model.BiometricDataEntity;
 import com.api.idsa.domain.biometric.model.ReportEntity;
@@ -78,9 +79,9 @@ public class ReportServiceImpl implements IReportService {
         Integer totalStudents = studentRepository.countStudents();
         Integer studentsWithReports = reportRepository.countStudentsWithReports();
         Integer studentsWithoutReports = totalStudents - studentsWithReports;
-        Integer studentsWithLowProbability = reportRepository.countStudentsByPredictionRange(BigDecimal.ZERO, new BigDecimal(40));
-        Integer studentsWithMediumProbability = reportRepository.countStudentsByPredictionRange(new BigDecimal(40), new BigDecimal(70));
-        Integer studentsWithHighProbability = reportRepository.countStudentsByPredictionRange(new BigDecimal(70), new BigDecimal(100));
+        Integer studentsWithLowProbability = reportRepository.countStudentsByPredictionResult(PredictionLevel.BAJA.name());
+        Integer studentsWithMediumProbability = reportRepository.countStudentsByPredictionResult(PredictionLevel.MEDIA.name());
+        Integer studentsWithHighProbability = reportRepository.countStudentsByPredictionResult(PredictionLevel.ALTA.name());
         return ReportSummaryResponse.builder()
                 .totalStudents(totalStudents)
                 .studentsWithReports(studentsWithReports)
@@ -131,9 +132,7 @@ public class ReportServiceImpl implements IReportService {
             reportEntity.setDiastolicBloodPressure(
                 calculateAverage(biometricDataList.stream().map(BiometricDataEntity::getDiastolicBloodPressure).toList())
             );
-            reportEntity.setPupilDilationRight(new BigDecimal(2.45));
-            reportEntity.setPupilDilationLeft(new BigDecimal(2.47));
-            reportEntity.setPredictionResult(new BigDecimal(45.5));
+            reportEntity.setPredictionResult(PredictionLevel.BAJA);
             // TODO: Esto es una simulación de respuesta del modelo de deep learning
             reportEntity.setCreatedAt(ZonedDateTime.now());
             reportEntity.setBiometricData(biometricDataList);

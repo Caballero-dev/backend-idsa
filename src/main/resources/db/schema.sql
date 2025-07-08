@@ -145,13 +145,13 @@ CREATE TABLE reports
     heart_rate               NUMERIC(4, 2)            NOT NULL,
     systolic_blood_pressure  NUMERIC(5, 2)            NOT NULL,
     diastolic_blood_pressure NUMERIC(5, 2)            NOT NULL,
-    pupil_dilation_right     NUMERIC(4, 2)            NOT NULL,
-    pupil_dilation_left      NUMERIC(4, 2)            NOT NULL,
-    prediction_result        NUMERIC(5, 2)            NOT NULL,
+    prediction_result        VARCHAR(5)               NOT NULL,
     created_at               TIMESTAMP WITH TIME ZONE NOT NULL,
     PRIMARY KEY (report_id),
     FOREIGN KEY (student_id) REFERENCES students (student_id)
 );
+
+-- BAJA, MEDIA, ALTA
 
 CREATE TABLE report_biometric_data
 (
@@ -167,6 +167,7 @@ CREATE TABLE report_biometric_data
 -- ========================
 
 -- Función para contar estudiantes por rango de probabilidad
+/*
 CREATE OR REPLACE FUNCTION count_students_by_prediction_range(
     min_prediction NUMERIC,
     max_prediction NUMERIC
@@ -182,6 +183,7 @@ BEGIN
               AND prediction_result < max_prediction);
 END;
 $$ LANGUAGE plpgsql;
+*/
 
 -- Función para buscar generaciones por un valor de búsqueda
 CREATE OR REPLACE FUNCTION search_generations(searchValue varchar)

@@ -9,6 +9,7 @@ import java.math.BigDecimal;
 import java.time.ZonedDateTime;
 import java.util.List;
 
+import com.api.idsa.domain.biometric.enums.PredictionLevel;
 import com.api.idsa.domain.personnel.model.StudentEntity;
 
 @Entity
@@ -39,14 +40,9 @@ public class ReportEntity {
     @Column(name = "diastolic_blood_pressure", nullable = false, precision = 5, scale = 2)
     private BigDecimal diastolicBloodPressure;
 
-    @Column(name = "pupil_dilation_right", nullable = false, precision = 4, scale = 2)
-    private BigDecimal pupilDilationRight;
-
-    @Column(name = "pupil_dilation_left", nullable = false, precision = 4, scale = 2)
-    private BigDecimal pupilDilationLeft;
-
-    @Column(name = "prediction_result", nullable = false, precision = 5, scale = 2)
-    private BigDecimal predictionResult;
+    @Enumerated(EnumType.STRING)
+    @Column(name = "prediction_result", length = 5, nullable = false)
+    private PredictionLevel predictionResult;
 
     @Column(name = "created_at", nullable = false)
     private ZonedDateTime createdAt;

@@ -5,7 +5,7 @@ import lombok.Builder;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 
-import java.math.BigDecimal;
+import com.api.idsa.domain.biometric.enums.PredictionLevel;
 
 @Data
 @Builder
@@ -19,6 +19,6 @@ public class StudentResponse {
     private String firstSurname;
     private String secondSurname;
     private String phoneNumber;
-    private BigDecimal predictionResult;
+    private PredictionLevel predictionResult;
 
 }
