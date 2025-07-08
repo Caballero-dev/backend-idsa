@@ -145,13 +145,11 @@ CREATE TABLE reports
     heart_rate               NUMERIC(4, 2)            NOT NULL,
     systolic_blood_pressure  NUMERIC(5, 2)            NOT NULL,
     diastolic_blood_pressure NUMERIC(5, 2)            NOT NULL,
-    prediction_result        VARCHAR(5)               NOT NULL,
+    prediction_result        VARCHAR(5)               NOT NULL, -- BAJA, MEDIA, ALTA
     created_at               TIMESTAMP WITH TIME ZONE NOT NULL,
     PRIMARY KEY (report_id),
     FOREIGN KEY (student_id) REFERENCES students (student_id)
 );
-
--- BAJA, MEDIA, ALTA
 
 CREATE TABLE report_biometric_data
 (
