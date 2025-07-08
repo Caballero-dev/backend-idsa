@@ -21,8 +21,6 @@ public interface IReportMapper {
     @Mapping(source = "heartRate", target = "heartRate")
     @Mapping(source = "systolicBloodPressure", target = "systolicBloodPressure")
     @Mapping(source = "diastolicBloodPressure", target = "diastolicBloodPressure")
-    @Mapping(source = "pupilDilationRight", target = "pupilDilationRight")
-    @Mapping(source = "pupilDilationLeft", target = "pupilDilationLeft")
     @Mapping(source = "createdAt", target = "createdAt")
     @Mapping(source = "biometricData", target = "images", qualifiedByName = "imagesToPaths")
     ReportResponse toResponse(ReportEntity reportEntity);
@@ -33,8 +31,6 @@ public interface IReportMapper {
     @Mapping(source = "heartRate", target = "heartRate")
     @Mapping(source = "systolicBloodPressure", target = "systolicBloodPressure")
     @Mapping(source = "diastolicBloodPressure", target = "diastolicBloodPressure")
-    @Mapping(source = "pupilDilationRight", target = "pupilDilationRight")
-    @Mapping(source = "pupilDilationLeft", target = "pupilDilationLeft")
     @Mapping(source = "createdAt", target = "createdAt")
     @Mapping(source = "biometricData", target = "images", qualifiedByName = "imagesToPaths")
     List<ReportResponse> toResponseList(List<ReportEntity> reportEntities);

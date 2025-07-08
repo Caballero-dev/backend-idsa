@@ -69,6 +69,7 @@ idsa/
 ├── src/
 │   ├── main/
 │   │   ├── java/com/api/idsa/
+│   │   │   ├── IdsaApplication.java      # Clase principal de Spring Boot
 │   │   │   ├── common/                    # Componentes comunes
 │   │   │   │   ├── config/               # Configuraciones globales
 │   │   │   │   ├── exception/            # Excepciones personalizadas
@@ -88,6 +89,7 @@ idsa/
 │   │   │   ├── infrastructure/           # Infraestructura
 │   │   │   │   ├── fileStorage/          # Almacenamiento de archivos
 │   │   │   │   ├── mail/                 # Servicio de correos
+│   │   │   │   ├── model/                # Modelo de predicción
 │   │   │   │   └── mqtt/                 # Configuración MQTT
 │   │   │   └── security/                 # Seguridad y autenticación
 │   │   │       ├── config/               # Configuración de seguridad

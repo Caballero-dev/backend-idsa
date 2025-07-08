@@ -6,6 +6,7 @@ import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
 import org.springframework.web.servlet.support.ServletUriComponentsBuilder;
 
+import java.io.File;
 import java.io.IOException;
 import java.nio.file.Files;
 import java.nio.file.NoSuchFileException;
@@ -49,6 +50,11 @@ public class FileStorageServiceImpl implements IFileStorageService {
     @Override
     public Path getFilePath(String fileName) {
         return Paths.get(basePath).resolve(fileName);
+    }
+
+    @Override
+    public File getFile(String fileName) {
+        return getFilePath(fileName).toFile();
     }
     
     @Override

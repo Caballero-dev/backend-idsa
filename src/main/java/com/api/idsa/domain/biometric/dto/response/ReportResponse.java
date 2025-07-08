@@ -23,8 +23,6 @@ public class ReportResponse {
     private BigDecimal heartRate;
     private BigDecimal systolicBloodPressure;
     private BigDecimal diastolicBloodPressure;
-    private BigDecimal pupilDilationRight;
-    private BigDecimal pupilDilationLeft;
     private List<String> images;
     private ZonedDateTime createdAt;
 

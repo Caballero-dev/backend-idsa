@@ -9,7 +9,6 @@ import org.springframework.stereotype.Repository;
 
 import com.api.idsa.domain.biometric.model.ReportEntity;
 
-import java.math.BigDecimal;
 import java.util.Optional;
 
 @Repository
@@ -26,7 +25,7 @@ public interface IReportRepository extends JpaRepository<ReportEntity, Long> {
     @Query(value = "select count(distinct student_id) from reports", nativeQuery = true)
     Integer countStudentsWithReports();
 
-    @Query(value = "select count_students_by_prediction_range(:minPrediction, :maxPrediction)", nativeQuery = true)
-    Integer countStudentsByPredictionRange(@Param("minPrediction") BigDecimal minPrediction, @Param("maxPrediction") BigDecimal maxPrediction);
+    @Query(value = "select count(*) from reports where prediction_result = :predictionResult", nativeQuery = true)
+    Integer countStudentsByPredictionResult(@Param("predictionResult") String predictionResult);
 
 }
