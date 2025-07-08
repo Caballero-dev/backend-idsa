@@ -19,15 +19,16 @@ import com.api.idsa.domain.biometric.service.IReportService;
 import com.api.idsa.domain.personnel.model.StudentEntity;
 import com.api.idsa.domain.personnel.repository.IStudentRepository;
 import com.api.idsa.infrastructure.fileStorage.service.IFileStorageService;
+import com.api.idsa.infrastructure.model.dto.response.ModelPredictionResponse;
+import com.api.idsa.infrastructure.model.service.ModelPredictionService;
 
-import java.math.BigDecimal;
 import java.time.ZonedDateTime;
 import java.util.List;
 
 @Service
 public class ReportServiceImpl implements IReportService {
 
-    private final int RECORDS_THRESHOLD = 10;
+    private final int RECORDS_THRESHOLD = 2;
 
     @Autowired
     private IReportRepository reportRepository;
@@ -43,6 +44,9 @@ public class ReportServiceImpl implements IReportService {
 
     @Autowired
     IFileStorageService fileStorageService;
+
+    @Autowired
+    private ModelPredictionService modelPredictionService;
 
     @Override
     public Page<ReportResponse> findAll(Pageable pageable) {
@@ -117,23 +121,15 @@ public class ReportServiceImpl implements IReportService {
 
             System.out.println("Se genera el reporte: " + biometricDataList.size());
 
+            ModelPredictionResponse modelPredictionResponse = modelPredictionService.predictFromBiometricData(biometricDataList);
+
             ReportEntity reportEntity = new ReportEntity();
             reportEntity.setStudent(studentEntity);
-            // TODO: Esto es una simulación de respuesta del modelo de deep learning
-            reportEntity.setTemperature(
-                calculateAverage(biometricDataList.stream().map(BiometricDataEntity::getTemperature).toList())
-            );
-            reportEntity.setHeartRate(
-                calculateAverage(biometricDataList.stream().map(BiometricDataEntity::getHeartRate).toList())
-            );
-            reportEntity.setSystolicBloodPressure(
-                calculateAverage(biometricDataList.stream().map(BiometricDataEntity::getSystolicBloodPressure).toList())
-            );
-            reportEntity.setDiastolicBloodPressure(
-                calculateAverage(biometricDataList.stream().map(BiometricDataEntity::getDiastolicBloodPressure).toList())
-            );
-            reportEntity.setPredictionResult(PredictionLevel.BAJA);
-            // TODO: Esto es una simulación de respuesta del modelo de deep learning
+            reportEntity.setTemperature(modelPredictionResponse.getTemperature());
+            reportEntity.setHeartRate(modelPredictionResponse.getHeartRate());
+            reportEntity.setSystolicBloodPressure(modelPredictionResponse.getSystolicBloodPressure());
+            reportEntity.setDiastolicBloodPressure(modelPredictionResponse.getDiastolicBloodPressure());
+            reportEntity.setPredictionResult(PredictionLevel.valueOf(modelPredictionResponse.getPrediction()));
             reportEntity.setCreatedAt(ZonedDateTime.now());
             reportEntity.setBiometricData(biometricDataList);
 
@@ -148,12 +144,6 @@ public class ReportServiceImpl implements IReportService {
         return fileNames.stream()
                 .map(fileName -> fileStorageService.generateImageUrl(fileName))
                 .toList();
-    }
-
-    private BigDecimal calculateAverage(List<BigDecimal> values) {
-        return values.stream()
-                .reduce(BigDecimal.ZERO, BigDecimal::add)
-                .divide(BigDecimal.valueOf(values.size()));
     }
 
 }
