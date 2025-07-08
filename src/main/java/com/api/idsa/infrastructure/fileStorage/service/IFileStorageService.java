@@ -1,5 +1,6 @@
 package com.api.idsa.infrastructure.fileStorage.service;
 
+import java.io.File;
 import java.nio.file.Path;
 
 public interface IFileStorageService {
@@ -37,4 +38,12 @@ public interface IFileStorageService {
      */
     void deleteFile(String fileName);
 
+    /**
+     * Obtiene un archivo por su nombre
+     * 
+     * @param fileName El nombre del archivo
+     * @return El archivo
+     */
+    File getFile(String fileName);
+    
 }

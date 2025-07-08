@@ -4,13 +4,13 @@ import org.mapstruct.Mapper;
 import org.mapstruct.Mapping;
 import org.mapstruct.Named;
 
+import com.api.idsa.domain.biometric.enums.PredictionLevel;
 import com.api.idsa.domain.biometric.model.ReportEntity;
 import com.api.idsa.domain.personnel.dto.request.StudentRequest;
 import com.api.idsa.domain.personnel.dto.response.StudentResponse;
 import com.api.idsa.domain.personnel.model.PersonEntity;
 import com.api.idsa.domain.personnel.model.StudentEntity;
 
-import java.math.BigDecimal;
 import java.util.Comparator;
 import java.util.List;
 
@@ -42,7 +42,7 @@ public interface IStudentMapper {
     PersonEntity toPersonEntity(StudentRequest studentRequest);
 
     @Named("getLatestPredictionResult")
-    default BigDecimal getLatestPredictionResult(List<ReportEntity> reports) {
+    default PredictionLevel getLatestPredictionResult(List<ReportEntity> reports) {
         if (reports == null || reports.isEmpty()) {
             return null;
         }
