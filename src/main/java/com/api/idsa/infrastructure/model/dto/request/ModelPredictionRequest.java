@@ -1,7 +1,6 @@
 package com.api.idsa.infrastructure.model.dto.request;
 
 import java.math.BigDecimal;
-import java.time.ZonedDateTime;
 
 import lombok.AllArgsConstructor;
 import lombok.Builder;
@@ -18,7 +17,7 @@ public class ModelPredictionRequest {
     private BigDecimal heartRate;
     private BigDecimal systolicBloodPressure;
     private BigDecimal diastolicBloodPressure;
-    private String imagePath;
-    private ZonedDateTime createdAt;
+    private String fileName;
+    private String createdAt;
 
 }
