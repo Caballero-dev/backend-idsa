@@ -1,6 +1,7 @@
 package com.api.idsa.domain.biometric.service.impl;
 
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
@@ -28,7 +29,8 @@ import java.util.List;
 @Service
 public class ReportServiceImpl implements IReportService {
 
-    private final int RECORDS_THRESHOLD = 2;
+    @Value("${report.generation.threshold}")
+    private int biometricDataThreshold;
 
     @Autowired
     private IReportRepository reportRepository;
@@ -51,14 +53,7 @@ public class ReportServiceImpl implements IReportService {
     @Override
     public Page<ReportResponse> findAll(Pageable pageable) {
         Page<ReportEntity> reportPage = reportRepository.findAll(pageable);
-        Page<ReportResponse> reports = reportPage.map(reportMapper::toResponse);
-        reports.stream()
-                .map(r -> {
-                    r.setImages(generateImageUrl(r.getImages()));
-                    return r;
-                })
-                .toList();
-        return reports;
+        return reportPage.map(this::mapToResponseWithImages);
     }
 
     @Override
@@ -68,14 +63,7 @@ public class ReportServiceImpl implements IReportService {
         }
 
         Page<ReportEntity> reportPage = reportRepository.findByStudentStudentIdOrderByCreatedAtDesc(studentId, pageable);
-        Page<ReportResponse> reports = reportPage.map(reportMapper::toResponse);
-        reports.stream()
-                .map(r -> {
-                    r.setImages(generateImageUrl(r.getImages()));
-                    return r;
-                })
-                .toList();
-        return reports;
+        return reportPage.map(this::mapToResponseWithImages);
     }
 
     @Override
@@ -104,24 +92,23 @@ public class ReportServiceImpl implements IReportService {
         ReportEntity lastReport = reportRepository.findFirstByStudent_StudentIdOrderByCreatedAtDesc(studentEntity.getStudentId()).orElse(null);
         ZonedDateTime startDate = lastReport != null ? lastReport.getCreatedAt() : null;
 
-        System.out.println("Se consulta el ultimo reporte generado: " + startDate);
-
         Long recordCount = startDate != null ?
                 biometricDataRepository.countByStudent_StudentIdAndCreatedAtBetween(studentEntity.getStudentId(), startDate, endDate) :
                 biometricDataRepository.countByStudent_StudentId(studentEntity.getStudentId());
 
         System.out.println("Se consulta el conteo de registros: " + recordCount);
         
-        if (recordCount >= RECORDS_THRESHOLD) {
+        if (recordCount >= biometricDataThreshold) {
             // Si el conteo de registros es mayor o igual al umbral, se genera el reporte
-
             List<BiometricDataEntity> biometricDataList = startDate != null ?
                     biometricDataRepository.findByStudent_StudentIdAndCreatedAtBetween(studentEntity.getStudentId(), startDate, endDate) :
                     biometricDataRepository.findByStudent_StudentId(studentEntity.getStudentId());
 
-            System.out.println("Se genera el reporte: " + biometricDataList.size());
-
             ModelPredictionResponse modelPredictionResponse = modelPredictionService.predictFromBiometricData(biometricDataList);
+
+            if (modelPredictionResponse == null) {
+                return;
+            }
 
             ReportEntity reportEntity = new ReportEntity();
             reportEntity.setStudent(studentEntity);
@@ -139,8 +126,14 @@ public class ReportServiceImpl implements IReportService {
 
 
     }
+
+    private ReportResponse mapToResponseWithImages(ReportEntity report) {
+        ReportResponse response = reportMapper.toResponse(report);
+        response.setImages(generateImageUrls(response.getImages()));
+        return response;
+    }
     
-    private List<String> generateImageUrl(List<String> fileNames) {
+    private List<String> generateImageUrls(List<String> fileNames) {
         return fileNames.stream()
                 .map(fileName -> fileStorageService.generateImageUrl(fileName))
                 .toList();

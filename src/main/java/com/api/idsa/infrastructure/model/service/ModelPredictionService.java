@@ -23,11 +23,14 @@ import com.api.idsa.infrastructure.model.dto.request.ModelPredictionRequest;
 import com.api.idsa.infrastructure.model.dto.response.ModelPredictionResponse;
 import com.fasterxml.jackson.databind.ObjectMapper;
 
+import lombok.extern.slf4j.Slf4j;
+
+@Slf4j
 @Service
 public class ModelPredictionService {
 
-    @Value("${model.endpoint.url}")
-    private String modelEndpointUrl;
+    @Value("${model.base.url}")
+    private String modelBaseUrl;
 
     @Autowired
     private RestTemplate restTemplate;
@@ -35,92 +38,112 @@ public class ModelPredictionService {
     @Autowired
     private IFileStorageService fileStorageService;
     
-    private final ObjectMapper objectMapper = new ObjectMapper();
-    
-
-
-    /**
-     * Envía los datos biométricos al modelo y recibe la predicción
-     * @param biometricDataList Lista de datos biométricos
-     * @return Respuesta del modelo con la predicción y valores calculados
-     */
     public ModelPredictionResponse predictFromBiometricData(List<BiometricDataEntity> biometricDataList) {
         try {
-            // Crear el cuerpo multipart
-            MultiValueMap<String, Object> body = new LinkedMultiValueMap<>();
-            
-            // Agregar datos biométricos como JSON (incluyendo imagePath para la correspondencia)
-            List<ModelPredictionRequest> biometricData = biometricDataList.stream()
-                    .map(this::convertToDataPoint)
-                    .collect(Collectors.toList());
-            
-            // Convertir a JSON string para enviarlo como parte del form-data
-            String biometricDataJson = objectMapper.writeValueAsString(biometricData);
-            body.add("biometric_data", biometricDataJson);
+            log.debug("Se envían los datos biométricos al modelo: {}", biometricDataList.size());
 
-            System.out.println("JSON enviado: " + biometricDataJson);
-
-            
-            // Agregar archivos de imágenes manteniendo el orden y nombres
-            for (BiometricDataEntity data : biometricDataList) {
-                String imagePath = data.getImagePath();
-                
-                if (imagePath != null && !imagePath.isEmpty()) {
-                    File imageFile = fileStorageService.getFile(imagePath);
-                    if (imageFile.exists()) {
-                        // Usar el nombre del archivo como clave para mantener la correspondencia
-                        FileSystemResource fileResource = new FileSystemResource(imageFile);
-                        body.add("images", fileResource);
-                        
-                        System.out.println("Agregando imagen: " + imagePath + " para datos biométricos con temp: " + data.getTemperature());
-                    } else {
-                        System.err.println("Archivo de imagen no encontrado: " + imagePath);
-                    }
-                }
-            }
-            
-            System.out.println("Se envían " + biometricDataList.size() + " datos biométricos con sus respectivas imágenes al modelo");
+            // Construir el cuerpo de la petición
+            MultiValueMap<String, Object> requestBody = buildMultipartRequest(biometricDataList);
             
             // Configurar headers para multipart
             HttpHeaders headers = new HttpHeaders();
             headers.setContentType(MediaType.MULTIPART_FORM_DATA);
             
             // Crear la entidad HTTP
-            HttpEntity<MultiValueMap<String, Object>> httpEntity = new HttpEntity<>(body, headers);
+            HttpEntity<MultiValueMap<String, Object>> httpEntity = new HttpEntity<>(requestBody, headers);
             
             // Realizar la petición POST al modelo
             ModelPredictionResponse response = restTemplate.postForObject(
-                    modelEndpointUrl, 
+                    modelBaseUrl + "/model/predict", 
                     httpEntity, 
                     ModelPredictionResponse.class
             );
             
             if (response != null) {
-                System.out.println("Respuesta recibida del modelo: " + response.toString());
+                log.debug("Respuesta recibida del modelo: {}", response.toString());
                 return response;
             }
             
-            // Si no hay respuesta, devolvemos un valor por defecto solo para pruebas
-            return createDefaultResponse();
+            log.warn("No se recibió respuesta del modelo");
+            // return createDefaultResponse();
+            return null;
         } catch (Exception e) {
-            // En caso de error, registramos el error y devolvemos un valor por defecto
-            System.err.println("Error al llamar al modelo de predicción: " + e.getMessage());
-            // e.printStackTrace();
+            log.error("Error al llamar al modelo de predicción: {}", e.getMessage());
+            // Solo para pruebas         
             return createDefaultResponse();
+            // return null;
         }
+    }
+
+    private MultiValueMap<String, Object> buildMultipartRequest(List<BiometricDataEntity> biometricDataList) {
+        MultiValueMap<String, Object> body = new LinkedMultiValueMap<>();
+        
+        addBiometricDataAsJson(body, biometricDataList);
+        addImageFiles(body, biometricDataList);
+        
+        return body;
+    }
+    
+    private void addBiometricDataAsJson(MultiValueMap<String, Object> body, List<BiometricDataEntity> biometricDataList) {
+        try {
+            List<ModelPredictionRequest> requestData = biometricDataList.stream()
+                    .map(this::convertToRequestDto)
+                    .collect(Collectors.toList());
+            
+            ObjectMapper objectMapper = new ObjectMapper();
+            String jsonData = objectMapper.writeValueAsString(requestData);
+            body.add("biometric_data", jsonData);
+            
+            log.debug("Datos biométricos convertidos a JSON: {}", jsonData);
+        } catch (Exception e) {
+            log.error("Error al serializar datos biométricos", e);
+        }
+    }
+    
+    private void addImageFiles(MultiValueMap<String, Object> body, List<BiometricDataEntity> biometricDataList) {
+        int addedImages = 0;
+        
+        for (BiometricDataEntity data : biometricDataList) {
+            if (addImageFile(body, data)) {
+                addedImages++;
+            }
+        }
+        
+        log.debug("Se agregaron {} imágenes al request", addedImages);
+    }
+    
+    private boolean addImageFile(MultiValueMap<String, Object> body, BiometricDataEntity data) {
+        String imagePath = data.getImagePath();
+        
+        if (imagePath == null || imagePath.isEmpty()) {
+            log.warn("Ruta de imagen vacía para datos biométricos con temp: {}", data.getTemperature());
+            return false;
+        }
+        
+        File imageFile = fileStorageService.getFile(imagePath);
+        if (!imageFile.exists()) {
+            log.error("Archivo de imagen no encontrado: {}", imagePath);
+            return false;
+        }
+        
+        FileSystemResource fileResource = new FileSystemResource(imageFile);
+        body.add("images", fileResource);
+        
+        log.debug("Imagen agregada: {} (temp: {})", imagePath, data.getTemperature());
+        return true;
     }
     
     /**
      * Convierte una entidad de datos biométricos a un objeto DTO
      */
-    private ModelPredictionRequest convertToDataPoint(BiometricDataEntity data) {
+    private ModelPredictionRequest convertToRequestDto(BiometricDataEntity entity) {
         return ModelPredictionRequest.builder()
-                .temperature(data.getTemperature())
-                .heartRate(data.getHeartRate())
-                .systolicBloodPressure(data.getSystolicBloodPressure())
-                .diastolicBloodPressure(data.getDiastolicBloodPressure())
-                .fileName(data.getImagePath())
-                .createdAt(data.getCreatedAt().toString())
+                .temperature(entity.getTemperature())
+                .heartRate(entity.getHeartRate())
+                .systolicBloodPressure(entity.getSystolicBloodPressure())
+                .diastolicBloodPressure(entity.getDiastolicBloodPressure())
+                .fileName(entity.getImagePath())
+                .createdAt(entity.getCreatedAt().toString())
                 .build();
     }
     
