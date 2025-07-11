@@ -1,25 +1,27 @@
 package com.api.idsa.infrastructure.mail.service.impl;
 
-import jakarta.mail.MessagingException;
-import jakarta.mail.internet.MimeMessage;
+import lombok.extern.slf4j.Slf4j;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
-import org.springframework.mail.MailException;
-import org.springframework.mail.javamail.JavaMailSender;
-import org.springframework.mail.javamail.MimeMessageHelper;
 import org.springframework.stereotype.Service;
 import org.thymeleaf.TemplateEngine;
 import org.thymeleaf.context.Context;
 
 import com.api.idsa.common.exception.EmailSendingException;
 import com.api.idsa.infrastructure.mail.service.MailService;
+import com.mailgun.api.v3.MailgunMessagesApi;
+import com.mailgun.model.message.Message;
+import com.mailgun.model.message.MessageResponse;
 
+import feign.FeignException;
+
+@Slf4j
 @Service
 public class MailServiceImpl implements MailService {
 
     @Autowired
-    private JavaMailSender mailSender;
+    private MailgunMessagesApi mailgunMessagesApi;
 
     @Autowired
     private TemplateEngine templateEngine;
@@ -29,6 +31,12 @@ public class MailServiceImpl implements MailService {
 
     @Value("${jwt.verification.expiration}")
     private int verificationExpirationInMinutes;
+
+    @Value("${mailgun.domain}")
+    private String domain;
+
+    @Value("${mailgun.from.email}")
+    private String emailFrom;
 
     @Override
     public void sendVerificationEmail(String to, String token) {
@@ -61,22 +69,26 @@ public class MailServiceImpl implements MailService {
     }
 
     private void sendHtmlEmail(String to, String subject, String htmlContent) {
+        log.info("Intentando enviar correo a: {}", to);
         try {
-            MimeMessage message = mailSender.createMimeMessage();
-            MimeMessageHelper helper = new MimeMessageHelper(message, true, "UTF-8");
 
-            helper.setTo(to);
-            helper.setSubject(subject);
-            helper.setText(htmlContent, true);
+            Message message = Message.builder()
+                .from(emailFrom)
+                .to(to)
+                .subject(subject)
+                .html(htmlContent)
+                .build();
 
-            mailSender.send(message);
-        } catch (MessagingException e) {
-            throw new EmailSendingException("Error configuring email message");
-        } catch (MailException e) {
-            throw new EmailSendingException("Failed to send email");
-        } catch (Exception e) {
-            throw new EmailSendingException("An unexpected error occurred while sending email");
-        }
+                MessageResponse response = mailgunMessagesApi.sendMessage(domain, message);
+                log.info("Email enviado correctamente a {}: {}", to, response.getId());
+            } catch (FeignException e) {
+                log.error("Error de Mailgun al enviar email a {}: Status: {}, Mensaje: {}", 
+                    to, e.status(), e.getMessage());
+                throw new EmailSendingException("Error al enviar email a través de Mailgun");
+            } catch (Exception e) {
+                log.error("Error inesperado al enviar email a {}: {}", to, e.getMessage());
+                throw new EmailSendingException("Error inesperado al enviar email");
+            }
     }
 
 }
