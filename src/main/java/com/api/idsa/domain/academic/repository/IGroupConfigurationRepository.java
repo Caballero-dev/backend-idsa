@@ -15,8 +15,10 @@ import com.api.idsa.domain.academic.model.GroupEntity;
 import com.api.idsa.domain.academic.model.ModalityEntity;
 import com.api.idsa.domain.academic.model.SpecialtyEntity;
 
+import java.util.UUID;
+
 @Repository
-public interface IGroupConfigurationRepository extends JpaRepository<GroupConfigurationEntity, Long> {
+public interface IGroupConfigurationRepository extends JpaRepository<GroupConfigurationEntity, UUID> {
 
     boolean existsByCampusAndSpecialtyAndModalityAndGradeAndGroupAndGeneration(
             CampusEntity campus,
@@ -27,7 +29,7 @@ public interface IGroupConfigurationRepository extends JpaRepository<GroupConfig
             GenerationEntity generation
     );
 
-    boolean existsByGroupConfigurationId(Long groupConfigurationId);
+    boolean existsByGroupConfigurationId(UUID groupConfigurationId);
 
     Page<GroupConfigurationEntity> findByTutorPersonUserEmail(String personUserEmail, Pageable pageable);
 

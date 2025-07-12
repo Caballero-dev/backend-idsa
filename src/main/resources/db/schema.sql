@@ -6,21 +6,21 @@ CREATE DATABASE idsa;
 
 CREATE TABLE campuses
 (
-    campus_id   SERIAL,
+    campus_id   UUID DEFAULT gen_random_uuid(),
     campus_name VARCHAR(100) UNIQUE NOT NULL,
     PRIMARY KEY (campus_id)
 );
 
 CREATE TABLE modalities
 (
-    modality_id   SERIAL,
+    modality_id   UUID DEFAULT gen_random_uuid(),
     modality_name VARCHAR(50) UNIQUE NOT NULL,
     PRIMARY KEY (modality_id)
 );
 
 CREATE TABLE specialties
 (
-    specialty_id   SERIAL,
+    specialty_id   UUID DEFAULT gen_random_uuid(),
     specialty_name VARCHAR(100) UNIQUE NOT NULL,
     short_name     VARCHAR(10) UNIQUE  NOT NULL,
     PRIMARY KEY (specialty_id)
@@ -28,21 +28,21 @@ CREATE TABLE specialties
 
 CREATE TABLE grades
 (
-    grade_id   SERIAL,
+    grade_id   UUID DEFAULT gen_random_uuid(),
     grade_name VARCHAR(30) UNIQUE NOT NULL,
     PRIMARY KEY (grade_id)
 );
 
 CREATE TABLE groups
 (
-    group_id   SERIAL,
+    group_id   UUID DEFAULT gen_random_uuid(),
     group_name VARCHAR(2) UNIQUE NOT NULL,
     PRIMARY KEY (group_id)
 );
 
 CREATE TABLE generations
 (
-    generation_id SERIAL,
+    generation_id UUID DEFAULT gen_random_uuid(),
     start_year    TIMESTAMP WITH TIME ZONE NOT NULL,
     end_year      TIMESTAMP WITH TIME ZONE NOT NULL,
     PRIMARY KEY (generation_id),
@@ -51,7 +51,7 @@ CREATE TABLE generations
 
 CREATE TABLE people
 (
-    person_id      SERIAL,
+    person_id      UUID DEFAULT gen_random_uuid(),
     name           VARCHAR(50)        NOT NULL,
     first_surname  VARCHAR(50)        NOT NULL,
     second_surname VARCHAR(50)        NOT NULL,
@@ -61,16 +61,16 @@ CREATE TABLE people
 
 CREATE TABLE roles
 (
-    role_id   SERIAL,
+    role_id   UUID DEFAULT gen_random_uuid(),
     role_name VARCHAR(50) UNIQUE NOT NULL,
     PRIMARY KEY (role_id)
 );
 
 CREATE TABLE users
 (
-    user_id           SERIAL,
-    person_id         INT                      NOT NULL,
-    role_id           INT                      NOT NULL,
+    user_id           UUID DEFAULT gen_random_uuid(),
+    person_id         UUID                     NOT NULL,
+    role_id           UUID                     NOT NULL,
     email             VARCHAR(100) UNIQUE      NOT NULL,
     password          VARCHAR(255),
     created_at        TIMESTAMP WITH TIME ZONE NOT NULL,
@@ -83,8 +83,8 @@ CREATE TABLE users
 
 CREATE TABLE tutors
 (
-    tutor_id      SERIAL,
-    person_id     INT                NOT NULL,
+    tutor_id      UUID DEFAULT gen_random_uuid(),
+    person_id     UUID               NOT NULL,
     employee_code VARCHAR(20) UNIQUE NOT NULL,
     PRIMARY KEY (tutor_id),
     FOREIGN KEY (person_id) REFERENCES people (person_id)
@@ -92,14 +92,14 @@ CREATE TABLE tutors
 
 CREATE TABLE group_configurations
 (
-    group_configuration_id SERIAL,
-    campus_id              INT NOT NULL,
-    specialty_id           INT NOT NULL,
-    modality_id            INT NOT NULL,
-    grade_id               INT NOT NULL,
-    group_id               INT NOT NULL,
-    generation_id          INT NOT NULL,
-    tutor_id               INT NOT NULL,
+    group_configuration_id UUID DEFAULT gen_random_uuid(),
+    campus_id              UUID NOT NULL,
+    specialty_id           UUID NOT NULL,
+    modality_id            UUID NOT NULL,
+    grade_id               UUID NOT NULL,
+    group_id               UUID NOT NULL,
+    generation_id          UUID NOT NULL,
+    tutor_id               UUID NOT NULL,
     PRIMARY KEY (group_configuration_id),
     CONSTRAINT unique_group_configuration UNIQUE (campus_id, specialty_id, modality_id, grade_id, group_id,
                                                   generation_id),
@@ -114,9 +114,9 @@ CREATE TABLE group_configurations
 
 CREATE TABLE students
 (
-    student_id             SERIAL,
-    person_id              INT                NOT NULL,
-    group_configuration_id INT                NOT NULL,
+    student_id             UUID DEFAULT gen_random_uuid(),
+    person_id              UUID               NOT NULL,
+    group_configuration_id UUID               NOT NULL,
     student_code           VARCHAR(20) UNIQUE NOT NULL,
     PRIMARY KEY (student_id),
     FOREIGN KEY (group_configuration_id) REFERENCES group_configurations (group_configuration_id),
@@ -125,8 +125,8 @@ CREATE TABLE students
 
 CREATE TABLE biometric_data
 (
-    biometric_data_id        SERIAL,
-    student_id               INT                      NOT NULL,
+    biometric_data_id        UUID DEFAULT gen_random_uuid(),
+    student_id               UUID                     NOT NULL,
     temperature              NUMERIC(4, 2)            NOT NULL,
     heart_rate               NUMERIC(4, 2)            NOT NULL,
     systolic_blood_pressure  NUMERIC(5, 2)            NOT NULL,
@@ -139,8 +139,8 @@ CREATE TABLE biometric_data
 
 CREATE TABLE reports
 (
-    report_id                SERIAL,
-    student_id               INT                      NOT NULL,
+    report_id                UUID DEFAULT gen_random_uuid(),
+    student_id               UUID                     NOT NULL,
     temperature              NUMERIC(4, 2)            NOT NULL,
     heart_rate               NUMERIC(4, 2)            NOT NULL,
     systolic_blood_pressure  NUMERIC(5, 2)            NOT NULL,
@@ -153,8 +153,8 @@ CREATE TABLE reports
 
 CREATE TABLE report_biometric_data
 (
-    report_id         INT NOT NULL,
-    biometric_data_id INT NOT NULL,
+    report_id         UUID NOT NULL,
+    biometric_data_id UUID NOT NULL,
     PRIMARY KEY (report_id, biometric_data_id),
     FOREIGN KEY (report_id) REFERENCES reports (report_id),
     FOREIGN KEY (biometric_data_id) REFERENCES biometric_data (biometric_data_id)
@@ -305,7 +305,7 @@ END;
 $BODY$ LANGUAGE plpgsql;
 
 -- Función para buscar estudiantes por un valor de búsqueda y una configuración de grupo específica
-CREATE OR REPLACE FUNCTION search_students_by_group_configuration(searchValue varchar, groupConfigurationId bigint)
+CREATE OR REPLACE FUNCTION search_students_by_group_configuration(searchValue varchar, groupConfigurationId UUID)
     RETURNS SETOF students
 AS
 $BODY$

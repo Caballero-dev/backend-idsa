@@ -5,6 +5,8 @@ import com.api.idsa.common.exception.ResourceNotFoundException;
 import com.api.idsa.domain.personnel.dto.request.TutorRequest;
 import com.api.idsa.domain.personnel.dto.response.TutorResponse;
 
+import java.util.UUID;
+
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 
@@ -39,7 +41,7 @@ public interface ITutorService {
      * @throws DuplicateResourceException si ya existe un tutor con el mismo correo electrónico, número de teléfono o número de empleado.
      * @throws ResourceNotFoundException  si el tutor no existe.
      */
-    TutorResponse updateTutor(Long tutorId, TutorRequest tutorRequest);
+    TutorResponse updateTutor(UUID tutorId, TutorRequest tutorRequest);
 
     /**
      * Elimina un tutor existente.
@@ -47,6 +49,6 @@ public interface ITutorService {
      * @param tutorId ID del tutor a eliminar.
      * @throws ResourceNotFoundException si el tutor no existe.
      */
-    void deleteTutor(Long tutorId);
+    void deleteTutor(UUID tutorId);
 
 }

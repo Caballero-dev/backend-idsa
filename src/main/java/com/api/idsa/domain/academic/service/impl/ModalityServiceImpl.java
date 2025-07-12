@@ -17,6 +17,8 @@ import org.springframework.stereotype.Service;
 import org.springframework.dao.DataIntegrityViolationException;
 import org.springframework.util.StringUtils;
 
+import java.util.UUID;
+
 @Service
 public class ModalityServiceImpl implements IModalityService {
 
@@ -49,8 +51,7 @@ public class ModalityServiceImpl implements IModalityService {
     }
     
     @Override
-    public ModalityResponse updateModality(Long modalityId, ModalityRequest modalityRequest) {
-        
+    public ModalityResponse updateModality(UUID modalityId, ModalityRequest modalityRequest) {
         ModalityEntity modalityEntity = modalityRepository.findById(modalityId)
                 .orElseThrow(() -> new ResourceNotFoundException("Modality", "id", modalityId));
         
@@ -63,7 +64,7 @@ public class ModalityServiceImpl implements IModalityService {
     }
     
     @Override
-    public void deleteModality(Long modalityId) {
+    public void deleteModality(UUID modalityId) {
         try {
             ModalityEntity modalityEntity = modalityRepository.findById(modalityId)
                     .orElseThrow(() -> new ResourceNotFoundException("Modality", "id", modalityId));

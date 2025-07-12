@@ -1,5 +1,7 @@
 package com.api.idsa.domain.personnel.model;
 
+import java.util.UUID;
+
 import jakarta.persistence.*;
 import lombok.AllArgsConstructor;
 import lombok.Data;
@@ -13,9 +15,9 @@ import lombok.NoArgsConstructor;
 public class RoleEntity {
 
     @Id
-    @GeneratedValue(strategy = GenerationType.IDENTITY)
-    @Column(name = "role_id")
-    private Long roleId;
+    @GeneratedValue(strategy = GenerationType.UUID)
+    @Column(name = "role_id", columnDefinition = "UUID")
+    private UUID roleId;
 
     @Column(name = "role_name", length = 50, nullable = false, unique = true)
     private String roleName;

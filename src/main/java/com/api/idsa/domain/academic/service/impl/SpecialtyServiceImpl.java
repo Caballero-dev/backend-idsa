@@ -17,6 +17,8 @@ import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 import org.springframework.util.StringUtils;
 
+import java.util.UUID;
+
 @Service
 public class SpecialtyServiceImpl implements ISpecialtyService {
 
@@ -56,7 +58,7 @@ public class SpecialtyServiceImpl implements ISpecialtyService {
     }
 
     @Override
-    public SpecialtyResponse updateSpecialty(Long specialtyId, SpecialtyRequest specialtyRequest) {
+    public SpecialtyResponse updateSpecialty(UUID specialtyId, SpecialtyRequest specialtyRequest) {
 
         SpecialtyEntity specialtyEntity = specialtyRepository.findById(specialtyId)
                 .orElseThrow(() -> new ResourceNotFoundException("Specialty", "id", specialtyId));
@@ -75,7 +77,7 @@ public class SpecialtyServiceImpl implements ISpecialtyService {
     }
 
     @Override
-    public void deleteSpecialty(Long specialtyId) {
+    public void deleteSpecialty(UUID specialtyId) {
         try {
             SpecialtyEntity specialtyEntity = specialtyRepository.findById(specialtyId)
                     .orElseThrow(() -> new ResourceNotFoundException("Specialty", "id", specialtyId));

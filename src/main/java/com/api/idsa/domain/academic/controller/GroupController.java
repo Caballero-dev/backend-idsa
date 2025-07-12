@@ -15,6 +15,7 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
+import java.util.UUID;
 
 @RestController
 @RequestMapping("/api/admin/groups")
@@ -53,7 +54,7 @@ public class GroupController {
     }
 
     @PutMapping("/{groupId}")
-    public ResponseEntity<ApiResponse<GroupResponse>> updateGroup(@PathVariable Long groupId, @Valid @RequestBody GroupRequest groupRequest) {
+    public ResponseEntity<ApiResponse<GroupResponse>> updateGroup(@PathVariable UUID groupId, @Valid @RequestBody GroupRequest groupRequest) {
         return ResponseEntity.status(HttpStatus.OK).body(
             new ApiResponse<GroupResponse>(
                 HttpStatus.OK,
@@ -64,7 +65,7 @@ public class GroupController {
     }
 
     @DeleteMapping("/{groupId}")
-    public void deleteGroup(@PathVariable Long groupId) {
+    public void deleteGroup(@PathVariable UUID groupId) {
         groupService.deleteGroup(groupId);
     }
 

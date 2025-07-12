@@ -3,6 +3,7 @@ package com.api.idsa.domain.biometric.model;
 import java.math.BigDecimal;
 import java.time.ZonedDateTime;
 import java.util.List;
+import java.util.UUID;
 
 import com.api.idsa.domain.personnel.model.StudentEntity;
 
@@ -19,9 +20,9 @@ import lombok.NoArgsConstructor;
 public class BiometricDataEntity {
     
     @Id
-    @GeneratedValue(strategy = GenerationType.IDENTITY)
-    @Column(name = "biometric_data_id")
-    private Long biometricDataId;
+    @GeneratedValue(strategy = GenerationType.UUID)
+    @Column(name = "biometric_data_id", columnDefinition = "UUID")
+    private UUID biometricDataId;
 
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "student_id", nullable = false)

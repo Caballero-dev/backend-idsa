@@ -10,9 +10,10 @@ import org.springframework.stereotype.Repository;
 import com.api.idsa.domain.academic.model.GenerationEntity;
 
 import java.time.ZonedDateTime;
+import java.util.UUID;
 
 @Repository
-public interface IGenerationRepository extends JpaRepository<GenerationEntity, Long> {
+public interface IGenerationRepository extends JpaRepository<GenerationEntity, UUID> {
 
     boolean existsByStartYearAndEndYear(ZonedDateTime startYear, ZonedDateTime endYear);
 

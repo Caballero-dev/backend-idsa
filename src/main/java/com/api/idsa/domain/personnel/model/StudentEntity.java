@@ -6,6 +6,7 @@ import lombok.Data;
 import lombok.NoArgsConstructor;
 
 import java.util.List;
+import java.util.UUID;
 
 import com.api.idsa.domain.academic.model.GroupConfigurationEntity;
 import com.api.idsa.domain.biometric.model.BiometricDataEntity;
@@ -19,9 +20,9 @@ import com.api.idsa.domain.biometric.model.ReportEntity;
 public class StudentEntity {
 
     @Id
-    @GeneratedValue(strategy = GenerationType.IDENTITY)
-    @Column(name = "student_id")
-    private Long studentId;
+    @GeneratedValue(strategy = GenerationType.UUID)
+    @Column(name = "student_id", columnDefinition = "UUID")
+    private UUID studentId;
 
     @OneToOne(fetch = FetchType.LAZY, cascade = CascadeType.ALL)
     @JoinColumn(name = "person_id", nullable = false)

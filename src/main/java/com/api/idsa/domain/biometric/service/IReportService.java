@@ -1,6 +1,7 @@
 package com.api.idsa.domain.biometric.service;
 
 import java.time.ZonedDateTime;
+import java.util.UUID;
 
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
@@ -23,7 +24,7 @@ public interface IReportService {
      *
      * @return Lista de {@link ReportResponse} con la información de los reportes del estudiante.
      */
-    Page<ReportResponse> getReportsByStudentId(Long studentId, Pageable pageable);
+    Page<ReportResponse> getReportsByStudentId(UUID studentId, Pageable pageable);
 
     /**
      * Obtiene un resumen de los reportes registrados.

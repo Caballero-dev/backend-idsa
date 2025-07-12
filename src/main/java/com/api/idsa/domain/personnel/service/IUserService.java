@@ -6,6 +6,8 @@ import com.api.idsa.common.exception.UserRoleCreationDeniedException;
 import com.api.idsa.domain.personnel.dto.request.UserRequest;
 import com.api.idsa.domain.personnel.dto.response.UserResponse;
 
+import java.util.UUID;
+
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 
@@ -43,7 +45,7 @@ public interface IUserService {
      * @throws UserRoleCreationDeniedException si se intenta actualizar un usuario con rol no permitido.
      */
     // Nota: es opcinal actualizar la contraseña
-    UserResponse updateUser(Long userId, boolean isUpdatePassword, UserRequest updateUserRequest);
+    UserResponse updateUser(UUID userId, boolean isUpdatePassword, UserRequest updateUserRequest);
 
     /**
      * Actualiza el estado de un usuario existente a activo o inactivo.
@@ -52,7 +54,7 @@ public interface IUserService {
      * @param isActive Estado a establecer (true para activo, false para inactivo).
      * @throws ResourceNotFoundException si el usuario no existe.
      */
-    void updateUserStatus(Long userId, boolean isActive);
+    void updateUserStatus(UUID userId, boolean isActive);
 
     /**
      * Elimina un usuario existente.
@@ -60,6 +62,6 @@ public interface IUserService {
      * @param userId ID del usuario a eliminar.
      * @throws ResourceNotFoundException si el usuario no existe.
      */
-    void deleteUser(Long userId);
+    void deleteUser(UUID userId);
 
 }

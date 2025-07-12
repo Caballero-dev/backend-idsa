@@ -15,6 +15,7 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
+import java.util.UUID;
 
 @RestController
 @RequestMapping("/api/admin/campuses")
@@ -53,7 +54,7 @@ public class CampusController {
     }
 
     @PutMapping("/{campusId}")
-    public ResponseEntity<ApiResponse<CampusResponse>> updateCampus(@PathVariable Long campusId, @Valid @RequestBody CampusRequest campusRequest) {
+    public ResponseEntity<ApiResponse<CampusResponse>> updateCampus(@PathVariable UUID campusId, @Valid @RequestBody CampusRequest campusRequest) {
         return ResponseEntity.status(HttpStatus.OK).body(
             new ApiResponse<CampusResponse>(
                 HttpStatus.OK,
@@ -64,7 +65,7 @@ public class CampusController {
     }
 
     @DeleteMapping("/{campusId}")
-    public void deleteCampus(@PathVariable Long campusId) {
+    public void deleteCampus(@PathVariable UUID campusId) {
         campusService.deleteCampus(campusId);
     }
 

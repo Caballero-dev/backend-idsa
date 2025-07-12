@@ -5,6 +5,8 @@ import lombok.Builder;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 
+import java.util.UUID;
+
 import com.api.idsa.domain.biometric.enums.PredictionLevel;
 
 @Data
@@ -13,7 +15,7 @@ import com.api.idsa.domain.biometric.enums.PredictionLevel;
 @NoArgsConstructor
 public class StudentResponse {
 
-    private Long studentId;
+    private UUID studentId;
     private String studentCode;
     private String name;
     private String firstSurname;

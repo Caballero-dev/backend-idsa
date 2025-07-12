@@ -23,6 +23,7 @@ import org.springframework.transaction.annotation.Transactional;
 import org.springframework.util.StringUtils;
 
 import java.util.List;
+import java.util.UUID;
 
 @Service
 public class StudentServiceImpl implements IStudentService {
@@ -54,7 +55,7 @@ public class StudentServiceImpl implements IStudentService {
     }
 
     @Override
-    public Page<StudentResponse> getStudentsByGroupConfigurationId(Long groupConfigurationId, String search, Pageable pageable) {
+    public Page<StudentResponse> getStudentsByGroupConfigurationId(UUID groupConfigurationId, String search, Pageable pageable) {
         if (!groupConfigurationRepository.existsByGroupConfigurationId(groupConfigurationId)) {
             throw new ResourceNotFoundException("Group Configuration", "id", groupConfigurationId);
         }
@@ -68,7 +69,7 @@ public class StudentServiceImpl implements IStudentService {
     }
 
     @Override
-    public StudentResponse createStudent(StudentRequest studentRequest, Long groupConfigurationId) {
+    public StudentResponse createStudent(StudentRequest studentRequest, UUID groupConfigurationId) {
 
         if (studentRepository.existsByStudentCode(studentRequest.getStudentCode())) {
             throw new DuplicateResourceException("Student", "student_code", studentRequest.getStudentCode());
@@ -96,7 +97,7 @@ public class StudentServiceImpl implements IStudentService {
     }
 
     @Override
-    public StudentResponse updateStudent(Long studentId, StudentRequest studentRequest) {
+    public StudentResponse updateStudent(UUID studentId, StudentRequest studentRequest) {
         
         StudentEntity studentEntity = studentRepository.findById(studentId)
                 .orElseThrow(() -> new ResourceNotFoundException("Student", "id", studentId));
@@ -127,7 +128,7 @@ public class StudentServiceImpl implements IStudentService {
 
     @Override
     @Transactional
-    public void deleteStudent(Long studentId) {
+    public void deleteStudent(UUID studentId) {
         StudentEntity studentEntity = studentRepository.findById(studentId)
                 .orElseThrow(() -> new ResourceNotFoundException("Student", "id", studentId));
         

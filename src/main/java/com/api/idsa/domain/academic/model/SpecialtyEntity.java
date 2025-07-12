@@ -1,5 +1,7 @@
 package com.api.idsa.domain.academic.model;
 
+import java.util.UUID;
+
 import jakarta.persistence.*;
 import lombok.AllArgsConstructor;
 import lombok.Data;
@@ -13,9 +15,9 @@ import lombok.NoArgsConstructor;
 public class SpecialtyEntity {
 
     @Id
-    @GeneratedValue(strategy = GenerationType.IDENTITY)
-    @Column(name = "specialty_id")
-    private Long specialtyId;
+    @GeneratedValue(strategy = GenerationType.UUID)
+    @Column(name = "specialty_id", columnDefinition = "UUID")
+    private UUID specialtyId;
 
     @Column(name = "specialty_name", length = 100, nullable = false, unique = true)
     private String specialtyName;

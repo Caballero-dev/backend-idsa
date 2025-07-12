@@ -6,6 +6,7 @@ import lombok.Data;
 import lombok.NoArgsConstructor;
 
 import java.util.List;
+import java.util.UUID;
 
 import com.api.idsa.domain.personnel.model.StudentEntity;
 import com.api.idsa.domain.personnel.model.TutorEntity;
@@ -33,9 +34,9 @@ import com.api.idsa.domain.personnel.model.TutorEntity;
 public class GroupConfigurationEntity {
 
     @Id
-    @GeneratedValue(strategy = GenerationType.IDENTITY)
-    @Column(name = "group_configuration_id")
-    private Long groupConfigurationId;
+    @GeneratedValue(strategy = GenerationType.UUID)
+    @Column(name = "group_configuration_id", columnDefinition = "UUID")
+    private UUID groupConfigurationId;
 
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "campus_id", nullable = false)

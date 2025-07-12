@@ -17,6 +17,8 @@ import org.springframework.stereotype.Service;
 import org.springframework.dao.DataIntegrityViolationException;
 import org.springframework.util.StringUtils;
 
+import java.util.UUID;
+
 @Service
 public class GroupServiceImpl implements IGroupService {
 
@@ -49,7 +51,7 @@ public class GroupServiceImpl implements IGroupService {
     }
 
     @Override
-    public GroupResponse updateGroup(Long groupId, GroupRequest groupRequest) {
+    public GroupResponse updateGroup(UUID groupId, GroupRequest groupRequest) {
 
         GroupEntity groupEntity = groupRepository.findById(groupId)
                 .orElseThrow(() -> new ResourceNotFoundException("Group", "id", groupId));
@@ -63,7 +65,7 @@ public class GroupServiceImpl implements IGroupService {
     }
 
     @Override
-    public void deleteGroup(Long groupId) {
+    public void deleteGroup(UUID groupId) {
         try {
             GroupEntity groupEntity = groupRepository.findById(groupId)
                     .orElseThrow(() -> new ResourceNotFoundException("Group", "id", groupId));

@@ -8,6 +8,7 @@ import lombok.NoArgsConstructor;
 import java.math.BigDecimal;
 import java.time.ZonedDateTime;
 import java.util.List;
+import java.util.UUID;
 
 import com.api.idsa.domain.biometric.enums.PredictionLevel;
 import com.api.idsa.domain.personnel.model.StudentEntity;
@@ -20,9 +21,9 @@ import com.api.idsa.domain.personnel.model.StudentEntity;
 public class ReportEntity {
 
     @Id
-    @GeneratedValue(strategy = GenerationType.IDENTITY)
-    @Column(name = "report_id")
-    private Long reportId;
+    @GeneratedValue(strategy = GenerationType.UUID)
+    @Column(name = "report_id", columnDefinition = "UUID")
+    private UUID reportId;
 
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "student_id", nullable = false)

@@ -7,8 +7,10 @@ import org.springframework.stereotype.Repository;
 
 import com.api.idsa.domain.academic.model.ModalityEntity;
 
+import java.util.UUID;
+
 @Repository
-public interface IModalityRepository extends JpaRepository<ModalityEntity, Long> {
+public interface IModalityRepository extends JpaRepository<ModalityEntity, UUID> {
 
     boolean existsByModalityName(String modalityName);
 
