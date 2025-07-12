@@ -15,6 +15,7 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
+import java.util.UUID;
 
 @RestController
 @RequestMapping("/api/admin/specialities")
@@ -53,7 +54,7 @@ public class SpecialtyController {
     }
 
     @PutMapping("/{specialtyId}")
-    public ResponseEntity<ApiResponse<SpecialtyResponse>> updateSpecialty(@PathVariable Long specialtyId, @Valid @RequestBody SpecialtyRequest specialtyRequest) {
+    public ResponseEntity<ApiResponse<SpecialtyResponse>> updateSpecialty(@PathVariable UUID specialtyId, @Valid @RequestBody SpecialtyRequest specialtyRequest) {
         return ResponseEntity.status(HttpStatus.OK).body(
             new ApiResponse<SpecialtyResponse>(
                 HttpStatus.OK,
@@ -64,7 +65,7 @@ public class SpecialtyController {
     }
 
     @DeleteMapping("/{specialtyId}")
-    public void deleteSpeciality(@PathVariable Long specialtyId) {
+    public void deleteSpeciality(@PathVariable UUID specialtyId) {
         specialtyService.deleteSpecialty(specialtyId);
     }
 

@@ -28,6 +28,7 @@ import org.springframework.transaction.annotation.Transactional;
 import org.springframework.util.StringUtils;
 
 import java.time.ZonedDateTime;
+import java.util.UUID;
 
 @Service
 public class TutorServiceImpl implements ITutorService {
@@ -113,7 +114,7 @@ public class TutorServiceImpl implements ITutorService {
 
     @Override
     @Transactional
-    public TutorResponse updateTutor(Long tutorId, TutorRequest tutorRequest) {
+    public TutorResponse updateTutor(UUID tutorId, TutorRequest tutorRequest) {
 
         TutorEntity tutorEntity = tutorRepository.findById(tutorId)
                 .orElseThrow(() -> new ResourceNotFoundException("Tutor", "id", tutorId));
@@ -160,7 +161,7 @@ public class TutorServiceImpl implements ITutorService {
     }
 
     @Override
-    public void deleteTutor(Long tutorId) throws ResourceNotFoundException {
+    public void deleteTutor(UUID tutorId) throws ResourceNotFoundException {
         try {
             TutorEntity tutorEntity = tutorRepository.findById(tutorId)
                     .orElseThrow(() -> new ResourceNotFoundException("Tutor", "id", tutorId));

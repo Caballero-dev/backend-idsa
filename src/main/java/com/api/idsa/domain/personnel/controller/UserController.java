@@ -17,6 +17,7 @@ import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
+import java.util.UUID;
 
 @RestController
 @RequestMapping("/api/admin/users")
@@ -56,7 +57,7 @@ public class UserController {
 
     @PutMapping(value = "/{userId}", params = "isUpdatePassword=true")
     public ResponseEntity<ApiResponse<UserResponse>> updateUserWithPassword(
-        @PathVariable Long userId, 
+        @PathVariable UUID userId, 
         @RequestParam() boolean isUpdatePassword, 
         @Validated(UserRequest.PasswordUpdate.class) @RequestBody() UserRequest updateUserRequest) {
             return ResponseEntity.status(HttpStatus.OK).body(
@@ -70,7 +71,7 @@ public class UserController {
 
     @PutMapping(value = "/{userId}", params = "isUpdatePassword=false")
     public ResponseEntity<ApiResponse<UserResponse>> updateUserWithoutPassword(
-        @PathVariable Long userId, 
+        @PathVariable UUID userId, 
         @RequestParam() boolean isUpdatePassword, 
         @Validated @RequestBody() UserRequest updateUserRequest) {
             return ResponseEntity.status(HttpStatus.OK).body(
@@ -83,12 +84,12 @@ public class UserController {
     }
 
     @PutMapping("/{userId}/status")
-    public void updateUserStatus(@PathVariable Long userId, @RequestParam boolean isActive) {
+    public void updateUserStatus(@PathVariable UUID userId, @RequestParam boolean isActive) {
         userService.updateUserStatus(userId, isActive);
     }
 
     @DeleteMapping("/{userId}")
-    public void deleteUser(@PathVariable Long userId) {
+    public void deleteUser(@PathVariable UUID userId) {
         userService.deleteUser(userId);
     }
 

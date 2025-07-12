@@ -1,5 +1,7 @@
 package com.api.idsa.domain.personnel.dto.response;
 
+import java.util.UUID;
+
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Data;
@@ -11,7 +13,7 @@ import lombok.NoArgsConstructor;
 @NoArgsConstructor
 public class TutorResponse {
 
-    private Long tutorId;
+    private UUID tutorId;
     private String email;
     private String name;
     private String firstSurname;

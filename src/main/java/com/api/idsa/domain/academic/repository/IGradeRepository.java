@@ -7,8 +7,10 @@ import org.springframework.stereotype.Repository;
 
 import com.api.idsa.domain.academic.model.GradeEntity;
 
+import java.util.UUID;
+
 @Repository
-public interface IGradeRepository extends JpaRepository<GradeEntity, Long> {
+public interface IGradeRepository extends JpaRepository<GradeEntity, UUID> {
 
     boolean existsByGradeName(String gradeName);
 

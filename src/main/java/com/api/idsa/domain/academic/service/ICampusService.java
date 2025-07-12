@@ -8,6 +8,7 @@ import com.api.idsa.domain.academic.dto.response.CampusResponse;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 
+import java.util.UUID;
 
 public interface ICampusService {
 
@@ -38,7 +39,7 @@ public interface ICampusService {
      * @throws ResourceNotFoundException si el campus no existe.
      * @throws DuplicateResourceException si ya existe un campus con el mismo nombre.
      */
-    CampusResponse updateCampus(Long campusId, CampusRequest campusRequest);
+    CampusResponse updateCampus(UUID campusId, CampusRequest campusRequest);
 
     /**
      * Elimina un campus existente.
@@ -46,6 +47,6 @@ public interface ICampusService {
      * @param campusId ID del campus a eliminar.
      * @throws ResourceNotFoundException si el campus no existe.
      */
-    void deleteCampus(Long campusId);
+    void deleteCampus(UUID campusId);
 
 }

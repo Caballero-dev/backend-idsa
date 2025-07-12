@@ -7,8 +7,10 @@ import org.springframework.stereotype.Repository;
 
 import com.api.idsa.domain.academic.model.CampusEntity;
 
+import java.util.UUID;
+
 @Repository
-public interface ICampusRepository extends JpaRepository<CampusEntity, Long> {
+public interface ICampusRepository extends JpaRepository<CampusEntity, UUID> {
 
     boolean existsByCampusName(String campusName);
 

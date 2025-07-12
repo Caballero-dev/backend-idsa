@@ -10,9 +10,10 @@ import org.springframework.stereotype.Repository;
 import com.api.idsa.domain.personnel.model.UserEntity;
 
 import java.util.Optional;
+import java.util.UUID;
 
 @Repository
-public interface IUserRepository extends JpaRepository<UserEntity, Long> {
+public interface IUserRepository extends JpaRepository<UserEntity, UUID> {
 
     Page<UserEntity> findAllByRoleRoleNameIsNot(String roleName, Pageable pageable);
 

@@ -8,6 +8,7 @@ import lombok.NoArgsConstructor;
 import java.math.BigDecimal;
 import java.time.ZonedDateTime;
 import java.util.List;
+import java.util.UUID;
 
 import com.api.idsa.domain.personnel.dto.response.StudentResponse;
 
@@ -17,7 +18,7 @@ import com.api.idsa.domain.personnel.dto.response.StudentResponse;
 @NoArgsConstructor
 public class ReportResponse {
 
-    private Long reportId;
+    private UUID reportId;
     private StudentResponse student;
     private BigDecimal temperature;
     private BigDecimal heartRate;

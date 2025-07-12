@@ -17,6 +17,8 @@ import org.springframework.dao.DataIntegrityViolationException;
 import org.springframework.stereotype.Service;
 import org.springframework.util.StringUtils;
 
+import java.util.UUID;
+
 @Service
 public class GenerationServiceImpl implements IGenerationService {
 
@@ -49,7 +51,7 @@ public class GenerationServiceImpl implements IGenerationService {
     }
 
     @Override
-    public GenerationResponse updateGeneration(Long generationId, GenerationRequest request) {
+    public GenerationResponse updateGeneration(UUID generationId, GenerationRequest request) {
 
         GenerationEntity generationEntity = generationRepository.findById(generationId)
                 .orElseThrow(() -> new ResourceNotFoundException("Generation", "id", generationId));
@@ -68,7 +70,7 @@ public class GenerationServiceImpl implements IGenerationService {
     }
 
     @Override
-    public void deleteGeneration(Long generationId) {
+    public void deleteGeneration(UUID generationId) {
         try {
             GenerationEntity generationEntity = generationRepository.findById(generationId)
                     .orElseThrow(() -> new ResourceNotFoundException("Generation", "id", generationId));

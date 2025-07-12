@@ -6,6 +6,7 @@ import lombok.Data;
 import lombok.NoArgsConstructor;
 
 import java.time.ZonedDateTime;
+import java.util.UUID;
 
 @Data
 @Builder
@@ -13,7 +14,7 @@ import java.time.ZonedDateTime;
 @NoArgsConstructor
 public class UserProfileResponse {
 
-    private Long userId;
+    private UUID userId;
     private String name;
     private String firstSurname;
     private String secondSurname;

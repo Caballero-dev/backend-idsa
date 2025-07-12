@@ -8,6 +8,8 @@ import com.api.idsa.domain.academic.dto.response.SpecialtyResponse;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 
+import java.util.UUID;
+
 public interface ISpecialtyService {
 
     /**
@@ -37,7 +39,7 @@ public interface ISpecialtyService {
      * @throws ResourceNotFoundException  si la especialidad no existe.
      * @throws DuplicateResourceException si ya existe una especialidad con el mismo nombre o abreviatura.
      */
-    SpecialtyResponse updateSpecialty(Long specialtyId, SpecialtyRequest specialtyRequest);
+    SpecialtyResponse updateSpecialty(UUID specialtyId, SpecialtyRequest specialtyRequest);
 
     /**
      * Elimina una especialidad existente.
@@ -45,6 +47,6 @@ public interface ISpecialtyService {
      * @param specialtyId ID de la especialidad a eliminar.
      * @throws ResourceNotFoundException si la especialidad no existe.
      */
-    void deleteSpecialty(Long specialtyId);
+    void deleteSpecialty(UUID specialtyId);
 
 }

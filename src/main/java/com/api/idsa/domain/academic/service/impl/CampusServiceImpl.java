@@ -17,6 +17,8 @@ import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 import org.springframework.util.StringUtils;
 
+import java.util.UUID;
+
 @Service
 public class CampusServiceImpl implements ICampusService {
 
@@ -49,7 +51,7 @@ public class CampusServiceImpl implements ICampusService {
     }
 
     @Override
-    public CampusResponse updateCampus(Long campusId, CampusRequest campusRequest) {
+    public CampusResponse updateCampus(UUID campusId, CampusRequest campusRequest) {
 
         CampusEntity campusEntity = campusRepository.findById(campusId)
                 .orElseThrow(() -> new ResourceNotFoundException("Campus", "id", campusId));
@@ -63,7 +65,7 @@ public class CampusServiceImpl implements ICampusService {
     }
 
     @Override
-    public void deleteCampus(Long campusId) {
+    public void deleteCampus(UUID campusId) {
         try {
             CampusEntity campusEntity = campusRepository.findById(campusId)
                     .orElseThrow(() -> new ResourceNotFoundException("Campus", "id", campusId));

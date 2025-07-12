@@ -15,6 +15,7 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
+import java.util.UUID;
 
 @RestController
 @RequestMapping("/api/admin/group-configurations")
@@ -54,7 +55,7 @@ public class GroupConfigurationController {
 
     @PutMapping("/{groupConfigurationId}")
     public ResponseEntity<ApiResponse<GroupConfigurationResponse>> updateGroupConfiguration(
-            @PathVariable Long groupConfigurationId,
+            @PathVariable UUID groupConfigurationId,
             @Valid @RequestBody GroupConfigurationRequest groupConfigurationRequest) {
         return ResponseEntity.status(HttpStatus.OK).body(
             new ApiResponse<GroupConfigurationResponse>(
@@ -66,7 +67,7 @@ public class GroupConfigurationController {
     }
 
     @DeleteMapping("/{groupConfigurationId}")
-    public void deleteGroupConfiguration(@PathVariable Long groupConfigurationId) {
+    public void deleteGroupConfiguration(@PathVariable UUID groupConfigurationId) {
         groupConfigurationService.deleteGroupConfiguration(groupConfigurationId);
     }
 

@@ -10,17 +10,18 @@ import org.springframework.stereotype.Repository;
 import com.api.idsa.domain.biometric.model.ReportEntity;
 
 import java.util.Optional;
+import java.util.UUID;
 
 @Repository
-public interface IReportRepository extends JpaRepository<ReportEntity, Long> {
+public interface IReportRepository extends JpaRepository<ReportEntity, UUID> {
     
-    ReportEntity findByStudent_StudentId(Long studentId);
+    ReportEntity findByStudent_StudentId(UUID studentId);
     
-    boolean existsByStudent_StudentId(Long studentId);
+    boolean existsByStudent_StudentId(UUID studentId);
 
-    Page<ReportEntity> findByStudentStudentIdOrderByCreatedAtDesc(Long studentId, Pageable pageable);
+    Page<ReportEntity> findByStudentStudentIdOrderByCreatedAtDesc(UUID studentId, Pageable pageable);
 
-    Optional<ReportEntity> findFirstByStudent_StudentIdOrderByCreatedAtDesc(Long studentStudentId);
+    Optional<ReportEntity> findFirstByStudent_StudentIdOrderByCreatedAtDesc(UUID studentStudentId);
 
     @Query(value = "select count(distinct student_id) from reports", nativeQuery = true)
     Integer countStudentsWithReports();

@@ -1,5 +1,7 @@
 package com.api.idsa.domain.academic.model;
 
+import java.util.UUID;
+
 import jakarta.persistence.*;
 import lombok.AllArgsConstructor;
 import lombok.Data;
@@ -13,9 +15,9 @@ import lombok.NoArgsConstructor;
 public class GroupEntity {
 
     @Id
-    @GeneratedValue(strategy = GenerationType.IDENTITY)
-    @Column(name = "group_id")
-    private Long groupId;
+    @GeneratedValue(strategy = GenerationType.UUID)
+    @Column(name = "group_id", columnDefinition = "UUID")
+    private UUID groupId;
 
     @Column(name = "group_name", length = 2, nullable = false, unique = true)
     private String groupName;

@@ -1,12 +1,14 @@
 package com.api.idsa.common.exception;
 
+import java.util.UUID;
+
 public class ResourceDependencyException extends RuntimeException {
 
     public ResourceDependencyException(String message) {
         super(message);
     }
     
-    public ResourceDependencyException(String entity, Long id, String referencedBy, String dependencyReference) {
+    public ResourceDependencyException(String entity, UUID id, String referencedBy, String dependencyReference) {
         super(String.format("Failed: %s with id: %s has %s <<%s_dependency>>", entity, id, referencedBy, dependencyReference));
     }
 

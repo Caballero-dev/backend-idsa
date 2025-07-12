@@ -15,6 +15,7 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
+import java.util.UUID;
 
 @RestController
 @RequestMapping("/api/admin/generations")
@@ -53,7 +54,7 @@ public class GenerationController {
     }
 
     @PutMapping("/{generationId}")
-    public ResponseEntity<ApiResponse<GenerationResponse>> updateGeneration(@PathVariable Long generationId, @Valid @RequestBody GenerationRequest generationRequest) {
+    public ResponseEntity<ApiResponse<GenerationResponse>> updateGeneration(@PathVariable UUID generationId, @Valid @RequestBody GenerationRequest generationRequest) {
         return ResponseEntity.status(HttpStatus.OK).body(
             new ApiResponse<GenerationResponse>(
                 HttpStatus.OK,
@@ -64,7 +65,7 @@ public class GenerationController {
     }
 
     @DeleteMapping("/{generationId}")
-    public void deleteGeneration(@PathVariable Long generationId) {
+    public void deleteGeneration(@PathVariable UUID generationId) {
         generationService.deleteGeneration(generationId);
     }
 }

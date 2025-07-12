@@ -30,6 +30,7 @@ import org.springframework.transaction.annotation.Transactional;
 import org.springframework.util.StringUtils;
 
 import java.time.ZonedDateTime;
+import java.util.UUID;
 
 @Service
 public class UserServiceImpl implements IUserService {
@@ -121,7 +122,7 @@ public class UserServiceImpl implements IUserService {
 
     @Override
     @Transactional
-    public UserResponse updateUser(Long userId, boolean isUpdatePassword, UserRequest updateUserRequest) {
+    public UserResponse updateUser(UUID userId, boolean isUpdatePassword, UserRequest updateUserRequest) {
 
         UserEntity userEntity = userRepository.findById(userId)
                 .orElseThrow(() -> new ResourceNotFoundException("User", "id", userId));
@@ -176,7 +177,7 @@ public class UserServiceImpl implements IUserService {
     }
 
     @Override
-	public void updateUserStatus(Long userId, boolean isActive) {
+	public void updateUserStatus(UUID userId, boolean isActive) {
 
         UserEntity userEntity = userRepository.findById(userId)
                 .orElseThrow(() -> new ResourceNotFoundException("User", "id", userId));
@@ -186,7 +187,7 @@ public class UserServiceImpl implements IUserService {
 	}
 
     @Override
-    public void deleteUser(Long userId) {
+    public void deleteUser(UUID userId) {
         try {
             UserEntity userEntity = userRepository.findById(userId)
                     .orElseThrow(() -> new ResourceNotFoundException("User", "id", userId));

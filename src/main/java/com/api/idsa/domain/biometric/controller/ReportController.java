@@ -18,6 +18,7 @@ import com.api.idsa.domain.biometric.dto.response.ReportSummaryResponse;
 import com.api.idsa.domain.biometric.service.IReportService;
 
 import java.util.List;
+import java.util.UUID;
 
 @RestController
 @RequestMapping("/api/common/reports")
@@ -45,7 +46,7 @@ public class ReportController {
 
     @GetMapping("/student/{studentId}")
     public ResponseEntity<ApiResponse<List<ReportResponse>>> getReportsByStudentId(
-        @PathVariable Long studentId,
+        @PathVariable UUID studentId,
         @RequestParam(defaultValue = "0") int page,
         @RequestParam(defaultValue = "100") int size
     ) {

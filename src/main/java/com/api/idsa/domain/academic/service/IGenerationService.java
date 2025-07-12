@@ -8,6 +8,8 @@ import com.api.idsa.domain.academic.dto.response.GenerationResponse;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 
+import java.util.UUID;
+
 public interface IGenerationService {
 
     /**
@@ -20,24 +22,24 @@ public interface IGenerationService {
     Page<GenerationResponse> getAllGeneration(Pageable pageable, String search);
 
     /**
-     * Crea una nueva generación.
+     * Crea una generación.
      *
      * @param generationRequest Objeto que contiene la información de la generación a crear.
      * @return {@link GenerationResponse} con la información de la generación creada.
-     * @throws DuplicateResourceException si ya existe una generación con las mismas fechas.
+     * @throws DuplicateResourceException si ya existe una generación con los mismos años de inicio y fin.
      */
     GenerationResponse createGeneration(GenerationRequest generationRequest);
 
     /**
      * Actualiza los datos de una generación existente.
      *
-     * @param generationId ID de la generación a actualizar.
-     * @param request      Objeto que contiene la información actualizada de la generación.
+     * @param generationId      ID de la generación a actualizar.
+     * @param generationRequest Objeto que contiene la información actualizada de la generación.
      * @return {@link GenerationResponse} con la información de la generación actualizada.
      * @throws ResourceNotFoundException si la generación no existe.
-     * @throws DuplicateResourceException si ya existe una generación con las mismas fechas.
+     * @throws DuplicateResourceException si ya existe una generación con los mismos años de inicio y fin.
      */
-    GenerationResponse updateGeneration(Long generationId, GenerationRequest generationRequest);
+    GenerationResponse updateGeneration(UUID generationId, GenerationRequest generationRequest);
 
     /**
      * Elimina una generación existente.
@@ -45,6 +47,6 @@ public interface IGenerationService {
      * @param generationId ID de la generación a eliminar.
      * @throws ResourceNotFoundException si la generación no existe.
      */
-    void deleteGeneration(Long generationId);
+    void deleteGeneration(UUID generationId);
 
 }

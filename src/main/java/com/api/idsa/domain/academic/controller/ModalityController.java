@@ -15,6 +15,7 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
+import java.util.UUID;
 
 @RestController
 @RequestMapping("/api/admin/modalities")
@@ -53,7 +54,7 @@ public class ModalityController {
     }
 
     @PutMapping("/{modalityId}")
-    public ResponseEntity<ApiResponse<ModalityResponse>> updateModality(@PathVariable Long modalityId, @Valid @RequestBody ModalityRequest modalityRequest) {
+    public ResponseEntity<ApiResponse<ModalityResponse>> updateModality(@PathVariable UUID modalityId, @Valid @RequestBody ModalityRequest modalityRequest) {
         return ResponseEntity.status(HttpStatus.OK).body(
             new ApiResponse<ModalityResponse>(
                 HttpStatus.OK,
@@ -64,7 +65,7 @@ public class ModalityController {
     }
 
     @DeleteMapping("/{modalityId}")
-    public void deleteModality(@PathVariable Long modalityId) {
+    public void deleteModality(@PathVariable UUID modalityId) {
         modalityService.deleteModality(modalityId);
     }
 
