@@ -16,6 +16,7 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
+import java.util.UUID;
 
 @RestController
 @RequestMapping("/api/admin/tutors")
@@ -54,7 +55,7 @@ public class TutorController {
     }
 
     @PutMapping("/{tutorId}")
-    public ResponseEntity<ApiResponse<TutorResponse>> updateTutor(@PathVariable Long tutorId, @Valid @RequestBody TutorRequest tutorRequest) {
+    public ResponseEntity<ApiResponse<TutorResponse>> updateTutor(@PathVariable UUID tutorId, @Valid @RequestBody TutorRequest tutorRequest) {
         return ResponseEntity.status(HttpStatus.OK).body(
             new ApiResponse<TutorResponse>(
                 HttpStatus.OK,
@@ -65,7 +66,7 @@ public class TutorController {
     }
 
     @DeleteMapping("/{tutorId}")
-    public void deleteTutor(@PathVariable Long tutorId) {
+    public void deleteTutor(@PathVariable UUID tutorId) {
         tutorService.deleteTutor(tutorId);
     }
 

@@ -15,6 +15,7 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
+import java.util.UUID;
 
 @RestController
 @RequestMapping("/api/common/students")
@@ -43,7 +44,7 @@ public class StudentController {
 
     @GetMapping("/by-group/{groupConfigurationId}")
     public ResponseEntity<ApiResponse<List<StudentResponse>>> getStudentsByGroupConfigurationId(
-        @PathVariable Long groupConfigurationId,
+        @PathVariable UUID groupConfigurationId,
         @RequestParam(defaultValue = "0") int page,
         @RequestParam(defaultValue = "100") int size,
         @RequestParam(required = false) String search
@@ -61,7 +62,7 @@ public class StudentController {
     }
 
     @PostMapping("/by-group/{groupConfigurationId}")
-    public ResponseEntity<ApiResponse<StudentResponse>> createStudent(@Valid @RequestBody StudentRequest studentRequest, @PathVariable Long groupConfigurationId) {
+    public ResponseEntity<ApiResponse<StudentResponse>> createStudent(@Valid @RequestBody StudentRequest studentRequest, @PathVariable UUID groupConfigurationId) {
         return ResponseEntity.status(HttpStatus.CREATED).body(
             new ApiResponse<StudentResponse>(
                 HttpStatus.CREATED,
@@ -72,7 +73,7 @@ public class StudentController {
     }
 
     @PutMapping("/{studentId}")
-    public ResponseEntity<ApiResponse<StudentResponse>> updateStudent(@PathVariable Long studentId, @Valid @RequestBody StudentRequest studentRequest) {
+    public ResponseEntity<ApiResponse<StudentResponse>> updateStudent(@PathVariable UUID studentId, @Valid @RequestBody StudentRequest studentRequest) {
         return ResponseEntity.status(HttpStatus.OK).body(
             new ApiResponse<StudentResponse>(
                 HttpStatus.OK,
@@ -83,7 +84,7 @@ public class StudentController {
     }
 
     @DeleteMapping("/{studentId}")
-    public void deleteStudent(@PathVariable Long studentId) {
+    public void deleteStudent(@PathVariable UUID studentId) {
         studentService.deleteStudent(studentId);
     }
 
