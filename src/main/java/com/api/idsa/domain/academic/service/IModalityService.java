@@ -8,6 +8,8 @@ import com.api.idsa.domain.academic.dto.response.ModalityResponse;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 
+import java.util.UUID;
+
 public interface IModalityService {
 
     /**
@@ -37,7 +39,7 @@ public interface IModalityService {
      * @throws ResourceNotFoundException si la modalidad no existe.
      * @throws DuplicateResourceException si ya existe una modalidad con el mismo nombre.
      */
-    ModalityResponse updateModality(Long modalityId, ModalityRequest modalityRequest);
+    ModalityResponse updateModality(UUID modalityId, ModalityRequest modalityRequest);
 
     /**
      * Elimina una modalidad existente.
@@ -45,6 +47,6 @@ public interface IModalityService {
      * @param modalityId ID de la modalidad a eliminar.
      * @throws ResourceNotFoundException si la modalidad no existe.
      */
-    void deleteModality(Long modalityId);
+    void deleteModality(UUID modalityId);
 
 }

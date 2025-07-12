@@ -7,6 +7,7 @@ import lombok.Data;
 import lombok.NoArgsConstructor;
 
 import java.util.List;
+import java.util.UUID;
 
 @Entity
 @Table(name = "tutors")
@@ -16,9 +17,9 @@ import java.util.List;
 public class TutorEntity {
 
     @Id
-    @GeneratedValue(strategy = GenerationType.IDENTITY)
-    @Column(name = "tutor_id")
-    private Long tutorId;
+    @GeneratedValue(strategy = GenerationType.UUID)
+    @Column(name = "tutor_id", columnDefinition = "UUID")
+    private UUID tutorId;
 
     @OneToOne(fetch = FetchType.LAZY, cascade = CascadeType.ALL)
     @JoinColumn(name = "person_id", nullable = false)

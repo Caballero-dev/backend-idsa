@@ -7,8 +7,10 @@ import org.springframework.stereotype.Repository;
 
 import com.api.idsa.domain.academic.model.GroupEntity;
 
+import java.util.UUID;
+
 @Repository
-public interface IGroupRepository extends JpaRepository<GroupEntity, Long> {
+public interface IGroupRepository extends JpaRepository<GroupEntity, UUID> {
 
     boolean existsByGroupName(String groupName);
 

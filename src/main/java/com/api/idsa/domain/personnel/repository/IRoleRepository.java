@@ -7,9 +7,10 @@ import com.api.idsa.domain.personnel.model.RoleEntity;
 
 import java.util.List;
 import java.util.Optional;
+import java.util.UUID;
 
 @Repository
-public interface IRoleRepository extends JpaRepository<RoleEntity, Long> {
+public interface IRoleRepository extends JpaRepository<RoleEntity, UUID> {
 
     List<RoleEntity> findAllByRoleNameNot(String roleName);
 

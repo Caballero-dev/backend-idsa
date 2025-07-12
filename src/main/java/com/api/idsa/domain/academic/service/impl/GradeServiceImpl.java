@@ -17,6 +17,8 @@ import org.springframework.stereotype.Service;
 import org.springframework.dao.DataIntegrityViolationException;
 import org.springframework.util.StringUtils;
 
+import java.util.UUID;
+
 @Service
 public class GradeServiceImpl implements IGradeService {
 
@@ -49,7 +51,7 @@ public class GradeServiceImpl implements IGradeService {
     }
 
     @Override
-    public GradeResponse updateGrade(Long gradeId, GradeRequest gradeRequest) {
+    public GradeResponse updateGrade(UUID gradeId, GradeRequest gradeRequest) {
 
         GradeEntity gradeEntity = gradeRepository.findById(gradeId)
                 .orElseThrow(() -> new ResourceNotFoundException("Grade", "id", gradeId));
@@ -63,7 +65,7 @@ public class GradeServiceImpl implements IGradeService {
     }
 
     @Override
-    public void deleteGrade(Long gradeId) {
+    public void deleteGrade(UUID gradeId) {
         try {
             GradeEntity gradeEntity = gradeRepository.findById(gradeId)
                     .orElseThrow(() -> new ResourceNotFoundException("Grade", "id", gradeId));

@@ -17,6 +17,8 @@ import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 import org.springframework.util.StringUtils;
 
+import java.util.UUID;
+
 @Service
 public class GroupConfigurationServiceImpl implements IGroupConfigurationService {
 
@@ -67,7 +69,7 @@ public class GroupConfigurationServiceImpl implements IGroupConfigurationService
     }
 
     @Override
-    public GroupConfigurationResponse updateGroupConfiguration(Long groupConfigurationId, GroupConfigurationRequest groupConfigurationRequest) {
+    public GroupConfigurationResponse updateGroupConfiguration(UUID groupConfigurationId, GroupConfigurationRequest groupConfigurationRequest) {
 
         GroupConfigurationEntity groupConfigurationEntity = groupConfigurationRepository.findById(groupConfigurationId)
                 .orElseThrow(() -> new ResourceNotFoundException("Group Configuration", "id", groupConfigurationId));
@@ -112,7 +114,7 @@ public class GroupConfigurationServiceImpl implements IGroupConfigurationService
     }
 
     @Override
-    public void deleteGroupConfiguration(Long groupConfigurationId) {
+    public void deleteGroupConfiguration(UUID groupConfigurationId) {
         try {
             GroupConfigurationEntity groupConfigurationEntity = groupConfigurationRepository.findById(groupConfigurationId)
                     .orElseThrow(() -> new ResourceNotFoundException("Group Configuration", "id", groupConfigurationId));

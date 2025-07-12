@@ -6,6 +6,7 @@ import lombok.Data;
 import lombok.NoArgsConstructor;
 
 import java.time.ZonedDateTime;
+import java.util.UUID;
 
 @Entity
 @Table(
@@ -26,9 +27,9 @@ import java.time.ZonedDateTime;
 public class GenerationEntity {
 
     @Id
-    @GeneratedValue(strategy = GenerationType.IDENTITY)
-    @Column(name = "generation_id")
-    private Long generationId;
+    @GeneratedValue(strategy = GenerationType.UUID)
+    @Column(name = "generation_id", columnDefinition = "UUID")
+    private UUID generationId;
 
     @Column(name = "start_year", nullable = false)
     private ZonedDateTime startYear;

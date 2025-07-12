@@ -8,6 +8,8 @@ import com.api.idsa.domain.academic.dto.response.GroupResponse;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 
+import java.util.UUID;
+
 public interface IGroupService {
 
     /**
@@ -22,29 +24,29 @@ public interface IGroupService {
     /**
      * Crea un grupo.
      *
-     * @param groupRequest Objeto que contiene la información del grupo a crear
-     * @return {@link GroupResponse} con la información del grupo creado
-     * @throws DuplicateResourceException si ya existe un grupo con el mismo nombre
+     * @param groupRequest Objeto que contiene la información del grupo a crear.
+     * @return {@link GroupResponse} con la información del grupo creado.
+     * @throws DuplicateResourceException si ya existe un grupo con el mismo nombre.
      */
     GroupResponse createGroup(GroupRequest groupRequest);
 
     /**
      * Actualiza los datos de un grupo existente.
      *
-     * @param groupId      ID del grupo a actualizar
-     * @param groupRequest Objeto que contiene la información actualizada del grupo
-     * @return {@link GroupResponse} con la información del grupo actualizado
-     * @throws ResourceNotFoundException  si el grupo no existe
-     * @throws DuplicateResourceException si ya existe un grupo con el mismo nombre
+     * @param groupId      ID del grupo a actualizar.
+     * @param groupRequest Objeto que contiene la información actualizada del grupo.
+     * @return {@link GroupResponse} con la información del grupo actualizado.
+     * @throws ResourceNotFoundException si el grupo no existe.
+     * @throws DuplicateResourceException si ya existe un grupo con el mismo nombre.
      */
-    GroupResponse updateGroup(Long groupId, GroupRequest groupRequest);
+    GroupResponse updateGroup(UUID groupId, GroupRequest groupRequest);
 
     /**
      * Elimina un grupo existente.
      *
-     * @param groupId ID del grupo a eliminar
-     * @throws ResourceNotFoundException si el grupo no existe
+     * @param groupId ID del grupo a eliminar.
+     * @throws ResourceNotFoundException si el grupo no existe.
      */
-    void deleteGroup(Long groupId);
+    void deleteGroup(UUID groupId);
 
 }

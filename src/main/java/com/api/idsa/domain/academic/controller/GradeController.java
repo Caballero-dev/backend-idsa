@@ -15,6 +15,7 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
+import java.util.UUID;
 
 @RestController
 @RequestMapping("/api/admin/grades")
@@ -53,7 +54,7 @@ public class GradeController {
     }
 
     @PutMapping("/{gradeId}")
-    public ResponseEntity<ApiResponse<GradeResponse>> updateGrade(@PathVariable Long gradeId, @Valid @RequestBody GradeRequest gradeRequest) {
+    public ResponseEntity<ApiResponse<GradeResponse>> updateGrade(@PathVariable UUID gradeId, @Valid @RequestBody GradeRequest gradeRequest) {
         return ResponseEntity.status(HttpStatus.OK).body(
             new ApiResponse<GradeResponse>(
                 HttpStatus.OK,
@@ -64,7 +65,7 @@ public class GradeController {
     }
 
     @DeleteMapping("/{gradeId}")
-    public void deleteGrade(@PathVariable Long gradeId) {
+    public void deleteGrade(@PathVariable UUID gradeId) {
         gradeService.deleteGrade(gradeId);
     }
 

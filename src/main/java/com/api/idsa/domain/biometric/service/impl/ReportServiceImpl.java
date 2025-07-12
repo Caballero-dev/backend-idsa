@@ -25,6 +25,7 @@ import com.api.idsa.infrastructure.model.service.ModelPredictionService;
 
 import java.time.ZonedDateTime;
 import java.util.List;
+import java.util.UUID;
 
 @Service
 public class ReportServiceImpl implements IReportService {
@@ -57,7 +58,7 @@ public class ReportServiceImpl implements IReportService {
     }
 
     @Override
-    public Page<ReportResponse> getReportsByStudentId(Long studentId, Pageable pageable) {
+    public Page<ReportResponse> getReportsByStudentId(UUID studentId, Pageable pageable) {
         if (!studentRepository.existsById(studentId)) {
             throw new ResourceNotFoundException("Student", "id", studentId);
         }

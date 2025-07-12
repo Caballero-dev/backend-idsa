@@ -5,6 +5,8 @@ import com.api.idsa.common.exception.ResourceNotFoundException;
 import com.api.idsa.domain.personnel.dto.request.StudentRequest;
 import com.api.idsa.domain.personnel.dto.response.StudentResponse;
 
+import java.util.UUID;
+
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 
@@ -29,7 +31,7 @@ public interface IStudentService {
      *              número de teléfono o código de estudiante.
      * @return Lista de {@link StudentResponse} con la información de los estudiantes.
      */
-    Page<StudentResponse> getStudentsByGroupConfigurationId(Long groupConfigurationId, String search ,Pageable pageable);
+    Page<StudentResponse> getStudentsByGroupConfigurationId(UUID groupConfigurationId, String search ,Pageable pageable);
 
     /**
      * Crea un nuevo estudiante.
@@ -39,7 +41,7 @@ public interface IStudentService {
      * @throws DuplicateResourceException si ya existe un estudiante con el mismo código, email o número de teléfono.
      * @throws ResourceNotFoundException si la configuración del grupo no existe.
      */
-    StudentResponse createStudent(StudentRequest studentRequest, Long groupConfigurationId);
+    StudentResponse createStudent(StudentRequest studentRequest, UUID groupConfigurationId);
 
     /**
      * Actualiza la información de un estudiante existente.
@@ -50,7 +52,7 @@ public interface IStudentService {
      * @throws DuplicateResourceException si ya existe un estudiante con el mismo código, email o número de teléfono.
      * @throws ResourceNotFoundException si el estudiante no existe.
      */
-    StudentResponse updateStudent(Long studentId, StudentRequest studentRequest);
+    StudentResponse updateStudent(UUID studentId, StudentRequest studentRequest);
 
     /**
      * Elimina un estudiante existente.
@@ -58,6 +60,6 @@ public interface IStudentService {
      * @param studentId ID del estudiante a eliminar.
      * @throws ResourceNotFoundException si el estudiante no existe.
      */
-    void deleteStudent(Long studentId);
+    void deleteStudent(UUID studentId);
 
 }

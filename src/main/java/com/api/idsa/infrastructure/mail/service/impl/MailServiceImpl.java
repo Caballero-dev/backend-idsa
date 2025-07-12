@@ -84,7 +84,7 @@ public class MailServiceImpl implements MailService {
             } catch (FeignException e) {
                 log.error("Error de Mailgun al enviar email a {}: Status: {}, Mensaje: {}", 
                     to, e.status(), e.getMessage());
-                throw new EmailSendingException("Error al enviar email a través de Mailgun");
+                throw new EmailSendingException("Error al enviar email");
             } catch (Exception e) {
                 log.error("Error inesperado al enviar email a {}: {}", to, e.getMessage());
                 throw new EmailSendingException("Error inesperado al enviar email");
