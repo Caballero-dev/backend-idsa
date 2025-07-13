@@ -165,11 +165,7 @@ CREATE TABLE report_biometric_data
 -- ========================
 
 -- Función para contar estudiantes por rango de probabilidad
-/*
-CREATE OR REPLACE FUNCTION count_students_by_prediction_range(
-    min_prediction NUMERIC,
-    max_prediction NUMERIC
-)
+CREATE OR REPLACE FUNCTION count_students_by_prediction(predictionValue varchar)
     RETURNS INTEGER AS
 $$
 BEGIN
@@ -177,11 +173,9 @@ BEGIN
             FROM (SELECT DISTINCT ON (student_id) student_id, prediction_result
                   FROM reports
                   ORDER BY student_id, created_at DESC) latest_reports
-            WHERE prediction_result >= min_prediction
-              AND prediction_result < max_prediction);
+            WHERE prediction_result = predictionValue);
 END;
 $$ LANGUAGE plpgsql;
-*/
 
 -- Función para buscar generaciones por un valor de búsqueda
 CREATE OR REPLACE FUNCTION search_generations(searchValue varchar)

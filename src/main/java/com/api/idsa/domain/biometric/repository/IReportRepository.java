@@ -26,7 +26,7 @@ public interface IReportRepository extends JpaRepository<ReportEntity, UUID> {
     @Query(value = "select count(distinct student_id) from reports", nativeQuery = true)
     Integer countStudentsWithReports();
 
-    @Query(value = "select count(*) from reports where prediction_result = :predictionResult", nativeQuery = true)
+    @Query(value = "select * from count_students_by_prediction(:predictionResult)", nativeQuery = true)
     Integer countStudentsByPredictionResult(@Param("predictionResult") String predictionResult);
 
 }
