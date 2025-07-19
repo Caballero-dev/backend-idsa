@@ -1,4 +1,4 @@
-CREATE DATABASE idsa;
+-- CREATE DATABASE idsa;
 
 -- ========================
 -- ESQUEMA DE LA BASE DE DATOS
@@ -159,6 +159,15 @@ CREATE TABLE report_biometric_data
     FOREIGN KEY (report_id) REFERENCES reports (report_id),
     FOREIGN KEY (biometric_data_id) REFERENCES biometric_data (biometric_data_id)
 );
+
+-- ========================
+-- ROLES ESENCIALES DEL SISTEMA
+-- ========================
+
+INSERT INTO roles (role_name) VALUES 
+    ('ROLE_ADMIN'),
+    ('ROLE_TUTOR')
+ON CONFLICT (role_name) DO NOTHING;
 
 -- ========================
 -- FUNCIONES PARA CONSULTAS
