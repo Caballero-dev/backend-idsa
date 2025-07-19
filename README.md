@@ -138,7 +138,7 @@ cp .env.example .env
 2. Configurar las variables de entorno en el archivo `.env` según tus necesidades. Consulta el archivo [.env.example](.env.example) para ver todas las variables disponibles y sus descripciones.
 
 ### Configuración de Perfiles de Spring Boot
-El proyecto utiliza una arquitectura de configuración modular con perfiles específicos:
+El proyecto utiliza una arquitectura de configuración modular con perfiles específicos que se establecen mediante la variable de entorno `SPRING_PROFILES_ACTIVE` en el archivo `.env`.
 
 #### **Archivos de Configuración:**
 - **`application.properties`**: Configuración base común (se aplica a todos los perfiles)
@@ -151,19 +151,22 @@ El proyecto utiliza una arquitectura de configuración modular con perfiles espe
   - DDL: `none` (no modifica esquema)
   - SQL: Visible en consola (`show-sql=true`)
   - Logging: Detallado (DEBUG)
-  - Ejecución: `mvn spring-boot:run -Dspring-boot.run.profiles=dev`
+  - Configuración: `SPRING_PROFILES_ACTIVE=dev` en archivo `.env`
+  - Ejecución: `mvn spring-boot:run`
 - **Producción (prod):**
   - Base de datos: PostgreSQL de producción
   - DDL: `none` (no modifica esquema)
   - SQL: Oculto en consola (`show-sql=false`)
   - Logging: Optimizado (INFO/WARN)
   - Seguridad: Configuraciones adicionales
-  - Ejecución: `mvn spring-boot:run -Dspring-boot.run.profiles=prod`
+  - Configuración: `SPRING_PROFILES_ACTIVE=prod` en archivo `.env`
+  - Ejecución: `mvn spring-boot:run`
 - **Sin Perfil (default):**
   - Base de datos: PostgreSQL
   - DDL: `none` (no modifica esquema)
   - SQL: Oculto en consola
   - Logging: Configuración base
+  - Configuración: `SPRING_PROFILES_ACTIVE=` (vacío) o sin definir en archivo `.env`
   - Ejecución: `mvn spring-boot:run`
 
 ## 🌐 Relación con el Front-End
