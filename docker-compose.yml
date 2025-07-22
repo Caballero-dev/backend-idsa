@@ -10,7 +10,7 @@ services:
       - 5432:5432
     volumes:
       - ./src/main/resources/db/schema.sql:/docker-entrypoint-initdb.d/schema.sql
-      - ./docker/postgres:/var/lib/postgresql/data
+      - ./docker/_volumes/postgres:/var/lib/postgresql/data
     healthcheck:
       test: ["CMD-SHELL", "pg_isready -U ${SPRING_DATASOURCE_USERNAME} -d ${SPRING_DATASOURCE_DATABASE}"]
       timeout: 10s
@@ -69,8 +69,8 @@ services:
     ports:
       - 8080:${SERVER_PORT}
     volumes:
-      - ./docker/api/img:${FILE_STORAGE_BASE_PATH}
-      - ./docker/api/logs:/app/logs
+      - ./docker/_volumes/api/img:${FILE_STORAGE_BASE_PATH}
+      - ./docker/_volumes/api/logs:/app/logs
     depends_on:
       db:
         condition: service_healthy

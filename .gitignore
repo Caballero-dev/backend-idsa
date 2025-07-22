@@ -6,7 +6,7 @@ target/
 
 .env
 logs/
-docker/
+.docker/_volumes/
 
 ### STS ###
 .apt_generated

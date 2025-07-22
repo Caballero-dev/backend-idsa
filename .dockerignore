@@ -6,7 +6,6 @@ target/
 
 .env
 logs/
-docker/
 .docker/
 
 ### STS ###
