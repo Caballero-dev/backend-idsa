@@ -16,6 +16,16 @@ services:
       timeout: 10s
       retries: 10
   
+  mqtt:
+    build:
+      context: .docker/mosquitto
+      dockerfile: Dockerfile
+    container_name: idsa-mqtt
+    env_file:
+      - .docker/mosquitto/.env
+    ports:
+      - 1883:1883
+  
   api:
     build:
       context: ./
@@ -59,7 +69,7 @@ services:
     ports:
       - 8080:${SERVER_PORT}
     volumes:
-      - ./docker/api/img:/app/img
+      - ./docker/api/img:/app/images
       - ./docker/api/logs:/app/logs
     depends_on:
       db:
