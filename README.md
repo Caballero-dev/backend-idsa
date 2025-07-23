@@ -4,6 +4,7 @@
 [![Spring Boot](https://img.shields.io/badge/Spring%20Boot-3.4.3-brightgreen.svg)](https://spring.io/projects/spring-boot)
 [![Maven](https://img.shields.io/badge/Maven-3.10.1-blue.svg)](https://maven.apache.org/)
 [![PostgreSQL](https://img.shields.io/badge/PostgreSQL-16+-blue.svg)](https://www.postgresql.org/)
+[![Docker](https://img.shields.io/badge/Docker-28+-blue.svg)](https://www.docker.com/)
 
 ## 📋 Descripción
 
@@ -65,8 +66,8 @@ La API es responsable de:
 ## 📁 Estructura del Proyecto
 
 ```
-idsa/
-├── src/
+backend-idsa/
+├── src/                                  # Código fuente de la aplicación
 │   ├── main/
 │   │   ├── java/com/api/idsa/
 │   │   │   ├── IdsaApplication.java      # Clase principal de Spring Boot
@@ -109,10 +110,22 @@ idsa/
 │   │       └── templates/                # Plantillas Thymeleaf
 │   │           └── mail/                 # Plantillas de email
 │   └── test/                             # Pruebas unitarias
+├── .docker/                              # Configuraciones de Docker
+│   ├── mosquitto/                        # Configuración del broker MQTT
+│   │   ├── Dockerfile                    # Imagen personalizada de Mosquitto
+│   │   ├── entrypoint.sh                 # Script de inicialización MQTT
+│   │   └── .env.example                  # Variables de entorno para MQTT
+│   └── README.md                         # Documentación de Docker
+├── .mvn/                                 # Configuración Maven Wrapper
+├── .gitignore                            # Archivos ignorados por Git
+├── .dockerignore                         # Archivos ignorados por Docker
 ├── .env.example                          # Variables de entorno de ejemplo
-├── pom.xml                               # Configuración Maven
+├── docker-compose.yml                    # Orquestación de servicios Docker
+├── Dockerfile                            # Configuración de la imagen de la API
 ├── mvnw                                  # Wrapper Maven
-└── README.md                             # Este archivo
+├── mvnw.cmd                              # Wrapper Maven (Windows)
+├── pom.xml                               # Configuración Maven
+└── README.md                             # Documentación del proyecto
 ```
 
 ## 🚀 Instalación y Configuración
@@ -168,6 +181,52 @@ El proyecto utiliza una arquitectura de configuración modular con perfiles espe
   - Logging: Configuración base
   - Configuración: `SPRING_PROFILES_ACTIVE=` (vacío) o sin definir en archivo `.env`
   - Ejecución: `mvn spring-boot:run`
+
+## 🐳 Despliegue con Docker
+
+El proyecto incluye configuración completa para Docker y Docker Compose, permitiendo un despliegue rápido y consistente en cualquier entorno.
+
+### Configuración Inicial
+
+1. **Clonar el repositorio:**
+```bash
+git clone <repository-url>
+cd backend-idsa
+```
+
+2. **Configurar variables de entorno:**
+```bash
+cp .env.example .env
+# Editar el archivo .env con tus configuraciones
+```
+
+### Opciones de Despliegue
+
+#### 🚀 Opción 1: Despliegue Completo con Docker Compose (Recomendado)
+
+Esta opción despliega toda la infraestructura necesaria: API, base de datos PostgreSQL y broker MQTT.
+
+```bash
+# Construir y ejecutar todos los servicios
+docker-compose --env-file .env up -d
+```
+
+**Servicios incluidos:**
+- **API (idsa-api)**: Puerto 8080
+- **PostgreSQL (idsa-db)**: Puerto 5432
+- **MQTT Broker (idsa-mqtt)**: Puerto 1883
+
+#### 🐳 Opción 2: Solo la API con Docker
+
+Si ya tienes PostgreSQL y MQTT configurados externamente, puedes ejecutar solo la API:
+
+```bash
+# Construir la imagen
+docker build -t idsa-back .
+
+# Ejecutar el contenedor
+docker run -d -p 8080:8080 --name idsa-app-api --env-file .env idsa-back
+```
 
 ## 🌐 Relación con el Front-End
 La API está diseñada para ser consumida por el panel web [(frontend-idsa)](https://github.com/Caballero-dev/frontend-idsa), que permite a los usuarios finales consultar los resultados y reportes generados por el sistema.
