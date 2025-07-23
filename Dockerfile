@@ -7,7 +7,6 @@ RUN mvn clean package -DskipTests
 FROM amazoncorretto:21
 WORKDIR /app
 COPY --from=build /app/target/*.jar /app/app.jar
-RUN ls
 EXPOSE ${SERVER_PORT:-8080}
 ENTRYPOINT ["java", "-jar", "/app/app.jar"]
 
