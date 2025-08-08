@@ -54,7 +54,7 @@ public class ReportServiceImpl implements IReportService {
     @Override
     public Page<ReportResponse> findAll(Pageable pageable) {
         Page<ReportEntity> reportPage = reportRepository.findAll(pageable);
-        return reportPage.map(this::mapToResponseWithImages);
+        return reportPage.map(reportMapper::toResponse);
     }
 
     @Override
@@ -64,7 +64,7 @@ public class ReportServiceImpl implements IReportService {
         }
 
         Page<ReportEntity> reportPage = reportRepository.findByStudentStudentIdOrderByCreatedAtDesc(studentId, pageable);
-        return reportPage.map(this::mapToResponseWithImages);
+        return reportPage.map(reportMapper::toResponse);
     }
 
     @Override
@@ -126,18 +126,6 @@ public class ReportServiceImpl implements IReportService {
         }
 
 
-    }
-
-    private ReportResponse mapToResponseWithImages(ReportEntity report) {
-        ReportResponse response = reportMapper.toResponse(report);
-        response.setImages(generateImageUrls(response.getImages()));
-        return response;
-    }
-    
-    private List<String> generateImageUrls(List<String> fileNames) {
-        return fileNames.stream()
-                .map(fileName -> fileStorageService.generateImageUrl(fileName))
-                .toList();
     }
 
 }
