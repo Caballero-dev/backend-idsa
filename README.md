@@ -5,6 +5,7 @@
 [![Maven](https://img.shields.io/badge/Maven-3.10.1-blue.svg)](https://maven.apache.org/)
 [![PostgreSQL](https://img.shields.io/badge/PostgreSQL-16+-blue.svg)](https://www.postgresql.org/)
 [![Docker](https://img.shields.io/badge/Docker-28+-blue.svg)](https://www.docker.com/)
+[![Swagger](https://img.shields.io/badge/API%20Docs-Swagger-85EA2D.svg)](https://swagger.io/)
 
 ## 📋 Descripción
 
@@ -42,6 +43,23 @@ La API es responsable de:
 - **Validación de Datos:** Validación robusta con Bean Validation
 - **Manejo de Excepciones:** Sistema global de manejo de errores
 - **CORS Configurado:** Soporte para aplicaciones frontend
+- **Documentación API:** Documentación interactiva con Swagger/OpenAPI 3
+
+## 📚 Documentación de la API
+
+La API cuenta con documentación generada con **Swagger/OpenAPI 3** utilizando **Springdoc OpenAPI**. La documentación incluye todos los endpoints, modelos de datos y parámetros.
+
+### Acceso a la Documentación
+
+La interfaz de Swagger UI permite explorar y probar todos los endpoints de forma interactiva:
+
+- **Desarrollo:**
+  - http://localhost:8080/swagger-ui.html
+  - http://localhost:8080/swagger-ui/index.html
+  - http://localhost:8080/api-docs
+
+- **Producción:**
+  La documentación está **deshabilitada** en producción por seguridad.
 
 ## 🛠️ Tecnologías Utilizadas
 
@@ -53,6 +71,7 @@ La API es responsable de:
 - **Spring Integration MQTT**: Comunicación MQTT
 - **Spring Mail**: Envío de correos electrónicos
 - **Thymeleaf**: Plantillas para emails
+- **Springdoc OpenAPI**: Documentación API con Swagger
 
 ### Base de Datos
 - **PostgreSQL**
