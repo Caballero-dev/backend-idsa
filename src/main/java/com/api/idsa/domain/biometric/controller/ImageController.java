@@ -14,42 +14,58 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
 import com.api.idsa.infrastructure.fileStorage.service.IFileStorageService;
+
+import io.swagger.v3.oas.annotations.Operation;
+import io.swagger.v3.oas.annotations.Parameter;
+import io.swagger.v3.oas.annotations.tags.Tag;
+
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 
+@Tag(
+	name = "Imágenes Biométricas",
+	description = "Endpoint para la recuperación de imágenes faciales capturadas por los dispositivos IoT. Las imágenes se almacenan en el servidor y se sirven a través de este endpoint."
+)
 @RestController
 @RequestMapping("/api/image")
 public class ImageController {
 
-    @Autowired
-    IFileStorageService fileStorageService;
+	@Autowired
+	IFileStorageService fileStorageService;
 
-    @GetMapping("/{fileName:.+}")
-    public ResponseEntity<Resource> getImage(@PathVariable String fileName) {
-        try {
-            Path filePath = fileStorageService.getFilePath(fileName);
-            Resource resource = new UrlResource(filePath.toUri());
+	@Operation(
+		summary = "Obtener imagen facial por nombre de archivo",
+		description = "Retorna la imagen facial almacenada en el servidor. La imagen se sirve directamente con el tipo de contenido apropiado (JPEG, PNG, etc.)."
+	)
+	@GetMapping("/{fileName:.+}")
+	public ResponseEntity<Resource> getImage(
+		@Parameter(description = "Nombre del archivo de imagen (incluyendo extensión)", required = true, example = "image_1234567890.jpg")
+		@PathVariable String fileName
+	) {
+		try {
+			Path filePath = fileStorageService.getFilePath(fileName);
+			Resource resource = new UrlResource(filePath.toUri());
 
-            if (!resource.exists()) {
-                return ResponseEntity.notFound().build();
-            }
-            String contentType = Files.probeContentType(filePath);
-            if (contentType == null) {
-                contentType = MediaType.IMAGE_JPEG_VALUE;
-            }
+			if (!resource.exists()) {
+				return ResponseEntity.notFound().build();
+			}
+			String contentType = Files.probeContentType(filePath);
+			if (contentType == null) {
+				contentType = MediaType.IMAGE_JPEG_VALUE;
+			}
 
-            if (!contentType.startsWith("image/")) {
-                return ResponseEntity.badRequest().body(null);
-            }
+			if (!contentType.startsWith("image/")) {
+				return ResponseEntity.badRequest().body(null);
+			}
 
-            return ResponseEntity.ok()
-                    .contentType(MediaType.parseMediaType(contentType))
-                    .header(HttpHeaders.CONTENT_DISPOSITION, "inline; filename=\"" + resource.getFilename() + "\"")
-                    .body(resource);
-        
-        } catch (IOException e) {
-            return ResponseEntity.internalServerError().build();
-        }
-    }
+			return ResponseEntity.ok()
+					.contentType(MediaType.parseMediaType(contentType))
+					.header(HttpHeaders.CONTENT_DISPOSITION, "inline; filename=\"" + resource.getFilename() + "\"")
+					.body(resource);
+		
+		} catch (IOException e) {
+			return ResponseEntity.internalServerError().build();
+		}
+	}
 
 }
