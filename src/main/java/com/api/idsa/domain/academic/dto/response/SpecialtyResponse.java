@@ -1,5 +1,6 @@
 package com.api.idsa.domain.academic.dto.response;
 
+import io.swagger.v3.oas.annotations.media.Schema;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Data;
@@ -11,12 +12,16 @@ import java.util.UUID;
 @Builder
 @AllArgsConstructor
 @NoArgsConstructor
+@Schema(name = "SpecialtyResponse", description = "Respuesta con la información de una especialidad técnica")
 public class SpecialtyResponse {
 
-    private UUID specialtyId;
+	@Schema(description = "Identificador único de la especialidad", example = "550e8400-e29b-41d4-a716-446655440000")
+	private UUID specialtyId;
 
-    private String name;
+	@Schema(description = "Nombre completo de la especialidad", example = "Programación")
+	private String name;
 
-    private String shortName;
+	@Schema(description = "Nombre corto o abreviatura de la especialidad", example = "PROG")
+	private String shortName;
 
 }
