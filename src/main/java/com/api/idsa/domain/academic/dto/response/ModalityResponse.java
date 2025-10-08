@@ -1,5 +1,6 @@
 package com.api.idsa.domain.academic.dto.response;
 
+import io.swagger.v3.oas.annotations.media.Schema;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Data;
@@ -11,10 +12,13 @@ import java.util.UUID;
 @Builder
 @AllArgsConstructor
 @NoArgsConstructor
+@Schema(name = "ModalityResponse", description = "Respuesta con la información de una modalidad educativa")
 public class ModalityResponse {
 
-    private UUID modalityId;
+	@Schema(description = "Identificador único de la modalidad", example = "550e8400-e29b-41d4-a716-446655440000")
+	private UUID modalityId;
 
-    private String name;
+	@Schema(description = "Nombre de la modalidad educativa", example = "Escolarizada")
+	private String name;
 
 }
